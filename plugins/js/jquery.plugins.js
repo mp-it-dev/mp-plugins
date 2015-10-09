@@ -2020,28 +2020,85 @@ PluginDep.resetBodyScrollbar = function () {
         this.init();
     }
 
-    Gallery.prototype.init = function () {
-        var settings = this.settings;
-        var $body = $('body');
-        var html =  '<div id="Gallery" class="gallery">'+
-                        '<a class="close"></a>'+
-                        '<a class="previous"></a>'+
-                        '<a class="next"></a>'+
-                        '<div class="imgbox">'+
-                            '<img src="'+settings.imgArr[0]+'">'+
-                        '</div>'+
-                    '</div>';
-
-        PluginDep.hideBodyScrollbar();
-        $body.append(html);
-    }
-
     /**
      * [DEFAULTS 默认配置]
      */
     Gallery.DEFAULTS = {
         index       : 0,        //默认显示第一个
         clickhide   : true      //默认点击空白处隐藏
+    }
+
+    /**
+     * [init 初始化]
+     * @return {[type]} [description]
+     */
+    Gallery.prototype.init = function () {
+        var settings = this.settings;
+
+        if ($('#Gallery').length == 0) {
+            var html =  '<div id="Gallery" class="gallery">'+
+                            '<a class="gallery-close"></a>'+
+                            '<a class="gallery-prev"></a>'+
+                            '<a class="gallery-next"></a>'+
+                            '<div class="gallery-imgbox">'+
+                                '<img src="" class="gallery-img">'+
+                            '</div>'+
+                        '</div>';
+
+            this.ele = $(html).appendTo('body');
+            this.bindEvents();
+        }
+
+        this.show();
+        this.setImgSrc();
+    }
+
+    Gallery.prototype.setImgSrc = function () {
+        var imgArr = this.settings.imgArr;
+        var index = this.settings.index;
+        var $ele = this.ele;
+        var img = new Image();
+        
+        img.onload = function () {
+            var w = this.width;
+            var h = this.height;
+
+            $ele.find('.gallery-imgbox').css({
+                'margin-left': -w/2,
+                'margin-top': -h/2
+            });
+            $ele.find('.gallery-img').attr('src', this.src);
+        }
+
+        img.src = imgArr[index];
+    }
+
+    Gallery.prototype.show = function () {
+        PluginDep.hideBodyScrollbar();
+        this.ele.fadeIn();
+    }
+
+    Gallery.prototype.hide = function () {
+        PluginDep.resetBodyScrollbar();
+        this.ele.fadeOut();
+    }
+
+    Gallery.prototype.bindEvents = function () {
+        var $ele = this.ele;
+        var settings = this.settings;
+        var self = this;
+
+        $ele.on('click', '.gallery-close', function () {
+            self.hide();
+        });
+
+        $ele.on('click', '.gallery-prev', function () {
+
+        });
+
+        $ele.on('click', '.gallery-next', function () {
+
+        });
     }
 
     $.gallery = function (options) {
@@ -2063,7 +2120,7 @@ PluginDep.resetBodyScrollbar = function () {
             var $ul = $(this).parent().parent();
             var index = $(this).parent().index();
 
-            $ul.each(function(index, el) {
+            $ul.find('li').each(function(index, el) {
                 imgArr.push($(el).find('img').attr('src'));
             });
 
