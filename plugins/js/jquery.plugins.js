@@ -2047,6 +2047,8 @@ PluginDep.resetBodyScrollbar = function () {
 
             this.ele = $(html).appendTo('body');
             this.bindEvents();
+        } else {
+            this.ele = $('#Gallery');
         }
 
         this.show();
@@ -2079,8 +2081,9 @@ PluginDep.resetBodyScrollbar = function () {
     }
 
     Gallery.prototype.hide = function () {
-        PluginDep.resetBodyScrollbar();
-        this.ele.fadeOut();
+        this.ele.fadeOut(function () {
+            PluginDep.resetBodyScrollbar();
+        });
     }
 
     Gallery.prototype.bindEvents = function () {
