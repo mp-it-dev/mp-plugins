@@ -2077,11 +2077,11 @@ PluginDep.resetBodyScrollbar = function () {
 
     Gallery.prototype.show = function () {
         PluginDep.hideBodyScrollbar();
-        this.ele.fadeIn();
+        this.ele.fadeIn(200);
     }
 
     Gallery.prototype.hide = function () {
-        this.ele.fadeOut(function () {
+        this.ele.fadeOut(200, function () {
             PluginDep.resetBodyScrollbar();
         });
     }

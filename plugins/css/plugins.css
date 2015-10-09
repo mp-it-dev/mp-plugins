@@ -584,8 +584,8 @@
     display: none;
     width: 100%;
     height: 100%;
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#AA000000, endColorstr=#AA000000)";
-    background: rgba(0, 0, 0, 0.7);
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#88000000, endColorstr=#88000000)";
+    background: rgba(0, 0, 0, 0.5);
 }
 @media all and (min-width:0) {
     .gallery {
@@ -630,7 +630,7 @@
 .gallery-close:hover,
 .gallery-prev:hover,
 .gallery-next:hover {
-    background-color: #eee;
+    background-color: #ddd;
 }
 .gallery-imgbox {
     position: absolute;
