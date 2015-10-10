@@ -47,6 +47,7 @@
                 maxWidth        : 0,            //内容最大宽度
                 layerType       : '',           //弹出框类型
                 bodyScroll      : false,        //设置body是否需要被设置overflow: hidden;
+                imgPath         : './img/',     //图片路径
 
                 /**
                  * 弹出框分为：头部区域(header)、内容区域(content)和底部区域(footer)三部分组成
@@ -290,7 +291,7 @@
 
             //生成头部区域HTML
             var headerHTML  =   '<div class="layer-box-header">'+
-                                    '<h3 class="layer-header-title">'+settings.header+'</h3>'+
+                                    '<h4 class="layer-header-title">'+settings.header+'</h4>'+
                                     '<div class="layer-drag">&nbsp;</div>'+
                                     (settings.closeBtn ? '<div id="layer-cancel" class="layer-cancel" title="关闭" unselectable="on" onselectstart="return false;">×</div>' : '')+
                                 '</div>';
@@ -334,7 +335,7 @@
                 if (c.icon) {
                     html =  '<div class="layer-table">' +
                                 '<div class="layer-table-cell">' +
-                                    '<span class="layer-box-icon" style="background-image: url('+c.icon+');"></span>' +       
+                                    '<span class="layer-box-icon" style="background-image: url('+settings.imgPath + c.icon+');"></span>' +       
                                 '</div>' +
                                 '<div class="layer-table-cell">' +
                                     '<span class="layer-box-text">' + html + '</span>' +       
@@ -519,11 +520,10 @@
             layerData.stack.push(layerID)
             layerUtil.sortByZIndex.call(tlayer);
 
+            if (!settings.bodyScroll) {
+                layerUtil.hideBodyScrollBar(layerID);
+            }
             $layer[animation](duration, function () {
-                if (!settings.bodyScroll) {
-                    layerUtil.hideBodyScrollBar(layerID);
-                }
-
                 if (util.isFunction(fn)) {
                     fn.call($layer[0], layerID);
                 }
@@ -1005,7 +1005,7 @@
                 maxWidth        : 300,              //最大宽度
 
                 content: {
-                    icon        : "img/layer-icon.png",
+                    icon        : "layer-icon.png",
                     html        : ""
                 },
 
@@ -1065,7 +1065,7 @@
 
                 header          : false,            //提示框框不允许出现底部
                 content: {
-                    icon        : "img/layer-tips.png",
+                    icon        : "layer-tips.png",
                     html        : message
                 },
                 footer          : false,            //提示框框不允许出现头部
@@ -1129,7 +1129,7 @@
                 maxWidth        : 300,          //最大宽度
 
                 content: {
-                    icon        : "img/layer-loading.gif",
+                    icon        : "layer-loading.gif",
                     html        : ""
                 }
             }, options || {}, {

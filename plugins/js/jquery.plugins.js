@@ -2025,7 +2025,8 @@ PluginDep.resetBodyScrollbar = function () {
      */
     Gallery.DEFAULTS = {
         index       : 0,        //默认显示第一个
-        clickhide   : true      //默认点击空白处隐藏
+        clickhide   : true,     //默认点击空白处隐藏
+        animation   : 'fade'    //默认动画类型为fade
     }
 
     /**
@@ -2036,58 +2037,83 @@ PluginDep.resetBodyScrollbar = function () {
         var settings = this.settings;
 
         if ($('#Gallery').length == 0) {
-            var html =  '<div id="Gallery" class="gallery">'+
+            var html =  '<div id="Gallery" class="gallery '+settings.animation+'">'+
                             '<a class="gallery-close"></a>'+
                             '<a class="gallery-prev"></a>'+
                             '<a class="gallery-next"></a>'+
                             '<div class="gallery-imgbox">'+
-                                '<img src="" class="gallery-img">'+
+                                '<img src="" class="gallery-img" />'+
                             '</div>'+
+                            '<div class="gallery-screen"></div>'+
                         '</div>';
 
             this.ele = $(html).appendTo('body');
-            this.bindEvents();
         } else {
             this.ele = $('#Gallery');
         }
 
         this.show();
         this.setImgSrc();
+        this.bindEvents();
     }
 
     Gallery.prototype.setImgSrc = function () {
         var imgArr = this.settings.imgArr;
         var index = this.settings.index;
         var $ele = this.ele;
+        var $img = $ele.find('.gallery-img');
         var img = new Image();
         
+        $img.attr('src', './img/ajaxloading.gif');
+
         img.onload = function () {
             var w = this.width;
             var h = this.height;
 
             $ele.find('.gallery-imgbox').css({
+                'width': w,
+                'height': h,
+                'line-height': h + 'px',
                 'margin-left': -w/2,
                 'margin-top': -h/2
             });
-            $ele.find('.gallery-img').attr('src', this.src);
+            $img.attr('src', this.src);
         }
 
         img.src = imgArr[index];
     }
 
+    /**
+     * [show 关闭查看器]
+     * @return {[type]} [description]
+     */
     Gallery.prototype.show = function () {
         PluginDep.hideBodyScrollbar();
-        this.ele.fadeIn(200);
+        this.ele.show();
+        this.ele[0].offsetWidth;        //force reflow，否则动画无效
+        this.ele.addClass('in');
     }
 
+    /**
+     * [hide 显示查看器]
+     * @return {[type]} [description]
+     */
     Gallery.prototype.hide = function () {
-        this.ele.fadeOut(200, function () {
+        var self = this;
+
+        this.ele.removeClass('in');
+        setTimeout(function () {
+            self.ele.hide();
             PluginDep.resetBodyScrollbar();
-        });
+        }, 150);
     }
 
+    /**
+     * [bindEvents 绑定事件]
+     * @return {[type]} [description]
+     */
     Gallery.prototype.bindEvents = function () {
-        var $ele = this.ele;
+        var $ele = this.ele.off();
         var settings = this.settings;
         var self = this;
 
@@ -2095,12 +2121,31 @@ PluginDep.resetBodyScrollbar = function () {
             self.hide();
         });
 
-        $ele.on('click', '.gallery-prev', function () {
+        //点击空白处是否关闭查看器
+        if (settings.clickhide) {
+            $ele.on('click', '.gallery-screen', function () {
+                self.hide();
+            });
+        }
 
+        $ele.on('click', '.gallery-prev', function () {
+            settings.index--;
+
+            if (settings.index < 0) {
+                settings.index = settings.imgArr.length - 1;
+            }
+
+            self.setImgSrc();
         });
 
         $ele.on('click', '.gallery-next', function () {
+            settings.index++;
 
+            if (settings.index == settings.imgArr.length) {
+                settings.index = 0;
+            }
+
+            self.setImgSrc();
         });
     }
 

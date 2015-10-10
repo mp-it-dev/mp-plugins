@@ -80,7 +80,8 @@
 .layer-box-header {
     display: table;
     width: 100%;
-    padding: 0 15px;
+    height: 30px;
+    padding-left: 15px;
     border-bottom: 1px solid #eee;
 }
 
@@ -102,7 +103,7 @@
 .layer-header-title {
     display: table-cell;
     width: 100px;
-    padding: 10px 0;
+    padding: 5px 0;
     overflow: visible;
     white-space: nowrap;
     vertical-align: middle;
