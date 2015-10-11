@@ -43,12 +43,12 @@
 }
 
 .layer-box-container.blue {
-    border: 2px solid #2F6FAC;
+    border-color: #2F6FAC;
     box-shadow: #2F6FAC 0px 0px 5px;
 }
 
 .layer-box-container.black {
-    border: 2px solid #2a2a2a;
+    border-color: #2a2a2a;
     box-shadow: rgb(42, 42, 42) 0px 0px 5px;
 }
 /* layer公用类 结束 */
