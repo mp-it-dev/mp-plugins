@@ -1,10 +1,4 @@
 /* layer公用类 开始 */
-
-.layer-box-wraper * {
-    -ms-box-sizing: border-box;
-    box-sizing: border-box;
-}
-
 .layer-box-wraper {
     display: none;
     position: fixed;
@@ -12,6 +6,11 @@
     left: 0;
     width: 100%;
     height: 100%;
+}
+
+.layer-box-wraper * {
+    -ms-box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 .layer-box-mask {
@@ -30,25 +29,6 @@
     height: 100%;
     overflow: auto;
 }
-
-.layer-box-block-buttons {
-    margin-top: 3px;
-    overflow: hidden;
-    zoom: 1;
-}
-
-.layer-button {
-    cursor: pointer;
-    text-align: center;
-    font-weight: bold;
-    float: left;
-    background-position: center center;
-    background-repeat: no-repeat;
-}
-
-/* layer公用类 结束 */
-
-/* header 开始 */
 
 .layer-box-container {
     position: absolute;
@@ -71,16 +51,13 @@
     border: 2px solid #2a2a2a;
     box-shadow: rgb(42, 42, 42) 0px 0px 5px;
 }
+/* layer公用类 结束 */
 
-.layer-type-tips {
-    border: 1px solid #f0ea51;
-    background-color: #fdfded;
-}
-
+/* header 开始 */
 .layer-box-header {
     display: table;
     width: 100%;
-    height: 30px;
+    height: 40px;
     padding-left: 15px;
     border-bottom: 1px solid #eee;
 }
@@ -117,7 +94,7 @@
 .layer-cancel {
     display: table-cell;
     width: 30px;
-    line-height: 1;
+    padding-right: 10px;
     font-size: 24px;
     text-align: center;
     vertical-align: middle;
@@ -146,18 +123,16 @@
 .layer-box-container.black .layer-cancel:hover {
     color: #f00;
 }
-
 /* header 结束 */
 
 /* content 开始 */
-
-.layer-box-content-wraper {
-    position: relative;
-    background-color: #fff;
-    padding: 15px;
+.layer-box-content {
+    width: 100%;
 }
 
-.layer-box-content {
+.layer-box-iframe {
+    border: 0;
+    width: 100%;
     height: 100%;
 }
 
@@ -177,50 +152,18 @@
     font-size: 0;
 }
 
-.layer-box-content strong {
-    font-size: 12px;
-    color: red;
-}
-
 .layer-box-icon {
     display: inline-block;
     width: 40px;
     height: 40px;
     background-position: center;
     background-repeat: no-repeat;
-    margin-right: 10px;
 }
 
-.layer-box-text {
-    font-size: 14px;
+.layer-type-tips .layer-box-icon {
+    margin-right: 15px;
 }
-
-.layer-box-html {
-    display: inline-block;
-    *display: inline;
-    zoom: 1;
-    text-align: left;
-    background: no-repeat 0px 1px;
-    line-height: 20px;
-}
-
-iframe.layer-box-content {
-    border: none;
-    width: 100%;
-    height: 100%;
-    float: left;
-}
-
-/* loading->content 开始 */
-
-.layer-loading-box .layer-box-html {
-    background-position: 0px 3px;
-}
-
-/* loading->content 结束 */
-
 /* content 结束 */
-
 
 /* footer 开始 */
 .layer-box-footer {
@@ -560,16 +503,4 @@ iframe.layer-box-content {
     color: #ffffff;
     background-color: #222222;
 }
-
-/* confirm->footer 开始 */
-.layer-confirm-box .layer-button {
-    border-left: 1px solid #DCDCDC;
-}
-
-.layer-confirm-box .layer-button.first-child {
-    border-left: none;
-}
-
-/* confirm->footer 结束 */
-
 /* footer 结束 */

@@ -41,7 +41,7 @@
                 context         : document,     //上下文对象，弹出框将被追加到哪个上下文中，默认当前文档
                 onEsc           : false,        //当弹出框触发Esc按钮时执行的回调函数
                 auto            : true,         //默认自动显示，否则使用$.tlayer("show", layerID);
-                theme           : '',           //主题，目前提供default，blue, black三种
+                theme           : 'default',    //主题，目前提供default，blue, black三种
                 width           : 0,            //内容宽度，不包括头部和底部
                 height          : 0,            //内容高度，不包括头部和底部
                 maxWidth        : 0,            //内容最大宽度
@@ -58,14 +58,10 @@
 
                 content         : {             //弹出框内容区域的设置  
                     //当src和html属性同时存在，优先级依次降低
-                   
-                    src         : false,        //如果内容区域是通过绝对或相对路径来显示内容，
-                                                //那么将会使用iframe来显示
-                    frameID     : "",           // 设置iframe的id属性值
-                    frameName   : "",           // 设置iframe的name属性值
-
+                    src         : false,        //如果内容区域是通过绝对或相对路径来显示内容，那么将会使用iframe来显示
                     html        : false,        //一段文字或一段html代码
-                    icon        : false         //文字或html代码前带的icon图标
+                    icon        : false,        //文字或html代码前带的icon图标
+                    padding     : ''
                 },        
 
                 footer          : false,         //弹出框的底部参数设置。值为false时表示弹出框无底部
@@ -76,7 +72,7 @@
                  *     {
                  *         text         : false,    //按钮文字
                  *         buttonID     : false,    //按钮的id，可用于用户自定义设置按钮的样式
-                 *         style        : 'layer-btn-default',       //按钮样式
+                 *         style        : 'default',       //按钮样式
                  *         callback     : false,    //按钮点击时执行的操作
                  *     }
                  * ]
@@ -108,6 +104,10 @@
         close: function (layerID, fn) {
             var stack = _tlayer.layerData.stack;
             layerID = layerID || stack.pop();
+
+            if (typeof layerID != 'string') {
+                layerID = $(layerID).attr('id');
+            }
 
             layerUtil.hideLayer(layerID, function () {
 
@@ -210,10 +210,17 @@
                 content = layerUtil.content.call(this, layerID);
                 footer  = layerUtil.footer.call(this, layerID);
 
+            var s = [];
+
+            //设置样式
+            settings.width && s.push("width: "+settings.width+"px");
+            settings.maxWidth && s.push("max-width: "+settings.maxWidth+"px");
+            settings.height && s.push("height: "+settings.height+"px");
+
             //组合弹出框HTML代码
             var layer = mask +
                         '<div class="layer-dialog">'+
-                            '<div class="layer-box-container '+settings.theme+' layer-type-'+settings.layerType+'">'+
+                            '<div class="layer-box-container '+settings.theme+' layer-type-'+settings.layerType+'" style="'+s.join(';')+'">'+
                                 header+content+footer+
                             '</div>' +
                         '</div>';
@@ -221,6 +228,14 @@
             $layer.append(layer);
 
             setTimeout(function () {
+                var w = $layer.find(".layer-box-container").innerWidth();
+                var h = $layer.find(".layer-box-container").innerHeight();
+
+                $layer.find(".layer-box-content").css({
+                    width: w,
+                    height: h - $layer.find(".layer-box-header").outerHeight() - $layer.find(".layer-box-footer").outerHeight()
+                });
+
                 layerUtil.centerLayer($layer.find(".layer-box-container"), settings);
                 layerUtil.drag($layer.find(".layer-drag"), $layer.find(".layer-box-container"));
             }, 0);
@@ -312,22 +327,16 @@
 
             var cStyle = [];
 
-            //设置宽度
-            settings.width && cStyle.push("width: "+settings.width+"px");
-            //设置高度
-            settings.height && cStyle.push("height: "+settings.height+"px");
-            //设置最大宽度
-            settings.maxWidth && cStyle.push('max-width: '+settings.maxWidth+'px');
             //设置padding
             c.padding && cStyle.push("padding: " + c.padding);
 
             cStyle = ' style="'+cStyle.join(";")+'"';
 
-            var contentHTML = '<div class="layer-box-content-wraper"' + cStyle + '>';
+            var contentHTML = '<div class="layer-box-content"' + cStyle + '>';
 
             if (c.src) {
                 //内容区域是通过一个外链来获取的，则使用iframe
-                contentHTML += '<iframe class="layer-box-content layer-box-iframe" src="'+c.src+'" id="'+c.frameID+'" name="'+c.frameName+'" width="100%" height="100%" frameborder="0"></iframe>';
+                contentHTML += '<iframe class="layer-box-iframe" src="'+c.src+'"></iframe>';
             } else {
                 //内容区域是一段html字符串
                 var html = c.html || "&nbsp;";
@@ -343,7 +352,7 @@
                             '</div>';
                 }
 
-                contentHTML += '<div class="layer-box-content">'+html+'</div>';
+                contentHTML += html;
             }
 
             contentHTML += '</div>';
@@ -872,7 +881,6 @@
          * @return {String}         layer弹出框的id
          */
         alert: function (options) {
-
             if (util.typeOf(options) == "string") {
                 options = {
                     content     : {
@@ -885,12 +893,16 @@
             var settings = $.extend(true, {
                 layerType       : 'alert',          //弹出框类型
                 closeBtn        : true,
-                width           : 560,
+                width           : 600,
 
                 header          : '警告',           //alert弹出框不允许出现头部
+                content         : {
+                    padding     : '15px',
+                },
                 footer: [{
                     text  : "确定",
-                    buttonID    : "sure"
+                    buttonID    : "sure",
+                    style       : 'danger',
                 }]
             }, options || {});
 
@@ -926,7 +938,6 @@
          * @return {String}         layer弹出框的id
          */
         confirm: function (options, callback) {
-
             if (util.typeOf(options) == "string") {
                 options = {
                     content     : {
@@ -938,25 +949,29 @@
             //开启深度拷贝
             var settings = $.extend(true, {
                 layerType       : 'confirm',
-                width           : 560,
+                width           : 600,
 
+                header          : '提示',
                 content         : {
-                    html        : ""
+                    html        : "",
+                    padding     : '15px'
                 },
                 footer          : [{
                     text        : "确定",
                     buttonID    : "yes",
-                    callback    : callback
+                    style       : 'primary',
+                    callback    : function () {
+                        var r = callback();
+
+                        if (typeof r == 'undefined' || r) {
+                            methods.close(this);
+                        }
+                    }
                 }, {
                     text        : "取消",
                     buttonID    : "no"
                 }]
             }, options || {});
-
-            var buttons = settings.footer.buttons;
-
-            //confirm弹出框底部只允许两个按钮出现
-            settings.footer.buttons = [settings.footer.buttons[0], settings.footer.buttons[1]];
 
             var tlayer      = _tlayer,
                 layers      = tlayer.layerData.layers;
@@ -1002,11 +1017,13 @@
             var settings = $.extend(true, {
                 delay           : 1000,             //msg弹出框特有的延时消失时间，单位ms
                 layerType       : 'msg',            //弹出框类型
+                height          : 70,               //高度
                 maxWidth        : 300,              //最大宽度
 
                 content: {
                     icon        : "layer-icon.png",
-                    html        : ""
+                    html        : "",
+                    padding     : '0 15px',
                 },
 
                 onClose         : fn || false       //关闭msg弹出框特有的回调函数
@@ -1060,13 +1077,15 @@
                 delay           : 1500,             //提示框框特有的延时消失时间，单位ms
                 showMask        : false,            //不显示阴影层
                 layerType       : 'tips',           //弹出框类型
+                height          : 70,
                 maxWidth        : 300,              //最大宽度
                 bodyScroll      : true,             //不设置body的overflow: hidden;
 
                 header          : false,            //提示框框不允许出现底部
                 content: {
                     icon        : "layer-tips.png",
-                    html        : message
+                    html        : message,
+                    padding     : '0 15px',
                 },
                 footer          : false,            //提示框框不允许出现头部
 
@@ -1126,11 +1145,13 @@
             //开启深度拷贝
             var settings = $.extend(true, {
                 layerType       : 'loading',
+                height          : 70,
                 maxWidth        : 300,          //最大宽度
 
                 content: {
                     icon        : "layer-loading.gif",
-                    html        : ""
+                    html        : "",
+                    padding     : '0 15px'
                 }
             }, options || {}, {
                 header          : false,        //不允许出现头部
@@ -1169,12 +1190,15 @@
          * @return {String}         layer弹出框的id
          */
         content: function (options) {
-
             if (options && util.typeOf(options) == "object") {
                 //开启深度拷贝
                 var settings = $.extend(true, {
                     layerType       : 'conent',
-                    closeBtn        : true
+                    closeBtn        : true,
+                    width           : 600,
+                    content         : {
+                        padding     : '15px'
+                    }
                 }, options || {});
 
                 var tlayer      = _tlayer,

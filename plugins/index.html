@@ -84,7 +84,7 @@
 					<button type="button" class="btn btn-success" id="tips">按钮3</button>
 					<button type="button" class="btn btn-info" id="loading">按钮4</button>
 					<button type="button" class="btn btn-warning" id="content">按钮5</button>
-					<button type="button" class="btn btn-danger">按钮6</button>
+					<button type="button" class="btn btn-danger" id="confirm">按钮6</button>
 					<button type="button" class="btn btn-inverse">按钮7</button>
 				</div>
 			</div>
@@ -265,6 +265,12 @@
 			content: {
 				html: '这是一个content弹出框'
 			}
+		});
+	});
+
+	$('#confirm').click(function () {
+		$.confirm('您确定要做。。。吗？', function () {
+			alert(1);
 		});
 	});
 
