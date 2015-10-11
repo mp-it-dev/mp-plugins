@@ -43,8 +43,8 @@
 }
 
 .layer-box-container.blue {
-    border-color: #2F6FAC;
-    box-shadow: #2F6FAC 0px 0px 5px;
+    border-color: #337ab7;
+    box-shadow: #337ab7 0px 0px 5px;
 }
 
 .layer-box-container.black {
@@ -69,7 +69,7 @@
 
 .layer-box-container.blue .layer-box-header {
     color: #fff;
-    background-color: #2F6FAC;
+    background-color: #337ab7;
 }
 
 .layer-box-container.black .layer-box-header {
