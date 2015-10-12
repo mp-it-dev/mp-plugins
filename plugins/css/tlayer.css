@@ -81,6 +81,7 @@
     display: table-cell;
     width: 100px;
     padding: 5px 0;
+    font-weight: bold;
     overflow: visible;
     white-space: nowrap;
     vertical-align: middle;
