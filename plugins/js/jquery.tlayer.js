@@ -210,12 +210,26 @@
                 content = layerUtil.content.call(this, layerID);
                 footer  = layerUtil.footer.call(this, layerID);
 
+            //设置样式
             var s = [];
 
-            //设置样式
-            settings.width && s.push("width: "+settings.width+"px");
+            if (settings.width) {
+                if (typeof settings.width == 'string') {
+                    s.push("width: "+settings.width);
+                } else {
+                    s.push("width: "+settings.width+"px");
+                }
+            }
+
+            if (settings.height) {
+                if (typeof settings.height == 'string') {
+                    s.push("height: "+settings.height);
+                } else {
+                    s.push("height: "+settings.height+"px");
+                }
+            }
+            
             settings.maxWidth && s.push("max-width: "+settings.maxWidth+"px");
-            settings.height && s.push("height: "+settings.height+"px");
 
             //组合弹出框HTML代码
             var layer = mask +
@@ -574,8 +588,9 @@
                 if (util.isFunction(fn)) {
                     fn.call($layer.get(0), layerID);
                 }
-
             });
+
+            $(document).off('mousemove.layer_drag, mouseup.layer_drag');
         },
         /**
          * 为header和footer的buttons的callback重写具有隐藏弹出框功能
@@ -647,6 +662,8 @@
             */
             var dragging = false;
             var iX, iY;
+            var w = $moveTarget.outerWidth();
+            var h = $moveTarget.outerHeight();
 
             $dragTarget.mousedown(function (e) {
                 dragging = true;
@@ -658,7 +675,7 @@
                 return false;
             });
 
-            $(document).off('mousemove.layer_drag').on('mousemove.layer_drag', function (e) {
+            $(document).on('mousemove.layer_drag', function (e) {
                 if (dragging) {
                     var oX = e.clientX - iX;
                     var oY = e.clientY - iY;
@@ -666,17 +683,23 @@
                     if (oX < 0) oX = 0;
                     if (oY < 0) oY = 0;
 
+                    if (oX + w > $(window).width()) {
+                        oX = $(window).width() - w;
+                    }
+                    if (oY + h > $(window).height()) {
+                        oY = $(window).height() - h;
+                    }
+
                     $moveTarget.css({"left": oX + "px", "top": oY + "px"});
 
                     return false;
                 }
             });
 
-            $(document).off('mouseup.layer_drag').on('mouseup.layer_drag', function(e) {
+            $(document).on('mouseup.layer_drag', function(e) {
                 dragging = false;
-                e.cancelBubble = true;
-
                 $dragTarget[0].releaseCapture && $dragTarget[0].releaseCapture();   //结束拖放释放鼠标
+                return false;
             });
         },
 
@@ -688,11 +711,11 @@
         centerLayer: function ($container, settings) {
             var height = $(window).height();
             var width = $(window).width();
-            var mheight = $container.height();
-            var mwidth = $container.width();
+            var cheight = $container.outerHeight();
+            var cwidth = $container.outerWidth();
 
-            var t = (height - mheight) / 2 < 0 ? 0 : (height - mheight) / 2;
-            var l = (width - mwidth) / 2 < 0 ? 0 : (width - mwidth) / 2;
+            var t = (height - cheight) / 2 < 0 ? 0 : (height - cheight) / 2;
+            var l = (width - cwidth) / 2 < 0 ? 0 : (width - cwidth) / 2;
 
             $container.css({
                 "top": t + "px",
