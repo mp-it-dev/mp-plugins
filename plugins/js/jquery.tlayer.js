@@ -105,8 +105,11 @@
             var stack = _tlayer.layerData.stack;
             layerID = layerID || stack.pop();
 
-            if (typeof layerID != 'string') {
+            if (typeof layerID == 'object') {       //DOM或jquery对象
                 layerID = $(layerID).attr('id');
+            } else if (typeof layerID === 'function') {
+                fn = layerID;
+                layerID = stack.pop();
             }
 
             layerUtil.hideLayer(layerID, function () {
