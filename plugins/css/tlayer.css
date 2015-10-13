@@ -129,6 +129,7 @@
 /* content 开始 */
 .layer-box-content {
     width: 100%;
+    overflow: auto;
 }
 
 .layer-box-iframe {

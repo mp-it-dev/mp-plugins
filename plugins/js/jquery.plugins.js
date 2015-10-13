@@ -1202,8 +1202,6 @@ PluginDep.resetBodyScrollbar = function () {
  * 需要引入 plugin.css
  */
 (function($, window, undefined) {
-    'use strict';
-
     var pName = 'select';
     var namespace = 'ui.' + pName;
 
@@ -1971,8 +1969,6 @@ PluginDep.resetBodyScrollbar = function () {
  * 需要引入 plugin.css
  */
 ;(function ($) {
-    'use strict';
-
     var namespace = 'reg';
 
     //失去焦点时触发验证事件
@@ -2000,8 +1996,6 @@ PluginDep.resetBodyScrollbar = function () {
  * 需要引入 plugin.css
  */
 ;(function ($) {
-    'use strict';
-
     var pName = 'gallery';
     var namespace = 'ui.' + pName;
 
@@ -2010,7 +2004,7 @@ PluginDep.resetBodyScrollbar = function () {
      */
     var Gallery = function (options) {
         if (typeof options === 'object') {
-            this.settings = options;
+            this.settings = $.extend(true, {}, Gallery.DEFAULTS, options);
         } else if ($.isArray(options)) {
             this.settings = $.extend(true, {}, Gallery.DEFAULTS, {imgArr: options});
         } else {
@@ -2026,7 +2020,8 @@ PluginDep.resetBodyScrollbar = function () {
     Gallery.DEFAULTS = {
         index       : 0,        //默认显示第一个
         clickhide   : true,     //默认点击空白处隐藏
-        animation   : 'fade'    //默认动画类型为fade
+        animation   : 'fade',   //默认动画类型为fade
+        zoomScale   : 1.25      //放大缩小倍数
     }
 
     /**
@@ -2035,52 +2030,93 @@ PluginDep.resetBodyScrollbar = function () {
      */
     Gallery.prototype.init = function () {
         var settings = this.settings;
+        this.scale = 100;
+        this.rotate = 0;
 
         if ($('#Gallery').length == 0) {
             var html =  '<div id="Gallery" class="gallery '+settings.animation+'">'+
+                            '<div class="gallery-screen"></div>'+
                             '<a class="gallery-close"></a>'+
                             '<a class="gallery-prev"></a>'+
                             '<a class="gallery-next"></a>'+
                             '<div class="gallery-imgbox">'+
                                 '<img src="" class="gallery-img" />'+
                             '</div>'+
-                            '<div class="gallery-screen"></div>'+
-                        '</div>';
+                            '<div class="gallery-toolbar">'+
+                                '<div class="gallery-toolbar-mask"></div>'+
+                                '<span class="gallery-bar-btn">'+
+                                    '<a class="gallery-icon gallery-zoomin" title="放大"><i></i></a>'+
+                                    '<label class="gallery-zoomScale"></label>'+
+                                    '<a class="gallery-icon gallery-zoomout" title="缩小"><i></i></a>'+
+                                '</span>'+
+                                '<span class="gallery-bar-btn">'+
+                                    '<a class="gallery-icon gallery-origin" title="原始尺寸"><i></i></a>'+
+                                '</span>';
 
+            if (!PluginDep.browser.msie || parseInt(PluginDep.browser.version) > 8) {
+                html +=         '<span class="gallery-bar-btn">'+
+                                    '<a class="gallery-icon gallery-rotate" title="旋转"><i></i></a>'+
+                                '</span>';
+            }
+
+            html +=         '</div>'+ 
+                        '</div>';
+            
             this.ele = $(html).appendTo('body');
         } else {
             this.ele = $('#Gallery');
         }
 
+        var self = this;
+        setTimeout(function () {
+            //设置行高
+            var $imgbox = self.ele.find('.gallery-imgbox');
+            $imgbox.css('line-height', $imgbox.height() + 'px');
+        });
+
         this.show();
         this.setImgSrc();
         this.bindEvents();
+        this.cacheImg();
     }
 
+    /**
+     * [setImgSrc 设置图片]
+     */
     Gallery.prototype.setImgSrc = function () {
         var imgArr = this.settings.imgArr;
         var index = this.settings.index;
         var $ele = this.ele;
         var $img = $ele.find('.gallery-img');
         var img = new Image();
-        
+
+        this.scale = 100;
+        this.roteate = 0;
+        this.rotateImg();
+        $ele.find('.gallery-zoomScale').text(this.scale + '%');
         $img.attr('src', './img/ajaxloading.gif');
 
         img.onload = function () {
-            var w = this.width;
-            var h = this.height;
-
-            $ele.find('.gallery-imgbox').css({
-                'width': w,
-                'height': h,
-                'line-height': h + 'px',
-                'margin-left': -w/2,
-                'margin-top': -h/2
-            });
             $img.attr('src', this.src);
+            $img.attr('width', this.width);
+            $img.attr('height', this.height);
+            $img.data('origin-width', this.width);
+            $img.data('origin-height', this.height);
         }
 
         img.src = imgArr[index];
+    }
+
+    /**
+     * [cacheImg 缓存图片]
+     * @return {[type]} [description]
+     */
+    Gallery.prototype.cacheImg = function () {
+        var imgArr = this.settings.imgArr;
+
+        for (var i in imgArr) {
+            new Image().src = imgArr[i];
+        }
     }
 
     /**
@@ -2109,6 +2145,34 @@ PluginDep.resetBodyScrollbar = function () {
     }
 
     /**
+     * [setImgSize 设置图片尺寸]
+     */
+    Gallery.prototype.setImgSize = function () {
+        var $ele = this.ele;
+        var $img = $ele.find('.gallery-img');
+        var $label = $ele.find('.gallery-zoomScale');
+        var w = $img.data('origin-width');
+        var h = $img.attr('origin-height');
+
+        $label.text(this.scale + '%');
+        $img.attr('width', w * this.scale / 100);
+        $img.attr('height', h * this.scale / 100);
+    }
+
+    /**
+     * [rotateImg 旋转图片]
+     * @return {[type]} [description]
+     */
+    Gallery.prototype.rotateImg = function () {
+        var $img = this.ele.find('.gallery-img');
+        var transform = ['webkitTransform', 'mozTransform', 'msTransform', 'transform'];
+
+        for (var i in transform) {
+            $img.css(transform[i], 'rotate(' + this.rotate + 'deg)');
+        }
+    }
+
+    /**
      * [bindEvents 绑定事件]
      * @return {[type]} [description]
      */
@@ -2117,6 +2181,7 @@ PluginDep.resetBodyScrollbar = function () {
         var settings = this.settings;
         var self = this;
 
+        //关闭查看器
         $ele.on('click', '.gallery-close', function () {
             self.hide();
         });
@@ -2128,6 +2193,7 @@ PluginDep.resetBodyScrollbar = function () {
             });
         }
 
+        //上一张图片
         $ele.on('click', '.gallery-prev', function () {
             settings.index--;
 
@@ -2138,6 +2204,7 @@ PluginDep.resetBodyScrollbar = function () {
             self.setImgSrc();
         });
 
+        //下一张图片
         $ele.on('click', '.gallery-next', function () {
             settings.index++;
 
@@ -2147,18 +2214,31 @@ PluginDep.resetBodyScrollbar = function () {
 
             self.setImgSrc();
         });
+
+        //图片尺寸调整事件
+        $ele.on('click', '.gallery-zoomin, .gallery-zoomout, .gallery-origin', function () {
+            var zoomScale = settings.zoomScale;
+
+            if ($(this).hasClass('gallery-zoomin')) {     //放大
+                self.scale = Math.round(self.scale*zoomScale);
+            } else if ($(this).hasClass('gallery-zoomout')) {   //缩小
+                self.scale = Math.round(self.scale/zoomScale);
+            } else {    //原始尺寸
+                self.scale = 100;
+            }
+
+            self.setImgSize();
+        });
+
+        //旋转图片
+        $ele.on('click', '.gallery-rotate', function () {
+            self.rotate = (self.rotate + 90) % 360;
+            self.rotateImg();
+        });
     }
 
     $.gallery = function (options) {
         return new Gallery(options);
-    }
-
-    function runFunction (fn, args) {
-        if (typeof fn !== 'function') {
-            throw new Error(fn + ' is not a function in $().gallery');
-        }
-
-        fn(args);
     }
 
     // Gallery DATA-API
@@ -2169,7 +2249,7 @@ PluginDep.resetBodyScrollbar = function () {
             var index = $(this).parent().index();
 
             $ul.find('li').each(function(index, el) {
-                imgArr.push($(el).find('img').attr('src'));
+                imgArr.push($(el).find('img').attr('data-origin-src') || $(el).find('img').attr('src'));
             });
 
             var options = $.extend(true, {}, Gallery.DEFAULTS, {
