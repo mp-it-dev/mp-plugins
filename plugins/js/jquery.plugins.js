@@ -2006,7 +2006,7 @@ PluginDep.resetBodyScrollbar = function () {
         if (typeof options === 'object') {
             this.settings = $.extend(true, {}, Gallery.DEFAULTS, options);
         } else if ($.isArray(options)) {
-            this.settings = $.extend(true, {}, Gallery.DEFAULTS, {imgArr: options});
+            this.settings = $.extend(true, {}, Gallery.DEFAULTS, {data: options});
         } else {
             $.error('参数不正确！');
         }
@@ -2018,6 +2018,7 @@ PluginDep.resetBodyScrollbar = function () {
      * [DEFAULTS 默认配置]
      */
     Gallery.DEFAULTS = {
+        data        : [],       //数据
         index       : 0,        //默认显示第一个
         clickhide   : true,     //默认点击空白处隐藏
         animation   : 'fade',   //默认动画类型为fade
@@ -2084,7 +2085,7 @@ PluginDep.resetBodyScrollbar = function () {
      * [setImgSrc 设置图片]
      */
     Gallery.prototype.setImgSrc = function () {
-        var imgArr = this.settings.imgArr;
+        var data = this.settings.data;
         var index = this.settings.index;
         var $ele = this.ele;
         var $img = $ele.find('.gallery-img');
@@ -2104,7 +2105,7 @@ PluginDep.resetBodyScrollbar = function () {
             $img.data('origin-height', this.height);
         }
 
-        img.src = imgArr[index];
+        img.src = data[index];
     }
 
     /**
@@ -2112,10 +2113,10 @@ PluginDep.resetBodyScrollbar = function () {
      * @return {[type]} [description]
      */
     Gallery.prototype.cacheImg = function () {
-        var imgArr = this.settings.imgArr;
+        var data = this.settings.data;
 
-        for (var i in imgArr) {
-            new Image().src = imgArr[i];
+        for (var i in data) {
+            new Image().src = data[i];
         }
     }
 
@@ -2198,7 +2199,7 @@ PluginDep.resetBodyScrollbar = function () {
             settings.index--;
 
             if (settings.index < 0) {
-                settings.index = settings.imgArr.length - 1;
+                settings.index = settings.data.length - 1;
             }
 
             self.setImgSrc();
@@ -2208,7 +2209,7 @@ PluginDep.resetBodyScrollbar = function () {
         $ele.on('click', '.gallery-next', function () {
             settings.index++;
 
-            if (settings.index == settings.imgArr.length) {
+            if (settings.index == settings.data.length) {
                 settings.index = 0;
             }
 
@@ -2244,16 +2245,16 @@ PluginDep.resetBodyScrollbar = function () {
     // Gallery DATA-API
     $(document).ready(function () {
         $('[data-uitype="'+pName+'"] li a').click(function () {
-            var imgArr = [];
+            var data = [];
             var $ul = $(this).parent().parent();
             var index = $(this).parent().index();
 
             $ul.find('li').each(function(index, el) {
-                imgArr.push($(el).find('img').attr('data-origin-src') || $(el).find('img').attr('src'));
+                data.push($(el).find('img').attr('data-origin-src') || $(el).find('img').attr('src'));
             });
 
             var options = $.extend(true, {}, Gallery.DEFAULTS, {
-                imgArr: imgArr,
+                data: data,
                 index: index
             }, $ul.data());
 
