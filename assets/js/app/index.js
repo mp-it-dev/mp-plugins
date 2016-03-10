@@ -243,4 +243,32 @@ require(['jquery', 'util', 'bootstrap', 'uploadify', 'tlayer', 'plugins'], funct
 		}],
 		name: 'test_country'
 	});
+
+	var rMenu = $.rightMenu({
+		menu: [{
+			icon: './assets/img/close.png',
+			text: '新建目录',
+			callback: function () {
+				console.log('新建目录')
+			}
+		}, {
+			icon: '',
+			text: '删除目录',
+			callback: function () {
+				console.log('删除目录')
+			}
+		}, {
+			icon: '',
+			text: '上传文件',
+			callback: function () {
+				console.log('上传文件')
+			}
+		}]
+	});
+
+	$(document).on('contextmenu', function (e) {
+		rMenu.show(e.clientX, e.clientY);
+			
+		return false;
+	});
 });

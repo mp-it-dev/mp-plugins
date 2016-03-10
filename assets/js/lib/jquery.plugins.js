@@ -3156,3 +3156,120 @@ PluginDep.resetBodyScrollbar = function (context) {
         $('[data-uitype="'+pName+'"]').uiResize();
     });
 })(jQuery);
+
+(function ($, win) {
+    var pName = 'rightMenu';
+    var namespace = 'ui.' + pName;
+
+    var globalVar = win[namespace];
+
+    if (!globalVar) {
+        globalVar = win[namespace] = {
+            elements: []
+        };
+    }
+
+    var RightMenu = function (option) {
+        if (typeof option === 'object') {
+            this.setting = $.extend(true, {}, RightMenu.DEFAULTS, option);
+        } else {
+            $.error('参数不正确！');
+        }
+
+        this.init();
+    }
+
+    RightMenu.DEFAULTS = {
+        width : 100,
+        autoHide : false,
+        offsetX: 10,
+        offsetY: 10,
+        menu : [{
+            text: '',
+            icon: '',
+            callback: function () {
+
+            }
+        }]
+    }
+
+    RightMenu.prototype.init = function () {
+        this.id = 'rMenu_' + globalVar.elements.length;
+
+        var setting = this.setting;
+        var self = this;
+        var ul = $('<ul class="right-menu" id="' + this.id + '"></ul>').appendTo('body');
+
+        for (var i = 0, l = setting.menu.length; i < l; i++) {
+            (function (i) {
+                var op = setting.menu[i];
+                var li = $('<li><span class="right-menu-icon"></span><span class="right-menu-text">' + op.text + '</span></li>').appendTo(ul);
+
+                if (op.icon) {
+                    li.find('.right-menu-icon').append('<img src="' + op.icon + '">');
+                }
+
+                li.on('mousedown', function (e) {
+                    if (typeof op.callback == 'function') {
+                        var ret = op.callback.call(this, e);
+                        
+                        if (ret !== false) {
+                            self.hide();
+                        }
+
+                        return ret;
+                    }
+                });
+            })(i);
+        }
+
+        this.element = ul;
+        globalVar.elements.push(this);
+    }
+
+    RightMenu.prototype.show = function (left, top) {
+        var setting = this.setting;
+        var ele = this.element;
+        var self = this;
+
+        ele.show();
+
+        if (left + ele.outerWidth() > $(win).width()) {
+            left = left - ele.outerWidth();
+        } else {
+            left += setting.offsetX;
+        }
+
+        if (top > $(win).height() / 2 ) {
+            top = top - ele.outerHeight(true);
+        } else {
+            top += setting.offsetY;
+        }
+
+        ele.css({
+            left: left,
+            top: top
+        });
+
+        if (setting.autoHide) {
+            setTimeout(function () {
+                self.hide();
+            }, 3000);
+        }
+    }
+
+    RightMenu.prototype.hide = function () {
+        this.element.hide();
+    }
+
+    //点击隐藏
+    $(document).on('mousedown.' + namespace, function () {
+        for (var i = 0, l = win[namespace].elements.length; i < l; i++) {
+            win[namespace].elements[i].hide();
+        }
+    });
+
+    $.rightMenu = function (option) {
+        return new RightMenu(option);
+    }
+})(jQuery, window);

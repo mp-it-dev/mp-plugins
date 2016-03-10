@@ -926,3 +926,51 @@
     cursor: e-resize;
 }
 /*resize end*/
+
+/*右键菜单 start*/
+.right-menu {
+    position: fixed;
+    z-index: 9999;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    border-radius: 3px;
+    display: none;
+}
+.right-menu li {
+    border-top: 1px solid #ddd;
+    min-width: 100px;
+    padding: 0 30px;
+    font-size: 12px;
+    line-height: 30px;
+    overflow: hidden;
+}
+.right-menu li:hover {
+    background-color: #eee;
+    cursor: pointer;
+}
+.right-menu li:first-child {
+    border-top: 0;
+}
+.right-menu-icon,
+.right-menu-text {
+    display: inline-block;
+    vertical-align: middle;
+}
+.right-menu-icon {
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    line-height: 20px;
+    overflow: hidden;
+}
+.right-menu-icon img {
+    max-width: 100%;
+    max-height: 100%;
+}
+.right-menu-text {
+    padding-left: 10px;
+}
+/*右键菜单 end*/

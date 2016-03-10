@@ -280,68 +280,68 @@ define('util', function () {
         //获取文件扩展名的icon
         getFileIcon: function (fileName) {
             var extName = fileName.substring(fileName.lastIndexOf('.'));
-            var className = '';
+            var fileIcon = '';
 
             switch (extName.toLowerCase()) {
                 case '.xls':
-                    className = 'icon-xls';
+                    fileIcon = 'icon-xls';
                     break;
                 case '.xlsx':
-                    className = 'icon-xlsx';
+                    fileIcon = 'icon-xlsx';
                     break;
                 case '.doc':
-                    className = 'icon-doc';
+                    fileIcon = 'icon-doc';
                     break;
                 case '.docx':
-                    className = 'icon-docx';
+                    fileIcon = 'icon-docx';
                     break;
                 case '.ppt':
-                    className = 'icon-ppt';
+                    fileIcon = 'icon-ppt';
                     break;
                 case '.pptx':
-                    className = 'icon-pptx';
+                    fileIcon = 'icon-pptx';
                     break;
                 case '.pdf':
-                    className = 'icon-pdf';
+                    fileIcon = 'icon-pdf';
                     break;
                 case '.txt':
-                    className = 'icon-txt';
+                    fileIcon = 'icon-txt';
                     break;
                 case '.xml':
-                    className = 'icon-xml';
+                    fileIcon = 'icon-xml';
                     break;
                 case '.csv':
-                    className = 'icon-csv';
+                    fileIcon = 'icon-csv';
                     break;
                 case '.zip':
                 case '.7z':
-                    className = 'icon-zip';
+                    fileIcon = 'icon-zip';
                     break;
-                case ".rar":
-                    className = 'icon-rar';
+                case '.rar':
+                    fileIcon = 'icon-rar';
                     break;
                 case '.png':
-                    className = 'icon-png';
+                    fileIcon = 'icon-png';
                     break;
                 case '.jpg':
                 case '.jpeg':
-                    className = 'icon-jpg';
+                    fileIcon = 'icon-jpg';
                     break;
                 case '.gif':
-                    className = 'icon-gif';
+                    fileIcon = 'icon-gif';
                     break;
                 case '.js':
-                    className = 'icon-js';
+                    fileIcon = 'icon-js';
                     break;
                 case '.css':
-                    className = 'icon-css';
+                    fileIcon = 'icon-css';
                     break;
                 default:
-                    className = 'icon-more';
+                    fileIcon = 'icon-more';
                     break;
             }
 
-            return className;
+            return fileIcon;
         },
 
         //计算文件大小
