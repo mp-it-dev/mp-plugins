@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<title>前端控件-首页</title>
+	<link rel="stylesheet" type="text/css" href="./assets/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="./assets/css/common.css">
+	<link rel="stylesheet" type="text/css" href="./assets/css/plugins.css">
+	<link rel="stylesheet" type="text/css" href="./assets/css/tlayer.css">
+	<link rel="stylesheet" type="text/css" href="./assets/css/site.css">
+	<!--[if lt IE 9]>
+		<script src="./assets/js/lib/html5shiv.min.js"></script>
+		<script src="./assets/js/lib/respond.min.js"></script>
+	<![endif]-->
+	<style type="text/css">
+		.imglist li {
+			float: left;
+			margin-right: 10px;
+			margin-bottom: 10px;
+		}
+		.imglist img {
+			width: 100px;
+			height: 100px;
+		}
+	</style>
+</head>
+<body>
+	<div class="navbar navbar-inverse navbar-fixed-top" role="navigation" id="header">
+        <div class="container">
+            <div class="navbar-header">
+                <button class="collapsed navbar-toggle" type="button" data-toggle="collapse" data-target="#menu">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="./">
+                    <i class="glyphicon glyphicon-home"></i>
+                    前端常用控件
+                </a>
+            </div>
+            <div class="collapse navbar-collapse" id="menu">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="./">首页</a></li>
+                    <li><a href="./doc.html">文档</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-main navbar-padding-top" id="main">
+		<div class="container" id="cc" style="margin-top: 20px; margin-bottom: 20px;">
+			<form class="form-horizontal">
+				<div class="form-group">
+					<label class="col-md-2 control-label">Input框：</label>
+					<div class="col-md-3">
+						<input type="text" id="aaaaa" class="form-control" data-uitype="validate" data-reg="^a$" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">Textarea框：</label>
+					<div class="col-md-3">
+						<textarea class="form-control"></textarea>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">Select框（单选）：</label>
+					<div class="col-md-3">
+						<select name="country" class="form-control" id="sss" data-uitype="select">
+							<option value="1" disabled>中国</option>
+							<option value="2">日本</option>
+							<option value="3">美国</option>
+							<option value="4">英国</option>
+							<option value="5">韩国</option>
+							<option value="6">法国</option>
+							<option value="7">巴西</option>
+							<option value="8">俄罗斯</option>
+						</select>
+					</div>
+					<div class="col-md-3">
+						<select name="country" class="form-control" data-uitype="select" data-searchbox="true">
+							<option value="1">中国</option>
+							<option value="2">日本</option>
+							<option value="3">美国</option>
+							<option value="4">英国</option>
+							<option value="5">韩国</option>
+							<option value="6">法国</option>
+							<option value="7">巴西</option>
+							<option value="8">俄罗斯</option>
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">Select框（多选）：</label>
+					<div class="col-md-3">
+						<select name="countries" class="form-control" data-uitype="select" data-searchbox="true" data-multiple="1">
+							<optgroup label="国家">
+								<option value="1">中国</option>
+								<option value="2">日本</option>
+								<option value="3">美国</option>
+								<option value="4">英国</option>
+								<option value="5">韩国</option>
+								<option value="6">法国</option>
+								<option value="7">巴西</option>
+								<option value="8">俄罗斯</option>
+							</optgroup>
+						</select>
+					</div>
+					<div class="col-md-3">
+						<div id="uiSelector"></div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">按钮：</label>
+					<div class="col-md-6">
+						<button type="button" class="btn btn-default" id="msg">按钮1</button>
+						<button type="button" class="btn btn-primary" id="alert">按钮2</button>
+						<button type="button" class="btn btn-success" id="tips">按钮3</button>
+						<button type="button" class="btn btn-info" id="loading">按钮4</button>
+						<button type="button" class="btn btn-warning" id="content">按钮5</button>
+						<button type="button" class="btn btn-danger" id="confirm">按钮6</button>
+						<button type="button" class="btn btn-inverse">按钮7</button>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">按钮组：</label>
+					<div class="col-md-6 btn-group">
+						<button type="button" class="btn btn-default">按钮1</button>
+						<button type="button" class="btn btn-default">按钮2</button>
+						<button type="button" class="btn btn-default">按钮3</button>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">人员选择：</label>
+				    <div class="col-md-6">
+				    	<button type="button" class="btn btn-default btn-sm" id="singlePeople">单人</button>
+				    	<button type="button" class="btn btn-primary btn-sm" id="multiPeople">多人</button>
+				    	<button type="button" class="btn btn-success btn-sm" id="singleDep">单部门</button>
+				    	<button type="button" class="btn btn-warning btn-sm" id="multiDep">多部门</button>
+				    	<button type="button" class="btn btn-info btn-sm" id="singleJob">单职位</button>
+				    	<button type="button" class="btn btn-danger btn-sm" id="multiJob">多职位</button>
+				    	<button type="button" class="btn btn-inverse btn-sm" id="singleJobList">单职位列表</button>
+				    </div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">产品选择：</label>
+				    <div class="col-md-6">
+				    	<button type="button" class="btn btn-default btn-sm" id="productSelect">选择产品</button>
+				    </div>
+				</div>
+			</form>
+		</div>
+	    <div class="container">
+	    	<div class="row">
+	    		<div class="col-md-offset-9 col-md-3">
+	    			<div class="input-group">
+	    				<input type="text" class="form-control" id="keyword">
+			    		<span class="input-group-btn">
+			    			<button class="btn btn-default" id="search">
+			    				<span class="glyphicon glyphicon-search"></span>
+			    			</button>
+			    		</span>
+	    			</div>		    		
+		    	</div>
+	    	</div>
+	    	<div id="table"></div>
+	    </div>
+	    <div class="container" style="margin-bottom: 20px;">
+	    	<button id="upload" class="btn btn-primary">文件上传</button>
+	    </div>
+	    <div class="container">
+	    	<h3 style="margin: 10px 0;">照片查看器</h3>
+			<ul class="imglist" data-uitype="gallery" data-errorimg="./img/error.png" data-loadingimg="./img/loading_32.gif" data-showlist="true">
+				<li><a href="#"><img src="./assets/img/gallery/1.jpg" alt="第一张"></a></li>
+				<li><a href="#"><img src="./assets/img/gallery/2.jpg" alg="第二张"></a></li>
+				<li><a href="#"><img src="./assets/img/gallery/3.jpg" alg="第三张"></a></li>
+				<li><a href="#"><img src="./assets/img/gallery/4.jpg" alg="第四张"></a></li>
+				<li><a href="#"><img src="./assets/img/gallery/5.jpg" alg="第五张"></a></li>
+			</ul>
+	    </div>
+	    <div class="container">
+	    	<h3 style="margin: 10px 0;">照片查看器</h3>
+			<ul class="imglist" data-uitype="gallery" data-errorimg="./img/error.png" data-loadingimg="./img/loading_32.gif" data-showlist="true">
+				<li><a href="#"><img src="./assets/img/gallery/6.jpg" alt="第六张"></a></li>
+				<li><a href="#"><img src="./assets/img/gallery/7.jpg" alt="第七张"></a></li>
+				<li><a href="#"><img src="./assets/img/gallery/8.jpg" alt="第八张"></a></li>
+				<li><a href="#"><img src="./assets/img/gallery/9.jpg" alt="第九张"></a></li>
+				<li><a href="#"><img src="./assets/img/gallery/10.jpg" alt="第十张"></a></li>
+				<li><a href="#"><img src="./assets/img/gallery/11.jpg" alt="第十一张"></a></li>
+			</ul>
+	    </div>
+    </div>
+	
+	<div class="page-footer" id="footer">
+		<p class="text-center">底部</p>
+	</div>
+<script type="text/javascript" src="./assets/js/lib/require.min.js"></script>
+<script src="./assets/js/app/index.js"></script>
+</body>
+</html>
