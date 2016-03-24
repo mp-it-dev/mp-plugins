@@ -29,6 +29,7 @@
 
     //标记是否正在关闭中，防止不出现layer-box-mask
     var isClosing = false;
+    var layerShow = false;
 
     //弹出框的方法
     var methods = {
@@ -149,8 +150,6 @@
                 return;
             }
 
-            isClosing = true;
-
             var res = true;
             if (util.isFunction(layer.settings.beforeClose)) {
                 res = layer.settings.beforeClose.call(layer.layer, layerID);
@@ -173,8 +172,6 @@
                 if (util.isFunction(fn)) {
                     fn.call(this, layer);
                 }
-
-                isClosing = false;
             });
         },
         /**
@@ -233,20 +230,19 @@
             };
 
             //获取弹出框各个部分的HTML代码
-            var mask    = layerUtil.mask.call(this, layerID),
-                header  = layerUtil.header.call(this, layerID),
+            var header  = layerUtil.header.call(this, layerID),
                 content = layerUtil.content.call(this, layerID),
                 footer  = layerUtil.footer.call(this, layerID);
 
             //组合弹出框HTML代码
-            var layer = mask +
-                        '<div class="layer-dialog">'+
+            var layer = '<div class="layer-dialog">'+
                             '<div class="layer-box-container '+settings.theme+' layer-type-'+settings.layerType+'">'+
                                 header+content+footer+
                             '</div>' +
                         '</div>';
 
             $layer.append(layer);
+            layerUtil.addMask.call(this, layerID);
 
             setTimeout(function () {
                 layerUtil.centerLayer($layer.find(".layer-box-container"), settings);
@@ -290,18 +286,14 @@
          * @param  {String} layerID layer弹出框的id
          * @return {String} 返回背景层的HTML代码
          */
-        mask: function (layerID) {
+        addMask: function (layerID) {
             var tlayer = this,
                 layerData = this.layerData,
                 settings = layerData.layers[layerID].settings;
 
-            var maskHTML = '<div class="layer-box-mask">&nbsp;</div>';
-
-            if (!settings.showMask || (!isClosing && $('.layer-box-mask:visible').length > 0)) {
-                maskHTML = '';
+            if (settings.showMask && !layerShow) {
+                layerData.layers[layerID].layer.prepend('<div class="layer-box-mask">&nbsp;</div>');
             }
-            
-            return maskHTML;
         },
         /**
          * 生成头部HTML代码
@@ -363,7 +355,7 @@
             var contentHTML = '<div class="layer-box-content"' + cStyle + '>';
 
             if (c.src) {
-                contentHTML += '<div class="layer-iframe-container"><iframe class="layer-box-iframe" src="' + c.src + '" frameborder="0"></iframe><div>';             
+                contentHTML += '<div class="layer-iframe-container"><iframe class="layer-box-iframe" src="' + c.src + '" frameborder="0"></iframe></div>';             
             } else if (c.url) {
                 contentHTML += '<div class="layer-waiting"><img src="' + settings.imgPath + 'loading_16.gif"/>&nbsp;&nbsp;加载中...</div>';
             } else {
@@ -581,6 +573,8 @@
             //判断layer是否已显示，否则不允许再显示
             if (util.inArray(layerID, layerData.stack) > -1) { return false; }
 
+            layerShow = true;
+
             //显示类型
             var animation = {
                 "fade"      : "fadeIn",
@@ -624,6 +618,8 @@
                 $layer = layer.layer,
                 settings = layer.settings,
                 layerID = $layer.attr('id');
+
+            layerShow = false;
 
             //显示类型
             var animation = {
@@ -957,7 +953,7 @@
 
                 header          : '警告',
                 content         : {
-                    width       : 600,
+                    width       : 500,
                     padding     : '15px',
                     html        : msg
                 },
@@ -1025,7 +1021,7 @@
 
                 header          : '提示',
                 content         : {
-                    width       : 600,
+                    width       : 500,
                     padding     : '15px',
                     html        : msg
                 },

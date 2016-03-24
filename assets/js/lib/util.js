@@ -30,9 +30,7 @@ define('util', function () {
 
                 if (k in O) {
                     kValue = O[k];
-                    var ret = callback.call(T, kValue, k, O);
-
-                    if (ret === false) break;
+                    callback.call(T, kValue, k, O);
                 }
 
                 k++;
@@ -47,15 +45,13 @@ define('util', function () {
 
         if (this != null && this.length > 0) {
             arr.forEach(function (item, idx) {
-                if (typeof value == 'object' && typeof key != 'undefined') {
-                    if (item[key] == value[key]) {
+                if (typeof item == 'object' && typeof key != 'undefined') {
+                    if (item[key] == value) {
                         index = idx;
-                        return false;
                     }
                 } else {
                     if (item == value) {
                         index = idx;
-                        return false;
                     }
                 }
             });

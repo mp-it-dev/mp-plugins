@@ -32,7 +32,7 @@ PluginDep.browser = (function () {
         browser.version = matched.version;
     }
 
-    //由于IE11没有哦msie标识，所以换一种方式判断IE
+    //由于IE11没有msie标识，所以换一种方式判断IE
     if (window.ActiveXObject || "ActiveXObject" in window) { 
         browser.msie = true;
         delete browser['mozilla'];
@@ -352,7 +352,7 @@ PluginDep.resetBodyScrollbar = function (context) {
                         '<div class="table-body">' +
                             '<div class="table-loading">努力加载中...</div>'+
                             '<table class="table table-hover ' + options.tableClass + '">' + 
-                                '<thead>' + this.initHolder() +'</thead>'+
+                                '<thead>' + this.initHolder() + '</thead>' +
                             '</table>' +
                         '</div>'+
                     '</div>';
@@ -373,7 +373,7 @@ PluginDep.resetBodyScrollbar = function (context) {
         if (this.options.url) {
             this.getPageData();
         } else {
-            this.initTable();
+            this.createTable();
         }
     }
 
@@ -430,17 +430,24 @@ PluginDep.resetBodyScrollbar = function (context) {
                 complete        : function () {         //隐藏加载框
                     $container.find(".table-loading").hide();
                 },
-                success         : function (res, reloadFlag) {
+                success         : function (res) {
                     options.dataList = (options.dataField ? res[options.dataField] : res) || [];
+
+                    if (options.dataList == null || options.dataList.length == 0) {
+                        self.initError('无数据');
+                        return;
+                    }
                     
-                    self.initTable(reloadFlag);
+                    self.createTable();
                 },
                 error           : options.onRequestError,
                 resultVerify    : function (res) {
                     if (typeof options.resultVerify == 'function') {
                         var ret = options.resultVerify(res);
-                        var $tbody = self.showErrorInfo(ret.msg);
-                        $container.find('.table-body .table').append($tbody);
+
+                        if (!ret.state) {
+                            self.initError(ret.msg);
+                        }
 
                         return ret.state;
                     }
@@ -469,10 +476,26 @@ PluginDep.resetBodyScrollbar = function (context) {
                 },
                 success         : function (res) {
                     options.dataList = (options.dataField ? res[options.dataField] : res) || [];
+
+                    if (options.dataList == null || options.dataList.length == 0) {
+                        self.initError('无数据')
+                        return;
+                    }
                     
-                    self.initTable(false);
+                    self.createTable();
                 },
-                error           : options.onRequestError 
+                error: options.onRequestError,
+                resultVerify: function (res) {
+                    if (typeof options.resultVerify == 'function') {
+                        var ret = options.resultVerify(res);
+
+                        if (!res.state) {
+                            self.initError(ret.msg);
+                        }
+
+                        return ret.state;
+                    }
+                }
             }
 
             $.ajax(ajaxOpt);
@@ -480,17 +503,27 @@ PluginDep.resetBodyScrollbar = function (context) {
     }
 
     /**
-     * [initTable 生成表格]
+     * [createTable 生成表格]
      * @return {[type]} [description]
      */
-    Table.prototype.initTable = function (reloadFlag) {
-        var self = this,
-            options = this.options,
-            $container = this.container,
+    Table.prototype.createTable = function () {
+        var $container = this.container,
             $tbody = this.initTbody();
 
         $container.find('.table-body .table tbody').remove();
         $container.find('.table-body .table').append($tbody);
+
+        this.initTable();
+    }
+
+    /**
+     * [initTable 初始化表格，包括计算列宽，绑定事件等]
+     * @return {[type]} [description]
+     */
+    Table.prototype.initTable = function () {
+        var self = this,
+            options = this.options,
+            $container = this.container;
 
         setTimeout(function () {
             var $thead = $container.find('.table-head'),
@@ -523,7 +556,7 @@ PluginDep.resetBodyScrollbar = function (context) {
                 $tbody.css('padding-right', 1);
                 $thead.removeData('minusWidth');
             }
-            
+
             //出现竖直滚动条则设置padding-right
             if ($tbodyTable.outerHeight(true) > $tbody.outerHeight(true)) {
                 $theadLastTh.width($theadLastTh.outerWidth(true) - sWidth);
@@ -556,13 +589,13 @@ PluginDep.resetBodyScrollbar = function (context) {
 
             $container.find('.table').css('width', totalW);
 
-            //如果是重新加载的话不需要再次绑定事件
-            if (!reloadFlag) {
+            //如果绑定过事件的话不需要再次绑定
+            if (!$container.data('bindEvents')) {
                 self.bindEvents();
             }
 
-            if (options.onLoad) {
-                options.onLoad.call($container[0], options);
+            if (options.onInit) {
+                options.onInit.call($container[0], options);
             }
         }, 0);
     }
@@ -684,10 +717,6 @@ PluginDep.resetBodyScrollbar = function (context) {
             colLen      = colOptions.length;
 
         var $tbody = $('<tbody></tbody>');
-        
-        if (dataList == null || dataList.length == 0) {
-            return this.showErrorInfo('无数据');
-        }
 
         var i, j, dataLen = dataList.length;
 
@@ -777,16 +806,17 @@ PluginDep.resetBodyScrollbar = function (context) {
     }
 
     /**
-     * [initTbody 返回结果出错时显示错误信息]
+     * [initError 返回结果出错时显示错误信息]
      * @return {[type]} [description]
      */
-    Table.prototype.showErrorInfo = function (msg) {
-        var colLen  = this.container.find('.table-body thead th').length;
-        var $tbody = $('<tbody></tbody>');
-        
-        $tbody.append('<tr class="table-tr table-errorInfo"><td colspan="'+colLen+'" align="center">' + msg + '</td></tr>');
+    Table.prototype.initError = function (msg) {
+        var $container = this.container;
+        var colLen = $container.find('.table-body thead th').length;
+        var $tbody = $('<tbody><tr class="table-tr table-errorInfo"><td colspan="' + colLen + '" align="center">' + msg + '</td></tr></tbody>');
 
-        return $tbody;
+        $container.find('.table-body table tbody').remove();
+        $container.find('.table-body table').append($tbody);
+        this.initTable();
     }
 
     /**
@@ -809,6 +839,8 @@ PluginDep.resetBodyScrollbar = function (context) {
             data[options.sortOrderField] = options.sortOrder;
         }
 
+        this.container.find('.table-th-checkbox input').prop('checked', false);
+
         pager.pager('reload', data);
     }
 
@@ -819,6 +851,8 @@ PluginDep.resetBodyScrollbar = function (context) {
     Table.prototype.bindEvents = function () {
         var self = this,
             $container = this.container;
+
+        $container.data('bindEvents', true);
 
         //固定表头滚动
         $container.find('.table-body').on('scroll', function (e) {            
@@ -1037,7 +1071,7 @@ PluginDep.resetBodyScrollbar = function (context) {
                 pager.options.data = data;
             }
 
-            pager.requestData(1, true);
+            pager.requestData(1);
         },
 
         //销毁
@@ -1092,10 +1126,9 @@ PluginDep.resetBodyScrollbar = function (context) {
     /**
      * [requestData 请求数据]
      * @param  {[type]} pageIndex  [页码]
-     * @param  {[type]} reloadFlag [是否是reload]
      * @return {[type]}            [description]
      */
-    Pager.prototype.requestData = function (pageIndex, reloadFlag) {
+    Pager.prototype.requestData = function (pageIndex) {
         var self = this,
             $container = this.container,
             options = this.options,
@@ -1156,9 +1189,9 @@ PluginDep.resetBodyScrollbar = function (context) {
                         res = data.slice(0, options.pageIndex * options.pageSize);
                     }
 
-                    options.success(res, reloadFlag);
+                    options.success(res);
                 } else {
-                    options.success(res, reloadFlag);
+                    options.success(res);
                 }                
             }
         }
@@ -3180,13 +3213,14 @@ PluginDep.resetBodyScrollbar = function (context) {
     }
 
     RightMenu.DEFAULTS = {
-        width : 100,
+        width: 100,
         autoHide : false,
-        offsetX: 10,
-        offsetY: 10,
-        menu : [{
-            text: '',
+        offsetLeft: 0,
+        offsetTop: 0,
+        menu: [{
+            id: '',
             icon: '',
+            text: '',
             callback: function () {
 
             }
@@ -3203,17 +3237,14 @@ PluginDep.resetBodyScrollbar = function (context) {
         for (var i = 0, l = setting.menu.length; i < l; i++) {
             (function (i) {
                 var op = setting.menu[i];
-                var li = $('<li><span class="right-menu-icon"></span><span class="right-menu-text">' + op.text + '</span></li>').appendTo(ul);
-
-                if (op.icon) {
-                    li.find('.right-menu-icon').append('<img src="' + op.icon + '">');
-                }
+                var li = $('<li id="' + op.id + '"><span class="right-menu-icon">' + op.icon + '</span><span class="right-menu-text">' + op.text + '</span></li>').appendTo(ul);
 
                 li.on('mousedown', function (e) {
                     if (typeof op.callback == 'function') {
-                        var ret = op.callback.call(this, e);
+                        var args = [e].concat(self.args);
+                        var ret = op.callback.apply(this, args);    //执行回调，并将额外参数传入回调
                         
-                        if (ret !== false) {
+                        if (ret !== false) {     //如果返回false，则邮件惨淡不消失
                             self.hide();
                         }
 
@@ -3232,18 +3263,23 @@ PluginDep.resetBodyScrollbar = function (context) {
         var ele = this.element;
         var self = this;
 
+        //保存额外参数，回调时候使用
+        if (arguments.length > 2) {
+            this.args = Array.prototype.slice.call(arguments, 2);
+        }
+
         ele.show();
 
         if (left + ele.outerWidth() > $(win).width()) {
             left = left - ele.outerWidth();
         } else {
-            left += setting.offsetX;
+            left += setting.offsetLeft;
         }
 
         if (top > $(win).height() / 2 ) {
             top = top - ele.outerHeight(true);
         } else {
-            top += setting.offsetY;
+            top += setting.offsetTop;
         }
 
         ele.css({
