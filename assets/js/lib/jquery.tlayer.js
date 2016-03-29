@@ -144,11 +144,12 @@
             }
 
             var layer = methods.getLayer(layerID);
-            layerID = layer.layer.attr('id');
 
             if (!layer) {
                 return;
             }
+
+            layerID = layer.layer.attr('id');
 
             var res = true;
             if (util.isFunction(layer.settings.beforeClose)) {

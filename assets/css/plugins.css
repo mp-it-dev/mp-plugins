@@ -35,12 +35,10 @@
 }
 .table-container .table-th {
     position: relative;
-}
-.table-container .table-head .table th {
     background-color: #eee;
     border-top: 1px solid #ddd;
 }
-.table-container .table-head .table-border > thead > tr > th {
+.table-container .table-head .table-border th {
     border-top-width: 1px;
 }
 .table-container .table-th-text {
@@ -49,7 +47,7 @@
     text-overflow: ellipsis;
     position: relative;
 }
-.table-hover > tbody > .table-errorInfo:hover {
+.table-hover .table-errorInfo:hover {
     background-color: transparent;
 }
 .table-container .table-td-text {
@@ -58,7 +56,7 @@
 .table-container .table-td-text a:hover {
     text-decoration: underline;
 }
-.table-container .holder > th {
+.table-container .holder th {
     height: 0 !important;
     padding: 0 !important;
     border: 0 !important;

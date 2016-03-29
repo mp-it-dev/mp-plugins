@@ -202,7 +202,7 @@ require(['jquery', 'util', 'bootstrap', 'uploadify', 'tlayer', 'plugins'], funct
 	$('#confirm').click(function () {
 		$.confirm('您确定要这么做吗？', function (result) {
 			if (result) {
-				alert(1);
+				alert(1)
 			}
 		});
 	});

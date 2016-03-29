@@ -926,7 +926,7 @@ input[type="submit"].btn::-moz-focus-inner {
     margin-right: 15px;
 }
 .navbar .navbar-link {
-    display: block;
+    display: inline-block;
     margin-left: 5px;
     padding: 15px;
     line-height: 20px;
@@ -1059,3 +1059,6 @@ input[type="submit"].btn::-moz-focus-inner {
     background-color: #f5f5f5;
 }
 /*下拉菜单 end*/
+.tooltip {
+    position: fixed;
+}
