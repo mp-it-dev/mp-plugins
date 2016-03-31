@@ -5,11 +5,11 @@
 
     //把以下变量保存成局部变量
     var _top = top || window,
-        document = window.document;
+        document = _top.document;
 
     //初始化弹窗
     _top.tlayer = _top.tlayer || {},
-    window.tlayer = $.tlayer = _top.tlayer;
+    _top.tlayer = $.tlayer = _top.tlayer;
     var _tlayer = $.tlayer;
 
     //当前弹出框使用情况
@@ -493,7 +493,6 @@
         bindEvents: function () {
             //绑定ESC键触发关闭layer操作
             $(document).on("keyup.tmenu", function (e) {
-                e = e || window.event;
                 var code = e.keyCode || e.which;
 
                 var tlayer = _tlayer;
@@ -538,11 +537,11 @@
                     if (oX < 0) oX = 0;
                     if (oY < 0) oY = 0;
 
-                    if (oX + w > $(window).width()) {
-                        oX = $(window).width() - w;
+                    if (oX + w > $(_top).width()) {
+                        oX = $(_top).width() - w;
                     }
-                    if (oY + h > $(window).height()) {
-                        oY = $(window).height() - h;
+                    if (oY + h > $(_top).height()) {
+                        oY = $(_top).height() - h;
                     }
 
                     target.css({ "left": oX + "px", "top": oY + "px" });
@@ -728,8 +727,8 @@
         centerLayer: function ($container, settings) {
             var l, t;
 
-            var height = $(window).height();
-            var width = $(window).width();
+            var height = $(_top).height();
+            var width = $(_top).width();
             var cheight = $container.outerHeight();
             var cwidth = $container.outerWidth();
 
@@ -754,8 +753,8 @@
 
             var argumentsArr = arguments;
 
-            $(window).on("resize.centerLayer", function () {
-                $(window).off("resize.centerLayer");
+            $(_top).on("resize.centerLayer", function () {
+                $(_top).off("resize.centerLayer");
 
                 if (argumentsArr) {
                     argumentsArr.callee.apply(null, argumentsArr);
@@ -769,8 +768,8 @@
                 $layer = layer.layer,
                 settings = layerData.layers[layerID].settings;
 
-            var $body = $('body');
-            var fullWindowWidth = window.innerWidth;
+            var $body = $('body', document);
+            var fullWindowWidth = _top.innerWidth;
 
             if (!fullWindowWidth) { // workaround for missing window.innerWidth in IE8
               var documentElementRect = document.documentElement.getBoundingClientRect();
@@ -804,9 +803,9 @@
          * @return {[type]}         [description]
          */
         resetBodyScrollBar: function () {
-            if ($('body').hasClass('hide-scrollbar')) {
-                $('body').removeClass('hide-scrollbar')
-                    .css('padding-right', $('body').originalBodyPad || '');
+            if ($('body', document).hasClass('hide-scrollbar')) {
+                $('body', document).removeClass('hide-scrollbar')
+                    .css('padding-right', $('body', document).originalBodyPad || '');
             }            
         }
     };
@@ -907,13 +906,13 @@
 
                 //如果函数的参数列表存在1个参数
                 if (argsl == 1) {
-                    fn.apply(window);
+                    fn.apply(_top);
                 }
 
                 //如果函数的参数列表存在2个参数
                 if (argsl == 2) {
                     if (this.typeOf(thisObj) == "array") {
-                        fn.apply(window, thisObj);
+                        fn.apply(_top, thisObj);
                     } else {
                         fn.apply(thisObj);
                     }
@@ -921,7 +920,7 @@
 
                 //如果函数的参数列表存在3个参数
                 if (argsl == 3) {
-                    fn.apply(thisObj || window, args);
+                    fn.apply(thisObj || _top, args);
                 }
             }
         }

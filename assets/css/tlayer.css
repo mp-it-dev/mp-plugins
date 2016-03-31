@@ -166,41 +166,6 @@
     margin-right: 15px;
 }
 
-/*警告框情景*/
-.layer-box-content .alert {
-  padding: 15px;
-  margin-bottom: 0;
-  border: 1px solid transparent;
-  border-radius: 4px;
-}
-.layer-box-content .alert > p {
-  margin-bottom: 0;
-}
-.layer-box-content .alert > p + p {
-  margin-top: 5px;
-}
-.layer-box-content .alert-success {
-  color: #3c763d;
-  background-color: #dff0d8;
-  border-color: #d6e9c6;
-}
-.layer-box-content .alert-info {
-  color: #31708f;
-  background-color: #d9edf7;
-  border-color: #bce8f1;
-}
-.layer-box-content .alert-warning {
-  color: #8a6d3b;
-  background-color: #fcf8e3;
-  border-color: #faebcc;
-}
-.layer-box-content .alert-danger {
-  color: #a94442;
-  background-color: #f2dede;
-  border-color: #ebccd1;
-}
-/* content 结束 */
-
 /* footer 开始 */
 .layer-box-footer {
     padding: 5px 15px;
