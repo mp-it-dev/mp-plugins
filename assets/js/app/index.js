@@ -1,30 +1,3 @@
-require.config({
-    baseUrl: './assets/js',
-    paths: {
-        'jquery': 'lib/jquery-1.11.3.min',
-        'bootstrap': 'lib/bootstrap.min',
-        'uploadify': 'lib/jquery.uploadify',
-        'tlayer': 'lib/jquery.tlayer',
-        'plugins': 'lib/jquery.plugins',
-        'util': 'lib/util'
-    },
-    shim: {
-        'bootstrap': {
-            deps: ['jquery']
-        },
-        'uploadify': {
-            deps: ['jquery']
-        },
-        'tlayer': {
-            deps: ['jquery']
-        },
-        'plugins': {
-            deps: ['jquery']
-        }
-    },
-    urlArgs: 'bust=' + (new Date()).getTime()   //开发环境下禁用缓存，生产环境要移除
-});
-
 require(['jquery', 'util', 'bootstrap', 'uploadify', 'tlayer', 'plugins'], function ($, util) {
 	$('#cc').scrollbar();
 	
@@ -207,8 +180,9 @@ require(['jquery', 'util', 'bootstrap', 'uploadify', 'tlayer', 'plugins'], funct
 		});
 	});
 
-	$('[name="country"]').on('changed.ui.select', function (e, value, oldValue) {
-		
+	$('[name="countries"]').on('changed.ui.select', function (e, value, oldValue) {
+		console.log(value)
+		console.log(oldValue)
 	});
 
 	$('#resizeTest').uiResize({
@@ -246,28 +220,28 @@ require(['jquery', 'util', 'bootstrap', 'uploadify', 'tlayer', 'plugins'], funct
 
 	var rMenu = $.rightMenu({
 		menu: [{
-			icon: './assets/img/close.png',
+			icon: '<i class="glyphicon glyphicon-plus" style="color: green;"></i>',
 			text: '新建目录',
-			callback: function () {
+			callback: function (e, obj) {
 				console.log('新建目录')
 			}
 		}, {
-			icon: '',
+			icon: '<i class="glyphicon glyphicon-remove" style="color: red;"></i>',
 			text: '删除目录',
-			callback: function () {
+			callback: function (e) {
 				console.log('删除目录')
 			}
 		}, {
-			icon: '',
+			icon: '<i class="glyphicon glyphicon-upload" style="color: blue;"></i>',
 			text: '上传文件',
-			callback: function () {
+			callback: function (e) {
 				console.log('上传文件')
 			}
 		}]
 	});
 
-	$(document).on('contextmenu', function (e) {
-		rMenu.show(e.clientX, e.clientY);
+	$('#table').on('contextmenu', '.table-body .table-tr', function (e) {
+		rMenu.show(e.clientX, e.clientY, this);
 			
 		return false;
 	});

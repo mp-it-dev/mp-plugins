@@ -1576,7 +1576,7 @@ PluginDep.resetBodyScrollbar = function (context) {
 
         //查找选中数据
         outloop:
-        for (var i in this.data) {
+        for (var i = 0, l = this.data.length; i < l; i++) {
             if (typeof this.data[i] == 'string') {
                 this.data[i] = {
                     value: this.data[i],
@@ -1585,7 +1585,7 @@ PluginDep.resetBodyScrollbar = function (context) {
             }
 
             if (this.data[i].children) {
-                for (var j in this.data[i].children) {
+                for (var j = 0, jLen = this.data[i].children.length; j < jLen; j++) {
                     if (this.data[i].children[j].selected) {
                         this.selectData.push({
                             value: this.data[i].children[j].value,
@@ -1684,14 +1684,14 @@ PluginDep.resetBodyScrollbar = function (context) {
                 $('<li class="ui-select-checkAll">'+icon+'全选</li>').appendTo($list);
             }
 
-            for (var i in data) {
+            for (var i = 0, l = data.length; i < l; i++) {
                 if (data[i].children) {
                     var label = data[i].label;
                     var children = data[i].children;
                     
                     $('<li class="optgroup">'+label+'</li>').appendTo($list);
 
-                    for (var j in children) {
+                    for (var j = 0, jLen = children.length; j < jLen; j++) {
                         var d = children[j];
 
                         var text = '';
@@ -1750,7 +1750,7 @@ PluginDep.resetBodyScrollbar = function (context) {
             if (selectData.length == 0) {
                 $vbox.append('<span class="holder">&nbsp;</span>');
             } else {
-                for (var i in selectData) {                    
+                for (var i = 0, l = selectData.length; i < l; i++) {                    
                     $box.find('li[data-value="'+selectData[i].value+'"]').addClass('active');
                     value.push(selectData[i].value);
                     text.push(selectData[i].text);
@@ -1791,7 +1791,7 @@ PluginDep.resetBodyScrollbar = function (context) {
 
         //设置原select的选中项
         this.ele.find('option').each(function(index, el) {
-            for (var i in selectData) {
+            for (var i = 0, l = selectData.length; i < l; i++) {
                 if ($(this).val() == selectData[i].value) {
                     $(this).prop('selected', true);
                 }
@@ -1857,8 +1857,8 @@ PluginDep.resetBodyScrollbar = function (context) {
             value = [value];
         }
 
-        for (var i in this.data) {
-            for (var j in value) {
+        for (var i = 0, l = this.data.length; i < l; i++) {
+            for (var j = 0, jLen = value.length; j < jLen; j++) {
                 if (this.data[i].value == value[j]) {
                     this.selectData.push({
                         value: this.data[i].value,
@@ -1871,7 +1871,7 @@ PluginDep.resetBodyScrollbar = function (context) {
         var isSame = false;
         if (this.oldSelectData.length == this.selectData.length) {
             isSame = true
-            for (var i in this.oldSelectData) {
+            for (var i = 0, l = this.oldSelectData.length; i < l; i++) {
                 if ($.inArray(this.oldSelectData[i], this.selectData) == -1) {
                     isSame = false;
                 }
@@ -1978,7 +1978,7 @@ PluginDep.resetBodyScrollbar = function (context) {
 
             if (settings.multiple) {
                 if ($this.hasClass('active')) {
-                    for (var i in selectData) {
+                    for (var i = 0, l = selectData.length; i < l; i++) {
                         if (selectData[i].value === value) {
                             selectData.splice(i, 1);
                             break;
@@ -2053,7 +2053,7 @@ PluginDep.resetBodyScrollbar = function (context) {
             //保存改变之前的数据
             self.oldSelectData = selectData.slice(0);
 
-            for (var i in selectData) {
+            for (var i = 0, l = selectData.length; i < l; i++) {
                 if (selectData[i].value == value) {
                     selectData.splice(i, 1);
                     break;
@@ -2083,7 +2083,7 @@ PluginDep.resetBodyScrollbar = function (context) {
                                 data[i].children[j].text.indexOf(val) > -1) {
                                 var isExist = false;
 
-                                for (var ele in sData) {
+                                for (var k = 0, kLen = sData.length; k < kLen; k++) {
                                     if (ele.label === data[i].label) {
                                         isExist = true;
                                         ele.children.push(data[i].children[j]);
@@ -2689,7 +2689,7 @@ PluginDep.resetBodyScrollbar = function (context) {
         var $ul = this.ele.find('.gallery-imgList ul').empty();
         var $li, img;
 
-        for (var i in data) {
+        for (var i = 0, l = data.length; i < l; i++) {
             img = new Image();
             $li = $('<li><img /></li>').appendTo($ul);
 
@@ -2781,7 +2781,7 @@ PluginDep.resetBodyScrollbar = function (context) {
         var $img = this.ele.find('.gallery-img');
         var transform = ['webkitTransform', 'mozTransform', 'msTransform', 'transform'];
 
-        for (var i in transform) {
+        for (var i = 0, l = transform.length; i < l; i++) {
             $img.css(transform[i], 'rotate(' + this.rotate + 'deg)');
         }
     }

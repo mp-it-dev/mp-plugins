@@ -187,6 +187,24 @@
                     fn.call(this, layerID);
                 }
             });
+        },
+        /**
+         * 修改footer
+         * @param  {String} layerID layer弹出框的id
+         * @param  {Function} fn    显示之后的回调函数
+         * @return 无返回
+         */
+        updateFooter: function (layerID, footer) {
+            var stack = _tlayer.layerData.stack;
+            var layerData = _tlayer.layerData;
+
+            if (typeof layerID == 'object') {       //DOM或jquery对象
+                layerID = $(layerID).attr('id');
+            }
+
+            var layer = layerData.layers[layerID];
+
+            layerUtil.updateFooter.call(layer, layerID, footer);
         }
     };
 
@@ -807,6 +825,29 @@
                 $('body', document).removeClass('hide-scrollbar')
                     .css('padding-right', $('body', document).originalBodyPad || '');
             }            
+        },
+        /**
+         * 修改footer
+         * @param  {String} layerID layer弹出框的id
+         * @param  {Function} fn    显示之后的回调函数
+         * @return 无返回
+         */
+        updateFooter: function (layerID, footer) {
+            var stack = _tlayer.layerData.stack;
+            var layerData = _tlayer.layerData;
+            var layer = layerData.layers[layerID];
+
+            if (!layer) {
+                return;
+            }
+
+            layer.settings.footer = footer;
+            var html = layerUtil.footer.call(_tlayer, layerID);
+
+            layer.layer.find('.layer-box-footer').replaceWith(html);
+
+                //给弹出框的所有按钮绑定click事件
+            layerUtil.bindBtnClick.call(this, layerID);
         }
     };
 

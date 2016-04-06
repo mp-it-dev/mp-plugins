@@ -1069,13 +1069,13 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 	    }
 	}
 
-	$.fn.uploadify = function(method) {
+	$.fn.uploadify = function (method) {
 
-		if (methods[method]) {
+	    if (typeof method === 'object' || !method) {
+	        return methods.init.apply(this, arguments);
+	    } else if (methods[method]) {
 			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
-		} else if (typeof method === 'object' || !method) {
-			return methods.init.apply(this, arguments);
-		} else {
+		}  else {
 			$.error('The method ' + method + ' does not exist in $.uploadify');
 		}
 
