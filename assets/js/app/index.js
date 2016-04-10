@@ -47,7 +47,7 @@ require(['jquery', 'util', 'bootstrap', 'uploadify', 'tlayer', 'plugins'], funct
 			name: '收藏数',
 			field: 'collect_count'
 		}]
-	});
+	});	
 
 	$('#search').click(function () {
 		table.table('reload', {type: 'he'});

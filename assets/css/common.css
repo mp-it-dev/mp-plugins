@@ -1044,16 +1044,34 @@ input[type="submit"].btn::-moz-focus-inner {
 }
 /*panel样式重写 end*/
 
-/*下拉菜单 start*/
-.dropdown-menu > li {
-    padding: 0 10px;
+/*表单行item start*/
+.item-row {
+    position: relative;
+    margin-top: 10px;
 }
-.dropdown-menu > li:hover {
-    color: #262626;
-    text-decoration: none;
-    background-color: #f5f5f5;
+.item-row:first-child {
+    margin-top: 0;
 }
-/*下拉菜单 end*/
-.tooltip {
-    position: fixed;
+.item-name {
+    width: 100px;
+    padding-top: 8px;
+    margin-right: 5px;
+    margin-bottom: 0;
+    text-align: right;
+    float: left;
 }
+.item-name.required {
+    position: relative;
+}
+.item-name.required:before {
+    content: "*";
+    color: red;
+}
+.item-control {
+    overflow: hidden;
+}
+.item-static {
+    overflow: hidden;
+    padding-top: 8px;
+}
+/*表单行item end*/

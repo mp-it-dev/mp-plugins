@@ -318,11 +318,6 @@ PluginDep.resetBodyScrollbar = function (context) {
         sortOrderField      : 'sorder',             //排序方式字段名
         sortName            : '',                   //默认排序字段
         sortOrder           : 'asc',                //默认排序方式
-    
-        //树形表格选项
-        treetable           : { 
-            enable          : false                 //是否启用树形表格
-        },
 
         resultVerify        : false,                //返回结果验证
             
@@ -618,7 +613,7 @@ PluginDep.resetBodyScrollbar = function (context) {
 
         //行号
         if (options.rownum) {
-            html += '<th style="width: 40px;"></th>';
+            html += '<th style="width: 50px;"></th>';
         }
 
         for (var i = 0; i < colLen; i++) {
