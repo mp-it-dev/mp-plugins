@@ -17,6 +17,8 @@
     overflow: auto;
     padding-right: 1px;/*解决内层table造成的横向滚动条问题，原因暂时未查明*/
     padding-left: 1px;/*解决IE8下左边框被隐藏的问题*/
+    min-height: 40px;    
+    position: relative;
 }
 .table-container .table-body.resize-hack {
     overflow: hidden;
