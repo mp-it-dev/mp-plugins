@@ -94,24 +94,14 @@ input[type=checkbox], input[type=radio] {
     width: 100%;
     background-color: #fff;
 }
-.table-border {
-    border: 1px solid #ddd;
-}
-.table-responsive > .table-border > thead > tr > th:first-child,
-.table-responsive > .table-border > tbody > tr > td:first-child {
-    border-left: 0;
-}
-.table-responsive > .table> thead > tr > th {
-    white-space: nowrap;
-}
-.table > thead > tr > th,
-.table > tbody > tr > td {
-    padding: 8px;
-    line-height: 1.42857143;
-    vertical-align: middle;
-    word-break: break-all;
-    border-bottom: 1px solid #ddd;
+.table > tbody > tr > td, 
+.table > tbody > tr > th, 
+.table > tfoot > tr > td, 
+.table > tfoot > tr > th, 
+.table > thead > tr > td, 
+.table > thead > tr > th {
     border-top: 0;
+    border-bottom: 1px solid #ddd;
 }
 .table > thead > tr > th {
     -webkit-user-select: none;
@@ -119,16 +109,8 @@ input[type=checkbox], input[type=radio] {
     -ms-user-select: none;
     user-select: none;
     text-align: left;
-}
-.table-striped > tbody > tr:nth-of-type(odd) {
-    background-color: #f9f9f9;
-}
-.table-condensed > thead > tr > th,
-.table-condensed > tbody > tr > td {
-    padding: 5px;
-}
-.table > thead > tr > th {
-    border-top: 0;
+    vertical-align: middle;
+    border-top: 1px solid #ddd;
 }
 .table-border > thead > tr > th,
 .table-border > tbody > tr > td {
@@ -974,6 +956,7 @@ input[type="submit"].btn::-moz-focus-inner {
 	color: #9d9d9d;
 }
 .navbar-gray {
+    border-bottom: 1px solid #d4d4d4;
     background-color: #fafafa;
     background-image: -moz-linear-gradient(top,#fff,#f2f2f2);
     background-image: -webkit-gradient(linear,0 0,0 100%,from(#fff),to(#f2f2f2));
@@ -981,14 +964,12 @@ input[type="submit"].btn::-moz-focus-inner {
     background-image: -o-linear-gradient(top,#fff,#f2f2f2);
     background-image: linear-gradient(to bottom,#fff,#f2f2f2);
     background-repeat: repeat-x;
-    border-bottom: 1px solid #d4d4d4;
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff',endColorstr='#fff2f2f2',GradientType=0);
     -webkit-box-shadow: 0 1px 4px rgba(0,0,0,0.065);
     -moz-box-shadow: 0 1px 4px rgba(0,0,0,0.065);
     box-shadow: 0 1px 4px rgba(0,0,0,0.065);
+    color: #777;
 }
 .navbar-gray .navbar-brand {
-    color: #777;
     text-shadow: 0 1px 0 #fff;
 }
 .navbar-gray .nav>li>a {

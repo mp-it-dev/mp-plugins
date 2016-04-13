@@ -51,9 +51,9 @@ PluginDep.browser = (function () {
 /**
  * 是否是IE9以下
  */
-PluginDep.isBelowIE9 = function () {
+PluginDep.isBelowIE9 = (function () {
     return PluginDep.browser.msie && parseInt(PluginDep.browser.version) < 9;
-}
+})();
 
 /**
  * [isOverflow 判断是否出现滚动条]
@@ -235,6 +235,24 @@ PluginDep.resetBodyScrollbar = function (context) {
             return this.each(function () {
                 $(this).data(namespace).reload(data);                
             });
+        },
+
+        getSelectedRowData: function () {
+            var container = this.eq(0).data(namespace).container;
+            var selectedRow = [];
+
+            container.find('.table-td-checkbox input:checked').each(function () {
+                var data = $(this).parents('.table-tr').data('rowData');
+                selectedRow.push(data);
+            });
+
+            return selectedRow;
+        },
+
+        setGroupHeaders: function (o) {
+            return this.each(function () {
+                $(this).data(namespace).setGroupHeaders(o);
+            });
         }
     }
 
@@ -260,6 +278,8 @@ PluginDep.resetBodyScrollbar = function (context) {
         rowParam        : false,                    //行自定义参数，对象形式，支持函数返回
         colParam        : false,                    //列自定义参数，对象形式，支持函数返回
         colOptions      : [],                       //列设置
+        groupHeaders    : false,                    //多表头设置
+        align           : false,                    //全局设置对齐方式
 
         /*
          * colOptions格式：[{
@@ -270,7 +290,8 @@ PluginDep.resetBodyScrollbar = function (context) {
          *     edit: {                              //是否可编辑，默认为false
          *         replace: '<input />',            //编辑元素
          *         callback: function () {},        //编辑回调函数
-         *     },                         
+         *     },
+         *     align: false,                        //对齐方式
          *     css: false,                          //设置css样式
          *     class: false,                        //自定义类
          *     sort: {
@@ -356,6 +377,15 @@ PluginDep.resetBodyScrollbar = function (context) {
         //表头最后一个拖动条隐藏
         $container.find('.table-head .table-tr th:last .table-th-resize').addClass('table-th-resize-last');
 
+        for (var i = 0, l = $container.find('.table-head .holder th').length; i < l; i++) {
+            $container.find('.table-head .table-tr th').eq(i).attr('data-index', i);
+        }
+
+        //执行多列参数设置
+        if (options.groupHeaders) {
+            self.setGroupHeaders(options.groupHeaders);
+        }
+
         this.initData();
     }
 
@@ -417,7 +447,7 @@ PluginDep.resetBodyScrollbar = function (context) {
                 localPage       : paging.localPage,
                 beforeSend      : function () {       //加载框显示
                     var height = $container.find('.table-body').height();
-
+                    
                     if (height) {
                         $container.find(".table-loading").show();
                     }
@@ -546,7 +576,8 @@ PluginDep.resetBodyScrollbar = function (context) {
 
             //还原列宽
             if ($thead.data('minusWidth')) {
-                $theadLastTh.width($theadLastTh.outerWidth(true) + sWidth);
+                var w = Math.max(parseInt($theadLastTh[0].style.width) || $theadLastTh.width(), 40);
+                //$theadLastTh.width(w + sWidth);
                 $thead.css('padding-right', 1);
                 $tbody.css('padding-right', 1);
                 $thead.removeData('minusWidth');
@@ -554,7 +585,8 @@ PluginDep.resetBodyScrollbar = function (context) {
 
             //出现竖直滚动条则设置padding-right
             if ($tbodyTable.outerHeight(true) > $tbody.outerHeight(true)) {
-                $theadLastTh.width($theadLastTh.outerWidth(true) - sWidth);
+                var w = Math.max(parseInt($theadLastTh[0].style.width) || $theadLastTh.width(), 40);
+                //$theadLastTh.width(w - sWidth);
                 $thead.css('padding-right', sWidth + 1);
                 $tbody.css('padding-right', sWidth + 1);
                 $thead.data('minusWidth', true);
@@ -567,7 +599,7 @@ PluginDep.resetBodyScrollbar = function (context) {
                 $tbody.css('max-height', $tbody.getCss('max-height') - sWidth);
             }
 
-            $container.find('.table').css('table-layout', 'fixed');
+            //$container.find('.table').css('table-layout', 'fixed');
 
             //计算表格宽度
             var $thead_ths = $container.find('.table-head .holder th');
@@ -582,7 +614,14 @@ PluginDep.resetBodyScrollbar = function (context) {
                 $thead_ths.eq(i).width(w);
             }
 
+            //设置总宽度防止拖动时变形
             $container.find('.table').css('width', totalW);
+
+            if (PluginDep.browser.msie) {
+                $container.find('.table-th-resize').each(function () {
+                    $(this).height($(this).parent().outerHeight());
+                });
+            }            
 
             //如果绑定过事件的话不需要再次绑定
             if (!$container.data('bindEvents')) {
@@ -668,7 +707,7 @@ PluginDep.resetBodyScrollbar = function (context) {
 
         for (var i = 0; i < colLen; i++) {
             var col = colOptions[i];
-            var attr = 'data-field="'+col.field+'" onselectstart="return false;"', 
+            var attr = 'data-field="'+col.field+'" data-field-index="' + i + '" onselectstart="return false;"', 
                 stl = [],
                 sort = col.sort;
 
@@ -677,7 +716,7 @@ PluginDep.resetBodyScrollbar = function (context) {
                 attr += ' data-sname="' + sort.sname + '"' + ' data-sorder="' + sort.sorder + '"';
             }
 
-            var $th = $('<th class="table-th' + (col.sort ? ' table-sort' : '') + '" ' + attr +'">');
+            var $th = $('<th class="table-th' + (col.sort ? ' table-sort' : '') + '" ' + attr +'"></th>');
 
             if (col.css) {
                 $th.css(col.css);
@@ -685,6 +724,10 @@ PluginDep.resetBodyScrollbar = function (context) {
 
             if (col['class']) {
                 $th.addClass(col['class']);
+            }
+
+            if (col.align || options.align) {
+                $th.css('text-align', col.align || options.align);
             }
 
             if (options.resizable) {
@@ -728,7 +771,7 @@ PluginDep.resetBodyScrollbar = function (context) {
                 rowData += ' data-'+key+'="'+rowParam[key]+'"';
             }
 
-            var $tr = $('<tr class="table-tr"'+rowData+'>').appendTo($tbody);
+            var $tr = $('<tr class="table-tr"'+rowData+'></tr>').appendTo($tbody);
             $tr.data('rowData', dataList[i]);
 
             if (options.checkbox) {
@@ -788,11 +831,15 @@ PluginDep.resetBodyScrollbar = function (context) {
                     $td.addClass(col['class']);
                 }
 
+                if (col.align || options.align) {
+                    $td.css('text-align', col.align || options.align);
+                }
+
                 //如果返回的是html元素或jquery元素则使用append
                 if (typeof text === 'object' && (text instanceof jQuery || PluginDep.isDom(text))) {
                     $div.append(text);
                 } else {
-                    $div.html(text ? text + '' : '');
+                    $div.html((text === undefined || text === null) ? '' : text + '');
                 }
             }
         }
@@ -819,8 +866,7 @@ PluginDep.resetBodyScrollbar = function (context) {
      * @return {[type]} [description]
      */
     Table.prototype.reload = function (data) {
-        var options = this.options,
-            pager = this.container.find('.table-pager');
+        var options = this.options;
 
         if (typeof options.data !== 'function') {
             data = $.extend(true, {}, options.data, data);
@@ -836,7 +882,114 @@ PluginDep.resetBodyScrollbar = function (context) {
 
         this.container.find('.table-th-checkbox input').prop('checked', false);
 
-        pager.pager('reload', data);
+        if (options.paging.enable) {
+            this.container.find('.table-pager').pager('reload', data);
+        } else {
+            this.getPageData();
+        }
+    }
+
+    /**
+     * [setGroupHeaders 设置多列表头]
+     * @return {[type]} [description]
+     */
+    Table.prototype.setGroupHeaders = function (o) {
+        o = $.extend({
+            useColSpanStyle: true,
+            headers: []
+        }, o || {});
+
+        var options = this.options,
+            container = this.container,
+            ts = this;
+
+        options.groupHeaders = o;
+
+        var i, cmi, skip = 0, $tr, $colHeader, th, $th, thStyle,
+            iCol,
+            cghi,
+            numberOfColumns,
+            titleText,
+            cVisibleColumns,
+            $htable = $('.table-head', container),
+            $thead = $htable.find("thead"),
+            $trLabels = $thead.find("tr.table-tr:last").addClass("table-second-header"),
+            $ths = $trLabels.find('th'),
+            colOptions = options.colOptions,
+            colLen = $ths.length,
+            $theadInTable, $firstRow;
+
+        var inColumnHeader = function (text, headers) {
+            var length = headers.length, i;
+
+            for (i = 0; i < length; i++) {
+                if (headers[i].startColumnField === text) {
+                    return i;
+                }
+            }
+
+            return -1;
+        };
+
+        $tr = $('<tr>').addClass("table-tr table-first-header");
+
+        for (i = 0; i < colLen; i++) {
+            $th = $ths.eq(i);
+            cmi = colOptions[+$th.data('field-index')];
+
+            iCol = cmi ? inColumnHeader(cmi.field, o.headers) : -1;
+
+            if (iCol >= 0) {
+                cghi = o.headers[iCol];
+                numberOfColumns = cghi.numberOfColumns;
+                titleText = cghi.name;
+
+                // caclulate the number of visible columns from the next numberOfColumns columns
+                for (cVisibleColumns = 0, iCol = 0; iCol < numberOfColumns && (i + iCol < colLen) ; iCol++) {
+                    if ($ths.eq(i + iCol).is(':visible')) {
+                        cVisibleColumns++;
+                    }
+                }
+
+                // The next numberOfColumns headers will be moved in the next row
+                // in the current row will be placed the new column header with the titleText.
+                // The text will be over the cVisibleColumns columns
+                $colHeader = $('<th>').addClass("table-th").html(titleText);
+
+                if (cVisibleColumns > 0) {
+                    $colHeader.attr("colspan", cVisibleColumns);
+                }
+
+                // hide if not a visible cols
+                if (cVisibleColumns === 0) {
+                    $colHeader.hide();
+                }
+
+                if (options.align) {
+                    $colHeader.css('text-align', options.align);
+                }
+
+                $tr.append($colHeader);         // move the current header in the next row
+
+                // set the coumter of headers which will be moved in the next row
+                skip = numberOfColumns - 1;
+            } else {
+                if (skip === 0) {
+                    if (o.useColSpanStyle) {
+                        $th.attr("rowspan", "2").remove().appendTo($tr);
+                    } else {
+                        $('<th>')
+                            .addClass(".table-th")
+                            .css({ "display": $th.css('display') })
+                            .appendTo($tr);
+                    }
+                } else {
+                    skip--;
+                }
+            }
+        }
+
+        $tr.insertBefore($trLabels);
     }
 
     /**
@@ -860,7 +1013,7 @@ PluginDep.resetBodyScrollbar = function (context) {
 
         //列宽度拖动，mousedown->mousemove->mouseup
         $container.on('mousedown', '.table-th-resize', function (e) {
-            index = $(this).parent().index();
+            index = +$(this).parent().data('index');
             $target = $container;
             oldX = e.clientX;
             oldLeft = 0;
@@ -1300,10 +1453,6 @@ PluginDep.resetBodyScrollbar = function (context) {
         setTimeout(function () {
             if (!self.initFlag) {
                 self.bindEvents();
-            }            
-
-            if (options.pageInfo) {
-                $('.pageSize').uiSelect();
             }
 
             if (options.onInit) {
