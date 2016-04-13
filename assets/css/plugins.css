@@ -95,12 +95,15 @@
 }
 .table-container .table-th-resize {
     position: absolute;
-    right: -1px;
+    right: 0px;
     top: 0;
     width: 1px;
     height: 100%;
     cursor: col-resize;
     background-color: #ddd;
+}
+.table-container .table-border .table-th-resize {
+    right: -1px;
 }
 .table-container .table-th-resize-last {
     background-color: transparent;
