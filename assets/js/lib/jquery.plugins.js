@@ -791,7 +791,7 @@ PluginDep.resetBodyScrollbar = function (context) {
                 var text;
 
                 if (typeof col.handler === 'function') {
-                    var val;
+                    var val = undefined;
 
                     if (col.field && data) {
                         val = data[col.field];

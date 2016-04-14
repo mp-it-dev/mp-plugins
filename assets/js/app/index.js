@@ -61,7 +61,7 @@ require(['jquery', 'util', 'bootstrap', 'uploadify', 'tlayer', 'plugins'], funct
 			content: {
 				width: 880,
 				height: 480,
-				src: 'http://eipdev.maipu.com/MpCommon/MpSelector/Selector?type=SinglePeople'
+				src: 'http://eipdev.maipu.com/MpSelector/Selector/SinglePeople'
 			},
 			onInit: function() {
 				var t = Date.now();
@@ -77,7 +77,7 @@ require(['jquery', 'util', 'bootstrap', 'uploadify', 'tlayer', 'plugins'], funct
 			content: {
 				width: 880,
 				height: 480,
-				src: 'http://eipdev.maipu.com/MpCommon/MpSelector/Selector?type=MultiPeople'
+				src: 'http://eipdev.maipu.com/MpSelector/Selector/MultiPeople'
 			}
 		});
 	});
@@ -89,7 +89,7 @@ require(['jquery', 'util', 'bootstrap', 'uploadify', 'tlayer', 'plugins'], funct
 			content: {
 				width: 430,
 				height: 380,
-				src: 'http://eipdev.maipu.com/MpCommon/MpSelector/Selector?type=SingleDep'
+				src: 'http://eipdev.maipu.com/MpSelector/Selector/SingleDep'
 			}
 		});
 	});
@@ -101,7 +101,7 @@ require(['jquery', 'util', 'bootstrap', 'uploadify', 'tlayer', 'plugins'], funct
 			content: {
 				width: 780,
 				height: 410,
-				src: 'http://eipdev.maipu.com/MpCommon/MpSelector/Selector?type=MultiDep'
+				src: 'http://eipdev.maipu.com/MpSelector/Selector/MultiDep'
 			}
 		});
 	});
@@ -113,7 +113,7 @@ require(['jquery', 'util', 'bootstrap', 'uploadify', 'tlayer', 'plugins'], funct
 			content: {
 				width: 430,
 				height: 380,
-				src: 'http://eipdev.maipu.com/MpCommon/MpSelector/Selector?type=SingleJob'
+				src: 'http://eipdev.maipu.com/MpSelector/Selector/SingleJob'
 			}
 		});
 	});
@@ -125,7 +125,7 @@ require(['jquery', 'util', 'bootstrap', 'uploadify', 'tlayer', 'plugins'], funct
 			content: {
 				width: 780,
 				height: 410,
-				src: 'http://eipdev.maipu.com/MpCommon/MpSelector/Selector?type=MultiJob'
+				src: 'http://eipdev.maipu.com/MpSelector/Selector/MultiJob'
 			}
 		});
 	});
@@ -137,7 +137,7 @@ require(['jquery', 'util', 'bootstrap', 'uploadify', 'tlayer', 'plugins'], funct
 			content: {
 				width: 430,
 				height: 410,
-				src: 'http://eipdev.maipu.com/MpCommon/MpSelector/Selector?type=SingleJobList'
+				src: 'http://eipdev.maipu.com/MpSelector/Selector/SingleJobList'
 			}
 		});
 	});

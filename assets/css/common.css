@@ -1023,19 +1023,41 @@ input[type="submit"].btn::-moz-focus-inner {
     background-color: #17c3e5;
     border-color: #17c3e5;
 }
+.panel[data-expand] > .panel-heading:before {
+    display: block;
+    font-family: "foundation-icons";
+    font-size: 13px;
+    line-height: 1;
+    float: left;
+    position: relative;
+    top: 3px;
+    margin-right: 5px;
+}
+.panel[data-expand="N"] > .panel-heading:before {
+    content: "︽";
+}
+.panel[data-expand="Y"] > .panel-heading:before {
+    content: "︾";
+}
+.panel[data-expand="N"] > .panel-body {
+    display: none;
+}
+.panel[data-expand="N"] > .panel-heading .panel-option {
+    display: none;
+}
 /*panel样式重写 end*/
 
 /*表单行item start*/
 .item {
     position: relative;
 }
-.item-row-margin-top + .item-row-margin-top {
+.item-row-margin + .item-row-margin {
     margin-top: 10px;
 }
 .item-name {
     width: 100px;
     padding-top: 8px;
-    margin-right: 5px;
+    margin-right: 10px;
     margin-bottom: 0;
     text-align: right;
     float: left;
@@ -1046,6 +1068,8 @@ input[type="submit"].btn::-moz-focus-inner {
 .item-name.required:before {
     content: "*";
     color: red;
+    position: relative;
+    right: 2px;
 }
 .item-control {
     overflow: hidden;
