@@ -1026,12 +1026,11 @@ input[type="submit"].btn::-moz-focus-inner {
 /*panel样式重写 end*/
 
 /*表单行item start*/
-.item-row {
+.item {
     position: relative;
-    margin-top: 10px;
 }
-.item-row:first-child {
-    margin-top: 0;
+.item-row-margin-top + .item-row-margin-top {
+    margin-top: 10px;
 }
 .item-name {
     width: 100px;
