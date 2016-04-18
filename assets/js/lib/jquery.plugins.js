@@ -791,7 +791,7 @@ PluginDep.resetBodyScrollbar = function (context) {
                 var text;
 
                 if (typeof col.handler === 'function') {
-                    var val = undefined;
+                    var val;
 
                     if (col.field && data) {
                         val = data[col.field];
@@ -1534,10 +1534,8 @@ PluginDep.resetBodyScrollbar = function (context) {
             $container = this.container;
 
         //每页显示条数切换事件
-        $container.on("changed.ui.select", ".pageSize", function (e, data) {
-            var pageSize = +data[0].value;
-            options.pageSize = pageSize;
-
+        $container.on("change", ".pageSize", function (e) {
+            options.pageSize = +$(this).val();
             self.requestData(1, true);
         });
 
