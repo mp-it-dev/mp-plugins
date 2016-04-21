@@ -6,6 +6,7 @@ require(['jquery', 'util', 'bootstrap', 'uploadify', 'tlayer', 'plugins'], funct
 		url: "https://api.douban.com/v2/movie/top250?start=1",
 		dataType: 'jsonp',
 		jsonp: 'callback',
+		tableClass: 'table-border',
 		data: function () {
 			return {
 				keyword: $('#keyword').val()

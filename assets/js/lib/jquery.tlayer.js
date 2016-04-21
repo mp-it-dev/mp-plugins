@@ -289,7 +289,7 @@
                 settings = layerData.layers[layerID].settings;
         
             //追加弹出框到响应的上下文对象上
-            $(settings.context).find("body").append($layer);
+            $("body", settings.context).append($layer);
 
             //为缺省关闭事件的按钮添加点击时执行隐藏的功能
             layerUtil.addHideFn.call(settings.footer, layerID);

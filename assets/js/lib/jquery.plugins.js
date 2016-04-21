@@ -280,6 +280,7 @@ PluginDep.resetBodyScrollbar = function (context) {
         colOptions      : [],                       //列设置
         groupHeaders    : false,                    //多表头设置
         align           : false,                    //全局设置对齐方式
+        headerAlign     : 'left',                   //表头对齐方式
 
         /*
          * colOptions格式：[{
@@ -298,6 +299,10 @@ PluginDep.resetBodyScrollbar = function (context) {
          *         sname: 'id',                     //排序字段
          *         sorder: 'asc',                   //排序方式，asc升序，desc降序
          *     },
+         *     numberFormat: {
+         *         toThousands: true,
+         *         toWarning: true
+         *     }
          *     handler: function (value, data) {    //列处理函数，在该列的所有数据
          *                                          //都会被此函数处理，一定要返回数据
          *         return value;
@@ -726,9 +731,7 @@ PluginDep.resetBodyScrollbar = function (context) {
                 $th.addClass(col['class']);
             }
 
-            if (col.align || options.align) {
-                $th.css('text-align', col.align || options.align);
-            }
+            $th.css('text-align', options.headerAlign);
 
             if (options.resizable) {
                 $th.append('<div class="table-th-resize">&nbsp;</div>');
@@ -802,6 +805,16 @@ PluginDep.resetBodyScrollbar = function (context) {
                     text = col.handler;
                 } else {
                     text = data[col.field];
+                }
+
+                //数字格式化
+                if (col.numberFormat) {
+                    if (col.numberFormat.toThousands) {
+                        text = NumberFormat.toThousands(text);
+                    }
+                    if (col.numberFormat.toWarning) {
+                        text = NumberFormat.toWarning(text);
+                    }
                 }
 
                 var colParam = options.colParam || {};
@@ -965,8 +978,8 @@ PluginDep.resetBodyScrollbar = function (context) {
                     $colHeader.hide();
                 }
 
-                if (options.align) {
-                    $colHeader.css('text-align', options.align);
+                if (options.headerAlign) {
+                    $colHeader.css('text-align', options.headerAlign);
                 }
 
                 $tr.append($colHeader);         // move the current header in the next row
@@ -1178,6 +1191,25 @@ PluginDep.resetBodyScrollbar = function (context) {
     }
 
     bindCommonEvents();
+
+    var NumberFormat = {
+        toThousands: function (num) {
+            //null is number 0?
+            if (num === null || isNaN(num)) {
+                return num;
+            }
+
+            return num.toString().replace(/(\d)(?=(?:\d{3})+$)/g, '$1,');
+        },
+        toWarning: function (num) {
+            //null is number 0?
+            if (num === null || isNaN(num)) {
+                return num;
+            }
+
+            return num < 0 ? '<span style="color: red;">' + num + '</span>' : num;
+        }
+    }
     
     $.fn.table = function (method) {
         if (methods[method]) {

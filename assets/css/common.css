@@ -1051,7 +1051,7 @@ input[type="submit"].btn::-moz-focus-inner {
 .item {
     position: relative;
 }
-.item-row-margin + .item-row-margin {
+.item-row + .item-row {
     margin-top: 10px;
 }
 .item-name {
