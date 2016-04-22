@@ -331,8 +331,6 @@ PluginDep.resetBodyScrollbar = function (context) {
             pageIndex       : 1,                    //从第几页开始
             pageSize        : 20,                   //每页显示多少条数据
             pageSizeArray   : false,                //每页显示多少条数据的选择数组
-            total           : 0,                    //数据总条数
-            totalPage       : 0,                    //总页数
             pageLength      : 5,                    //显示的页码数
             pageInfo        : true,                 //是否显示页码信息
             skipPage        : true                  //是否启用跳页
@@ -487,6 +485,7 @@ PluginDep.resetBodyScrollbar = function (context) {
             var $pager = $('<div class="table-pager"></div>').appendTo($container);
 
             $pager.pager(ajaxOpt);
+            options.paging.pager = $pager.data('ui.pager').options;
         } else {
             ajaxOpt = {
                 url             : options.url,
