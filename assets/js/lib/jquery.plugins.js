@@ -1192,21 +1192,35 @@ PluginDep.resetBodyScrollbar = function (context) {
     bindCommonEvents();
 
     var NumberFormat = {
-        toThousands: function (num) {
+        toThousands: function (num, precision) {
             //null is number 0?
             if (num === null || isNaN(num)) {
                 return num;
             }
 
-            return num.toString().replace(/(\d)(?=(?:\d{3})+$)/g, '$1,');
+            num = Number(num);
+            // 处理小数点位数
+            num = (typeof precision !== 'undefined' ? num.toFixed(precision) : num).toString();
+            // 分离数字的小数部分和整数部分
+            parts = num.split('.');
+            // 整数部分加[separator]分隔, 借用一个著名的正则表达式
+            parts[0] = parts[0].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + (','));
+
+            return parts.join('.');
         },
         toWarning: function (num) {
             //null is number 0?
-            if (num === null || isNaN(num)) {
+            if (num === null) {
                 return num;
             }
 
-            return num < 0 ? '<span style="color: red;">' + num + '</span>' : num;
+            var newNum = Number(num.toString().replace(/,/g, ''));
+
+            if (isNaN(newNum)) {
+                return num;
+            }
+
+            return newNum < 0 ? '<span style="color: red;">' + num + '</span>' : num;
         }
     }
     

@@ -235,35 +235,6 @@ define('util', function () {
             return s;
         },
 
-        //执行函数
-        runFunction: function (fn, thisObj, args) {
-            if (typeof fn === 'function') {
-                var argus = arguments,
-                    argsl = argus.length;
-
-                //如果函数的参数列表存在1个参数
-                if (argsl == 1) {
-                    return fn.apply(window);
-                }
-
-                //如果函数的参数列表存在2个参数
-                if (argsl == 2) {
-                    if (typeof thisObj === "array") {
-                        return fn.apply(window, thisObj);
-                    } else {
-                        return fn.apply(thisObj);
-                    }
-                }
-
-                //如果函数的参数列表存在3个参数
-                if (argsl == 3) {
-                    return fn.apply(thisObj || window, args);
-                }
-            } else {
-                throw fn + ' is not a function';
-            }
-        },
-
         //判断是否是DOM元素
         isDOM: function (obj) {
             if (typeof HTMLElement === 'object') {
@@ -378,6 +349,23 @@ define('util', function () {
             body.removeChild(scrollDiv);
 
             return scrollbarWidth;
+        },
+
+        formatNumber: function (num, precision, separator) {
+            //null is number 0?
+            if (num === null || isNaN(num)) {
+                return num;
+            }
+
+            num = Number(num);
+            // 处理小数点位数
+            num = (typeof precision !== 'undefined' ? num.toFixed(precision) : num).toString();
+            // 分离数字的小数部分和整数部分
+            parts = num.split('.');
+            // 整数部分加[separator]分隔, 借用一个著名的正则表达式
+            parts[0] = parts[0].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + (separator || ','));
+
+            return parts.join('.');
         }
     }
 
