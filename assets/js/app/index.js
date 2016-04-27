@@ -17,8 +17,7 @@ require(['jquery', 'util', 'bootstrap', 'uploadify', 'tlayer', 'plugins'], funct
 			enable: true,
 			indexField: "start",
 			sizeField: "count",
-			pageSize: 20,
-			skipPage: false
+			pageSize: 20
 		},
 		colOptions: [{
 			name: '名称',

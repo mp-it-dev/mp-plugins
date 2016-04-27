@@ -293,6 +293,7 @@ PluginDep.resetBodyScrollbar = function (context) {
          *         callback: function () {},        //编辑回调函数
          *     },
          *     align: false,                        //对齐方式
+         *     headerAlign: false,                  //表头对齐方式
          *     css: false,                          //设置css样式
          *     class: false,                        //自定义类
          *     sort: {
@@ -319,7 +320,8 @@ PluginDep.resetBodyScrollbar = function (context) {
         data                : false,                //请求数据，json或function
         dataType            : 'json',               //返回数据类型
         jsonp               : 'callback',           //跨域回调函数名称
-        dataField           : 'data',               //json数组字段名
+        dataField           : 'data',               //json数组字段名,
+        autoLoad            : true,                 //是否自动加载数据
 
         //分页选项
         paging              : {
@@ -399,7 +401,9 @@ PluginDep.resetBodyScrollbar = function (context) {
      */
     Table.prototype.initData = function () {
         if (this.options.url) {
-            this.getPageData();
+            if (this.options.autoLoad) {
+                this.getPageData();
+            }
         } else {
             this.createTable();
         }
@@ -541,6 +545,8 @@ PluginDep.resetBodyScrollbar = function (context) {
 
         $container.find('.table-body .table tbody').remove();
         $container.find('.table-body .table').append($tbody);
+        $container.find('.table-body').scrollTop(0);
+        //$container.find('.table-body').scrollLeft(0);
 
         this.initTable();
     }
@@ -895,7 +901,13 @@ PluginDep.resetBodyScrollbar = function (context) {
         this.container.find('.table-th-checkbox input').prop('checked', false);
 
         if (options.paging.enable) {
-            this.container.find('.table-pager').pager('reload', data);
+            var pager = this.container.find('.table-pager');
+
+            if (pager.length) {
+                pager.pager('reload', data);
+            } else {
+                this.getPageData();
+            }
         } else {
             this.getPageData();
         }
@@ -1015,8 +1027,17 @@ PluginDep.resetBodyScrollbar = function (context) {
         $container.data('bindEvents', true);
 
         //固定表头滚动
-        $container.find('.table-body').on('scroll', function (e) {            
+        $container.find('.table-body').on('scroll', function (e) {
+            var w = $(this).width();
+            var h = $(this).height();
+            var top = this.scrollTop;
+            var left = this.scrollLeft;
+
             $container.find('.table-head table').css('left', -this.scrollLeft);
+            $container.find('.table-loading').css({
+                top: h / 2 + top,
+                left: w / 2 + left
+            });
         });
 
         $container.on('click', '.table-th-resize', function () {
