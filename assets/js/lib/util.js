@@ -147,6 +147,8 @@ define('util', function () {
             }
 
             if (search) {
+                search = search.substring(1);
+                
                 var arr = search.split('&');
                 var d;
 

@@ -280,7 +280,7 @@ PluginDep.resetBodyScrollbar = function (context) {
         colOptions      : [],                       //列设置
         groupHeaders    : false,                    //多表头设置
         align           : false,                    //全局设置对齐方式
-        headerAlign     : 'left',                   //表头对齐方式
+        headerAlign     : false,                    //表头对齐方式
 
         /*
          * colOptions格式：[{
@@ -378,7 +378,7 @@ PluginDep.resetBodyScrollbar = function (context) {
                         '</div>'+
                     '</div>';
 
-        $container.html(html);
+        this.container = $container.html(html).find('.table-container');
         //表头最后一个拖动条隐藏
         $container.find('.table-head .table-tr th:last .table-th-resize').addClass('table-th-resize-last');
 
@@ -736,7 +736,9 @@ PluginDep.resetBodyScrollbar = function (context) {
                 $th.addClass(col['class']);
             }
 
-            $th.css('text-align', options.headerAlign);
+            if (col.headerAlign || options.headerAlign) {
+                $th.css('text-align', col.headerAlign || options.headerAlign);
+            }            
 
             if (options.resizable) {
                 $th.append('<div class="table-th-resize">&nbsp;</div>');
@@ -1195,19 +1197,19 @@ PluginDep.resetBodyScrollbar = function (context) {
         });
 
         //解决window.resize再回到原来尺寸时高度比原来大的问题
-        if (PluginDep.isBelowIE9) {
+        /*if (PluginDep.isBelowIE9) {
             var resizeTimes = 0;
             $(window).resize(function () {
                 if (resizeTimes % 2 == 0) {
                     $('.table-container .table-body').addClass('resize-hack');
                     setTimeout(function () {
                         $('.table-container .table-body').removeClass('resize-hack');
-                    }, 10);
+                    }, 50);
                 }
 
                 resizeTimes++;
             });
-        }        
+        }*/
     }
 
     bindCommonEvents();

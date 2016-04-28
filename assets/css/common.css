@@ -104,13 +104,8 @@ input[type=checkbox], input[type=radio] {
     border-bottom: 1px solid #ddd;
 }
 .table > thead > tr > th {
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
     text-align: left;
     vertical-align: middle;
-    border-top: 1px solid #ddd;
 }
 .table-border > thead > tr > th,
 .table-border > tbody > tr > td {

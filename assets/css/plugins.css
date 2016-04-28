@@ -37,6 +37,13 @@
     background-color: transparent;
     background-clip: padding-box;
 }
+.table-container .table > thead > tr > th {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    border-top: 1px solid #ddd;
+}
 /*解决IE中设置th为position: relative;后，背景色会覆盖border的问题，IE9+可以通过background-clip: padding-box;解决，IE8中直接去掉背景色*/
 @media screen and (min-width: 0) {
     .table-container .table-th {
