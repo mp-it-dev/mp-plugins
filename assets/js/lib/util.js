@@ -46,7 +46,7 @@ define('util', function () {
         if (this != null && this.length > 0) {
             arr.forEach(function (item, idx) {
                 if (typeof item == 'object' && typeof key != 'undefined') {
-                    if (item[key] == value) {
+                    if (item[key] == value[key]) {
                         index = idx;
                     }
                 } else {

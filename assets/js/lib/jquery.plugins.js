@@ -1233,7 +1233,7 @@ PluginDep.resetBodyScrollbar = function (context) {
         },
         toWarning: function (num) {
             //null is number 0?
-            if (num === null) {
+            if (num === null || num === undefined) {
                 return num;
             }
 
