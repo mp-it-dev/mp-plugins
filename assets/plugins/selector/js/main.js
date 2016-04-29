@@ -1,7 +1,3 @@
-var OP_CONFIG = {
-    rootUrl: 'http://localhost:100/Selector/'
-}
-
 require.config({
     baseUrl: './js/',
     paths: {

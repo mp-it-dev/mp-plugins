@@ -1,5 +1,5 @@
 require(['jquery', 'util', 'ztree'], function($, util) {
-	var rootUrl = OP_CONFIG.rootUrl;
+	var rootUrl = util.queryString('apiurl');
 	var zNodes;
 	var rootNodes = { id: 'C01', name: '迈普通信', pid: null, isParent: true, nocheck: true };
     var setting = {

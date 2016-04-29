@@ -1,5 +1,6 @@
 define(['jquery', 'tlayer'], function($) {
 	var selector = {
+		apiUrl: 'http://eip.maipu.com/Selector/',
 		baseUrl: './',
 		singlePeople: function(option) {
 			top.singlePeopleCallback = option.callback;
@@ -10,7 +11,7 @@ define(['jquery', 'tlayer'], function($) {
 				content: {
 					width: 930,
 					height: 480,
-					src: this.baseUrl + 'singlePeople.html?callback=singlePeopleCallback'
+					src: this.baseUrl + 'singlePeople.html?callback=singlePeopleCallback&apiurl=' + encodeURIComponent(this.apiUrl)
 				}
 			});
 		},
@@ -23,7 +24,7 @@ define(['jquery', 'tlayer'], function($) {
 				content: {
 					width: 930,
 					height: 480,
-					src: this.baseUrl + 'multiPeople.html?callback=multiPeopleCallback'
+					src: this.baseUrl + 'multiPeople.html?callback=multiPeopleCallback&apiurl=' + encodeURIComponent(this.apiUrl)
 				}
 			});
 		},
@@ -36,7 +37,7 @@ define(['jquery', 'tlayer'], function($) {
 				content: {
 					width: 530,
 					height: 480,
-					src: this.baseUrl + 'singleDep.html?callback=singleDepCallback'
+					src: this.baseUrl + 'singleDep.html?callback=singleDepCallback&apiurl=' + encodeURIComponent(this.apiUrl)
 				}
 			});
 		},
@@ -49,7 +50,7 @@ define(['jquery', 'tlayer'], function($) {
 				content: {
 					width: 530,
 					height: 480,
-					src: this.baseUrl + 'multiDep.html?callback=multiDepCallback'
+					src: this.baseUrl + 'multiDep.html?callback=multiDepCallback&apiurl=' + encodeURIComponent(this.apiUrl)
 				}
 			});
 		},
@@ -62,7 +63,7 @@ define(['jquery', 'tlayer'], function($) {
 				content: {
 					width: 530,
 					height: 480,
-					src: this.baseUrl + 'singleJob.html?callback=singleJobCallback'
+					src: this.baseUrl + 'singleJob.html?callback=singleJobCallback&apiurl=' + encodeURIComponent(this.apiUrl)
 				}
 			});
 		},
@@ -75,7 +76,7 @@ define(['jquery', 'tlayer'], function($) {
 				content: {
 					width: 530,
 					height: 480,
-					src: this.baseUrl + 'multiJob.html?callback=multiJobCallback'
+					src: this.baseUrl + 'multiJob.html?callback=multiJobCallback&apiurl=' + encodeURIComponent(this.apiUrl)
 				}
 			});
 		}
