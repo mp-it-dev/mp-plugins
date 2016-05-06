@@ -1,6 +1,5 @@
 require(['jquery', 'util', 'ztree'], function($, util) {
-	var rootUrl = util.queryString('apiurl');
-	var zNodes;
+	var apiUrl = decodeURIComponent(util.queryString('apiurl'));
 	var rootNodes = { id: 'C01', name: '迈普通信', pid: null, isParent: true, nocheck: true };
     var setting = {
         data: {
@@ -18,7 +17,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         		treeObj.updateNode(treeNode);
 
             	$.ajax({
-			    	url: rootUrl + 'Organization/GetDepNode?pid=' + treeNode.id,
+			    	url: apiUrl + 'Organization/GetDepNode?pid=' + treeNode.id,
 			    	dataType: 'jsonp',
 			    	success: function(data) {
 						if (data && data.length > 0) {
@@ -37,9 +36,9 @@ require(['jquery', 'util', 'ztree'], function($, util) {
 		        searchPeople();
 
 		        $.ajax({
-		        	url: rootUrl + 'Organization/GetJobNode',
+		        	url: apiUrl + 'Organization/GetJobNode',
 		        	data: {
-		        		DepId: treeNode.id
+		        		depId: treeNode.id
 		        	},
 		        	dataType: 'jsonp',
 		        	success: function(data) {
@@ -122,11 +121,11 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         $('#peopleList').empty()
 
         $.ajax({
-        	url: rootUrl + 'Organization/GetPeopleResult',
+        	url: apiUrl + 'Organization/GetPeopleResult',
         	data: {
-        		DepId: depId,
-        		JobId: jobId,
-        		Keyword: keyword
+        		depId: depId,
+        		jobId: jobId,
+        		keyword: keyword
         	},
         	dataType: 'jsonp',
         	success: function(data) {

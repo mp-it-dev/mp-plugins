@@ -3,7 +3,8 @@ body {
 	font-size: 13px;
 }
 .container-selector {
-	height: 450px;
+	height: 480px;
+	padding: 15px;
 	overflow: hidden;
     position: relative;
 }
@@ -55,6 +56,9 @@ body {
 .selector-job .organization {
 	width: 500px;
 }
+.selector-product .product {
+	width: auto;
+}
 .job {
 	width: 180px;
 }
@@ -71,12 +75,13 @@ body {
 	font-size: 12px;
 	padding: 5px 12px;
 }
-.container-selector .ztree {
-	padding: 5px 0;
-}
 .part-content {
 	overflow: auto;
 	position: relative;
+	padding: 5px 0;
+}
+.people .part-content {
+	padding: 0;
 }
 .list > li {
 	height: 20px;
@@ -102,7 +107,9 @@ body {
 }
 .table.table-content > thead > tr > th {
 	border-bottom: 1px solid #d4d4d4;
-	height: 29px;
+	line-height: 18px;
+	padding-top: 6px;
+	padding-bottom: 5px;
 	vertical-align: middle;
 }
 .table.table-content > tbody > tr > td {
@@ -111,7 +118,7 @@ body {
 	padding-bottom: 3px;
 	vertical-align: middle;
 }
-.table.table-content > tbody > tr > td:hover {
+.table.table-content > tbody > tr:hover {
 	cursor: pointer;
 	color: #368ee0;
 }
@@ -123,4 +130,45 @@ body {
 	padding-left: 10px;
 	padding-right: 10px;
 	vertical-align: middle;
+}
+.product .part-opt {
+	display: none;
+}
+.opt-row {
+	overflow: hidden;
+}
+.product .opt-row {
+	display: none;
+}
+.opt-item {
+	float: left;
+}
+.opt-item + .opt-item {
+	margin-left: 10px;
+}
+.opt-item .btn {
+	height: 30px;
+    font-size: 12px;
+    padding: 5px 12px;
+}
+.opt-item .item-name {
+	padding-top: 5px;
+}
+.search-result {
+	display: none;
+}
+.search-result .table {
+	margin-bottom: 0;
+	table-layout: fixed;
+}
+.search-result .table-body th {
+	height: 0 !important;
+	padding: 0 !important;
+	border: 0 !important;
+}
+.search-result .table > tbody > tr > td {
+	word-break: break-all;
+}
+.search-result .table-body {
+	overflow: auto;
 }

@@ -11,6 +11,7 @@ define(['jquery', 'tlayer'], function($) {
 				content: {
 					width: 930,
 					height: 480,
+					padding: 0,
 					src: this.baseUrl + 'singlePeople.html?callback=singlePeopleCallback&apiurl=' + encodeURIComponent(this.apiUrl)
 				}
 			});
@@ -24,6 +25,7 @@ define(['jquery', 'tlayer'], function($) {
 				content: {
 					width: 930,
 					height: 480,
+					padding: 0,
 					src: this.baseUrl + 'multiPeople.html?callback=multiPeopleCallback&apiurl=' + encodeURIComponent(this.apiUrl)
 				}
 			});
@@ -37,6 +39,7 @@ define(['jquery', 'tlayer'], function($) {
 				content: {
 					width: 530,
 					height: 480,
+					padding: 0,
 					src: this.baseUrl + 'singleDep.html?callback=singleDepCallback&apiurl=' + encodeURIComponent(this.apiUrl)
 				}
 			});
@@ -50,6 +53,7 @@ define(['jquery', 'tlayer'], function($) {
 				content: {
 					width: 530,
 					height: 480,
+					padding: 0,
 					src: this.baseUrl + 'multiDep.html?callback=multiDepCallback&apiurl=' + encodeURIComponent(this.apiUrl)
 				}
 			});
@@ -63,6 +67,7 @@ define(['jquery', 'tlayer'], function($) {
 				content: {
 					width: 530,
 					height: 480,
+					padding: 0,
 					src: this.baseUrl + 'singleJob.html?callback=singleJobCallback&apiurl=' + encodeURIComponent(this.apiUrl)
 				}
 			});
@@ -76,7 +81,30 @@ define(['jquery', 'tlayer'], function($) {
 				content: {
 					width: 530,
 					height: 480,
+					padding: 0,
 					src: this.baseUrl + 'multiJob.html?callback=multiJobCallback&apiurl=' + encodeURIComponent(this.apiUrl)
+				}
+			});
+		},
+
+		//选择产品结构
+		product: function(option) {
+			top.productCallback = option.callback;
+
+			var width = 530;
+
+			if (option.level == 'cp' || option.level === undefined) {
+				width = 830;
+			}
+
+			$.content({
+				theme: 'blue',
+				header: '产品选择',
+				content: {
+					width: width,
+					height: 480,
+					padding: 0,
+					src: this.baseUrl + 'product.html?callback=productCallback&apiurl=' + encodeURIComponent(this.apiUrl) + '&level=' + option.level + '&multi=' + option.multi
 				}
 			});
 		}

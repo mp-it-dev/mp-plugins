@@ -371,10 +371,10 @@
 
             cStyle = ' style="'+cStyle.join(";")+';"';
 
-            var contentHTML = '<div class="layer-box-content"' + cStyle + '>';
+            var contentHTML = '<div class="layer-box-content' + (c.src ? ' layer-iframe-container' : '') + '"' + cStyle + '>';
 
             if (c.src) {
-                contentHTML += '<div class="layer-iframe-container"><iframe class="layer-box-iframe" src="' + c.src + '" frameborder="0"></iframe></div>';             
+                contentHTML += '<iframe class="layer-box-iframe" src="' + c.src + '" frameborder="0"></iframe>';             
             } else if (c.url) {
                 contentHTML += '<div class="layer-waiting"><img src="' + settings.imgPath + 'loading_16.gif"/>&nbsp;&nbsp;加载中...</div>';
             } else {
