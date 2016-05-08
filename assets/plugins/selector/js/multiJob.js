@@ -73,10 +73,10 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                 var pNode = nodes[i].getParentNode();
                 
                 selectedData.push({
-                     DepId: pNode.id,
-                     DepName: pNode.name,
-                     JobId: nodes[i].id,
-                     JobName: nodes[i].name
+                    DepId: pNode.id,
+                    DepName: pNode.name,
+                    JobId: nodes[i].id,
+                    JobName: nodes[i].name
                 });
             }
 

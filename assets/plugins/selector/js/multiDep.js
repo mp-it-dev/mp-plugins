@@ -63,8 +63,8 @@ require(['jquery', 'util', 'ztree'], function($, util) {
 
             for (var i = 0, l = nodes.length; i < l; i++) {
                 selectedData.push({
-                     DepId: nodes[i].id,
-                     DepName: nodes[i].name
+                    DepId: nodes[i].id,
+                    DepName: nodes[i].name
                 });
             }
 

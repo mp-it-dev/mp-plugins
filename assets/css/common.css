@@ -93,6 +93,7 @@ input[type=checkbox], input[type=radio] {
 .table {
     width: 100%;
     background-color: #fff;
+    margin-bottom: 0;
 }
 .table > tbody > tr > td, 
 .table > tbody > tr > th, 
