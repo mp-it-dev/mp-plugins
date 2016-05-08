@@ -183,6 +183,9 @@
 /*table end*/
 
 /*页码 start*/
+.table-container .table-pager {
+    margin-top: 10px;
+}
 .pagination {
     display: block;
     text-align: center;
