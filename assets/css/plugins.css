@@ -973,3 +973,31 @@
     padding-left: 10px;
 }
 /*右键菜单 end*/
+
+/*input自动补全 start*/
+.ui-autoComplete {
+    position: relative;
+}
+.ui-autoComplete-result {
+    display: none;
+    position: absolute;
+    z-index: 999;
+    width: 100%;
+    background-color: #fff;
+    border: solid #ddd;
+    border-width: 0 1px 1px;
+}
+.ui-autoComplete-result table {
+    width: 100%;
+}
+.ui-autoComplete-result table td {
+    padding: 4px 10px;
+}
+.ui-autoComplete-result table tr + tr {
+    border-top: 1px dashed #ddd;
+}
+.ui-autoComplete-result table tr:hover {
+    background-color: #eee;
+    color: #0088cc;
+}
+/*input自动补全 end*/

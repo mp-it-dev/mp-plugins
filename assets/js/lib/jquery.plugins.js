@@ -56,6 +56,15 @@ PluginDep.isBelowIE9 = (function () {
 })();
 
 /**
+ * [parseTpl 解析简单的模板变量]
+ */
+PluginDep.parseTpl = function (template, itemData) {
+    return template.replace(/\#\{([\w]*)\}/g, function (s0, s1) {
+        return s1 == '' ? itemData : itemData[s1] || '';
+    });
+}
+
+/**
  * [isOverflow 判断是否出现滚动条]
  * @param  {[type]}  $ele [description]
  */
@@ -3400,6 +3409,9 @@ PluginDep.resetBodyScrollbar = function (context) {
     });
 })(jQuery);
 
+/**
+ * [RightMenu 右键菜单]
+ */
 (function ($, win) {
     var pName = 'rightMenu';
     var namespace = 'ui.' + pName;
@@ -3517,5 +3529,181 @@ PluginDep.resetBodyScrollbar = function (context) {
 
     $.rightMenu = function (option) {
         return new RightMenu(option);
+    }
+})(jQuery, window);
+
+/**
+ * [AutoComplete input框自动补全]
+ */
+(function ($, win) {
+    var pName = 'autoComplete';
+    var namespace = 'ui.' + pName;
+
+    var methods = {
+        init: function (option) {
+            return this.each(function() {
+                var $this = $(this);
+                var setting = $.extend(true, {}, AutoComplete.DEFAULTS, option); 
+                
+                $this.data(namespace, new AutoComplete($this, setting));
+            });
+        }
+    };
+
+    var AutoComplete = function (ele, setting) {
+        this.ele = ele;
+        this.setting = setting;
+
+        if (!setting.async.url) {
+            this.originDataList = setting.dataList;
+        }
+
+        this.init();
+    }
+
+    AutoComplete.DEFAULTS = {
+        width: false,
+        maxNum: null,
+        autoHide: false,
+        async: {
+            url: '',
+            type: 'GET',
+            data: false,
+            dataType: false,
+            dataField: 'data',
+            searchField: 'keyword'
+        },
+        dataList: [],
+        localSearchField: null,        
+        template: '<td>#{}</td>',
+        callback: false,
+        onInit: false
+    };
+
+    AutoComplete.prototype.init = function () {
+        var setting = this.setting;
+
+        var styleObj = {
+            display: this.ele.css('display'),
+            width: setting.width || this.ele.outerWidth(true)
+        };
+
+        var div = $('<div class="ui-autoComplete"></div>').css(styleObj);
+        this.ele.addClass('ui-autoComplete-input').wrap(div);
+        this.ele = this.ele.parent();
+        this.ele.append('<div class="ui-autoComplete-result"><table></table></div>');
+
+        if (typeof setting.onInit == 'function') {
+            setting.onInit.call(this.ele, this);
+        }
+
+        this.bindEvents();
+    }
+
+    AutoComplete.prototype.showList = function () {
+        var ele = this.ele;
+        var setting = this.setting;
+        
+        var table = ele.find('.ui-autoComplete-result table').empty();
+        var len = setting.maxNum ? Math.min(setting.maxNum, setting.dataList.length) : setting.dataList.length;
+
+        if (len > 0) {
+            for (var i = 0; i < len; i++) {
+                var tr = $('<tr>' + PluginDep.parseTpl(setting.template, setting.dataList[i]) + '</tr>');
+
+                tr.data('data', setting.dataList[i]).appendTo(table);
+            }
+
+            ele.find('.ui-autoComplete-result').show();
+
+            if (setting.autoHide) {
+                setTimeout(function () {
+                    ele.find('.ui-autoComplete-result').hide();
+                }, 3000);
+            }
+        }        
+    }
+
+    AutoComplete.prototype.bindEvents = function () {
+        var ele = this.ele;
+        var setting = this.setting;
+        var self = this;
+        var timer = null;
+
+        // note: propertychange不能冒泡
+        ele.find('.ui-autoComplete-input').on('click input propertychange', function (e) {
+            var async = setting.async;
+            var val = $(this).val();
+
+            if (async.url) {
+                clearTimeout(timer);
+
+                timer = setTimeout(function () {
+                    var ajaxOpt = {
+                        url: async.url,
+                        type: async.type,
+                        data: {},
+                        success: function (res) {
+                            setting.dataList = async.dataField ? res[async.dataField] : res;
+                            self.showList();
+                        }
+                    };
+
+                    if (async.dataType) {
+                        ajaxOpt.dataType = async.dataType;
+                    }
+
+                    ajaxOpt.data[async.searchField] = val;
+
+                    if (async.data) {
+                        $.extend(true, ajaxOpt.data, typeof async.data == 'function' ? async.data() : async.data);
+                    }
+
+                    $.ajax(ajaxOpt);
+                }, 300);
+            } else {
+                var originDataList = self.originDataList;
+                var field = setting.localSearchField;
+                setting.dataList = [];
+
+                for (var i = 0, l = originDataList.length; i < l; i++) {
+                    if (field) {
+                        if (originDataList[i][field].indexOf(val) > -1) {
+                            setting.dataList.push(originDataList[i]);
+                        }
+                    } else {
+                        if (originDataList[i].indexOf(val) > -1) {
+                            setting.dataList.push(originDataList[i]);
+                        }
+                    }
+                }
+
+                self.showList();
+            }
+
+            e.stopPropagation();
+        });
+
+        ele.on('click', '.ui-autoComplete-result tr', function (e) {
+            var data = $(this).data('data');
+
+            if (typeof setting.callback == 'function') {
+                setting.callback(data);
+            }
+        });
+    }
+
+    $(document).on('click', function () {
+        $('.ui-autoComplete-result').hide();
+    });
+
+    $.fn.autoComplete = function (method) {
+        if (methods[method]) {
+            return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
+        } else if (typeof method === 'object' || !method) {
+            return methods.init.apply(this, arguments);
+        } else {
+            $.error('The method ' + method + ' does not exist in $.autoComplete');
+        }
     }
 })(jQuery, window);
