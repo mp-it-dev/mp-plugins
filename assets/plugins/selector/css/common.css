@@ -93,6 +93,7 @@ input[type=checkbox], input[type=radio] {
 .table {
     width: 100%;
     background-color: #fff;
+    margin-bottom: 0;
 }
 .table > tbody > tr > td, 
 .table > tbody > tr > th, 
@@ -1042,6 +1043,7 @@ input[type="submit"].btn::-moz-focus-inner {
 /*表单行item start*/
 .item {
     position: relative;
+    display: table;
 }
 .item-row + .item-row {
     margin-top: 10px;
@@ -1052,7 +1054,8 @@ input[type="submit"].btn::-moz-focus-inner {
     margin-right: 10px;
     margin-bottom: 0;
     text-align: right;
-    float: left;
+    display: table-cell;
+    vertical-align: top;
 }
 .item-name.required {
     position: relative;
@@ -1064,10 +1067,14 @@ input[type="submit"].btn::-moz-focus-inner {
     right: 2px;
 }
 .item-control {
-    overflow: hidden;
+    display: table-cell;
+    vertical-align: top;
+    padding-left: 5px;
 }
 .item-static {
-    overflow: hidden;
+    display: table-cell;
+    vertical-align: top;
+    padding-left: 5px;
     padding-top: 8px;
 }
 /*表单行item end*/

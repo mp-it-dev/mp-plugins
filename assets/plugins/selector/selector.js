@@ -1,6 +1,6 @@
-define(['jquery', 'tlayer'], function($) {
+(function (win) {
 	var selector = {
-		apiUrl: 'http://eip.maipu.com/Selector/',
+		apiUrl: 'http://10.0.0.5:8011/Selector/',
 		baseUrl: './',
 		singlePeople: function(option) {
 			top.singlePeopleCallback = option.callback;
@@ -110,5 +110,15 @@ define(['jquery', 'tlayer'], function($) {
 		}
 	};
 
-	return selector;
-});
+	if (typeof define === "function" && define.amd) {
+		define(['jquery', 'tlayer'], function() {
+			return selector;
+		});
+	} else {
+		if (jQuery && jQuery.content) {
+			window.selector = selector;
+		} else {
+			throw new Error('selector depends on jQuery and tlayer');
+		}		
+	}
+})(this);
