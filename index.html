@@ -140,19 +140,22 @@
 				<div class="form-group">
 					<label class="col-md-2 control-label">人员选择：</label>
 				    <div class="col-md-6">
-				    	<button type="button" class="btn btn-default btn-sm" id="singlePeople">单人</button>
-				    	<button type="button" class="btn btn-primary btn-sm" id="multiPeople">多人</button>
-				    	<button type="button" class="btn btn-success btn-sm" id="singleDep">单部门</button>
-				    	<button type="button" class="btn btn-warning btn-sm" id="multiDep">多部门</button>
-				    	<button type="button" class="btn btn-info btn-sm" id="singleJob">单职位</button>
-				    	<button type="button" class="btn btn-danger btn-sm" id="multiJob">多职位</button>
-				    	<button type="button" class="btn btn-inverse btn-sm" id="singleJobList">单职位列表</button>
+				    	<button type="button" class="btn btn-primary selector-organiztion" data-type="singlePeople">单人</button>
+    	                <button type="button" class="btn btn-success selector-organiztion" data-type="multiPeople">多人</button>
+    	                <button type="button" class="btn btn-info selector-organiztion" data-type="singleDep">单部门</button>
+    	                <button type="button" class="btn btn-warning selector-organiztion" data-type="multiDep">多部门</button>
+    	                <button type="button" class="btn btn-danger selector-organiztion" data-type="singleJob">单职位</button>
+    	                <button type="button" class="btn btn-inverse selector-organiztion" data-type="multiJob">多职位</button>
 				    </div>
 				</div>
 				<div class="form-group">
-					<label class="col-md-2 control-label">产品选择：</label>
+					<label class="col-md-2 control-label">选产品结构：</label>
 				    <div class="col-md-6">
-				    	<button type="button" class="btn btn-default btn-sm" id="productSelect">选择产品</button>
+				    	<button type="button" class="btn btn-primary selector-product" data-level="cpx">产品线</button>
+		                <button type="button" class="btn btn-success selector-product" data-level="cpxl" data-multi="true">产品系列</button>
+		                <button type="button" class="btn btn-info selector-product" data-level="zhengji">整机</button>
+		                <button type="button" class="btn btn-warning selector-product" data-level="xsxh">销售型号</button>
+		                <button type="button" class="btn btn-danger selector-product" data-level="cp" data-multi="true">产品</button>
 				    </div>
 				</div>
 			</form>
