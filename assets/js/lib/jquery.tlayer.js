@@ -2,14 +2,13 @@
  * [弹出框插件]
  */
 ;(function ($, window, undefined) {
-
     //把以下变量保存成局部变量
-    var _top = top || window,
-        document = _top.document;
+    var win = top || window,
+        doc = win.document;
 
     //初始化弹窗
-    _top.tlayer = _top.tlayer || {},
-    _top.tlayer = $.tlayer = _top.tlayer;
+    win.tlayer = win.tlayer || {},
+    win.tlayer = $.tlayer = win.tlayer;
     var _tlayer = $.tlayer;
 
     //当前弹出框使用情况
@@ -53,7 +52,7 @@
                 bindEsc         : true,         //是否绑定Esc键关闭弹出框
                 animation       : "fade",       //动画效果 fade淡入(fadeIn)淡出(fadeOut), slide滑入(slideDown)滑出(slideUp), display显示(show)隐藏(hide)
                 duration        : 150,          //显示和隐藏的时间
-                context         : document,     //上下文对象，弹出框将被追加到哪个上下文中，默认当前文档
+                win             : win,          //窗口上下文对象
                 onEsc           : false,        //当弹出框触发Esc按钮时执行的回调函数
                 auto            : true,         //默认自动显示，否则使用$.tlayer("show", layerID);
                 theme           : 'default',    //主题，目前提供default，blue, black三种
@@ -278,7 +277,7 @@
             return $layer;
         },
         /**
-         * 将layerID对应的弹出框追加到相应的document上下文对象下
+         * 将layerID对应的弹出框追加到相应的上下文对象下
          * @param  {String} layerID layer弹出框的id
          * @return 无返回
          */
@@ -510,7 +509,7 @@
          */
         bindEvents: function () {
             //绑定ESC键触发关闭layer操作
-            $(document).on("keyup.tmenu", function (e) {
+            $(doc).on("keyup.tmenu", function (e) {
                 var code = e.keyCode || e.which;
 
                 var tlayer = _tlayer;
@@ -544,7 +543,7 @@
             });
 
             //绑定拖拽事件
-            $(document).on('mousemove.layer_drag', function (e) {
+            $(doc).on('mousemove.layer_drag', function (e) {
                 if (dragObj.ele) {
                     var oX = e.clientX - dragObj.oldX;
                     var oY = e.clientY - dragObj.oldY;
@@ -555,11 +554,11 @@
                     if (oX < 0) oX = 0;
                     if (oY < 0) oY = 0;
 
-                    if (oX + w > $(_top).width()) {
-                        oX = $(_top).width() - w;
+                    if (oX + w > $(win).width()) {
+                        oX = $(win).width() - w;
                     }
-                    if (oY + h > $(_top).height()) {
-                        oY = $(_top).height() - h;
+                    if (oY + h > $(win).height()) {
+                        oY = $(win).height() - h;
                     }
 
                     target.css({ "left": oX + "px", "top": oY + "px" });
@@ -569,7 +568,7 @@
             });
 
             //绑定拖拽事件
-            $(document).on('mouseup.layer_drag', function (e) {
+            $(doc).on('mouseup.layer_drag', function (e) {
                 dragObj.ele = null;
             });
         },
@@ -745,8 +744,8 @@
         centerLayer: function ($container, settings) {
             var l, t;
 
-            var height = $(_top).height();
-            var width = $(_top).width();
+            var height = $(win).height();
+            var width = $(win).width();
             var cheight = $container.outerHeight();
             var cwidth = $container.outerWidth();
 
@@ -771,8 +770,8 @@
 
             var argumentsArr = arguments;
 
-            $(_top).on("resize.centerLayer", function () {
-                $(_top).off("resize.centerLayer");
+            $(win).on("resize.centerLayer", function () {
+                $(win).off("resize.centerLayer");
 
                 if (argumentsArr) {
                     argumentsArr.callee.apply(null, argumentsArr);
@@ -786,16 +785,16 @@
                 $layer = layer.layer,
                 settings = layerData.layers[layerID].settings;
 
-            var $body = $('body', document);
-            var fullWindowWidth = _top.innerWidth;
+            var $body = $('body', doc);
+            var fullWindowWidth = win.innerWidth;
 
             if (!fullWindowWidth) { // workaround for missing window.innerWidth in IE8
-              var documentElementRect = document.documentElement.getBoundingClientRect();
+              var documentElementRect = doc.documentElement.getBoundingClientRect();
               fullWindowWidth = documentElementRect.right - Math.abs(documentElementRect.left);
             }
 
             //计算滚动条宽度
-            var scrollDiv = document.createElement('div');
+            var scrollDiv = doc.createElement('div');
             $(scrollDiv).css({
                 position: 'absolute',
                 top: '-9999px',
@@ -808,7 +807,7 @@
             //获取原始padding
             $body.originalBodyPad = parseInt(($body.css('padding-right') || 0), 10);
 
-            if (document.body.clientWidth < fullWindowWidth) {
+            if (doc.body.clientWidth < fullWindowWidth) {
                 $body.css('padding-right', $body.originalBodyPad + scrollbarWidth);
             }
 
@@ -821,9 +820,9 @@
          * @return {[type]}         [description]
          */
         resetBodyScrollBar: function () {
-            if ($('body', document).hasClass('hide-scrollbar')) {
-                $('body', document).removeClass('hide-scrollbar')
-                    .css('padding-right', $('body', document).originalBodyPad || '');
+            if ($('body', doc).hasClass('hide-scrollbar')) {
+                $('body', doc).removeClass('hide-scrollbar')
+                    .css('padding-right', $('body', doc).originalBodyPad || '');
             }            
         },
         /**
@@ -947,13 +946,13 @@
 
                 //如果函数的参数列表存在1个参数
                 if (argsl == 1) {
-                    fn.apply(_top);
+                    fn.apply(win);
                 }
 
                 //如果函数的参数列表存在2个参数
                 if (argsl == 2) {
                     if (this.typeOf(thisObj) == "array") {
-                        fn.apply(_top, thisObj);
+                        fn.apply(win, thisObj);
                     } else {
                         fn.apply(thisObj);
                     }
@@ -961,7 +960,7 @@
 
                 //如果函数的参数列表存在3个参数
                 if (argsl == 3) {
-                    fn.apply(thisObj || _top, args);
+                    fn.apply(thisObj || win, args);
                 }
             }
         }
