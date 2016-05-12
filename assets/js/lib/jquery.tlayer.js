@@ -2,14 +2,8 @@
  * [弹出框插件]
  */
 ;(function ($, window, undefined) {
-    //把以下变量保存成局部变量
-    var win = top || window,
-        doc = win.document;
-
-    //初始化弹窗
-    win.tlayer = win.tlayer || {},
-    win.tlayer = $.tlayer = win.tlayer;
-    var _tlayer = $.tlayer;
+    //弹出窗数据保存到jquery上
+    var _tlayer = $.tlayer = $.tlayer || {};
 
     //当前弹出框使用情况
     _tlayer.layerData = $.extend({
@@ -17,14 +11,6 @@
         layerLength     : 0,        //当前激活的弹出框的个数
         stack           : []        //弹出框堆栈
     }, _tlayer.layerData || {});
-
-    //拖动变量
-    var dragObj = {
-        ele: null,
-        target: null,
-        oldX: 0,
-        oldY: 0
-    }
 
     //标记是否正在关闭中，防止不出现layer-box-mask
     var isClosing = false;
@@ -52,10 +38,10 @@
                 bindEsc         : true,         //是否绑定Esc键关闭弹出框
                 animation       : "fade",       //动画效果 fade淡入(fadeIn)淡出(fadeOut), slide滑入(slideDown)滑出(slideUp), display显示(show)隐藏(hide)
                 duration        : 150,          //显示和隐藏的时间
-                win             : win,          //窗口上下文对象
+                win             : window,       //窗口上下文对象
                 onEsc           : false,        //当弹出框触发Esc按钮时执行的回调函数
                 auto            : true,         //默认自动显示，否则使用$.tlayer("show", layerID);
-                theme           : 'default',    //主题，目前提供default，blue, black三种
+                theme           : 'blue',       //主题，目前提供default，blue, black三种
                 layerType       : '',           //弹出框类型
                 bodyScroll      : false,        //设置body是否需要被设置overflow: hidden;
                 imgPath         : './assets/img/',     //图片路径
@@ -262,15 +248,15 @@
             $layer.append(layer);
             layerUtil.addMask.call(this, layerID);
 
+            var self = this;
+
             setTimeout(function () {
-                layerUtil.centerLayer($layer.find(".layer-box-container"), settings);
-                layerUtil.drag($layer.find(".layer-title"), $layer.find(".layer-box-container"));
+                layerUtil.bindEvents.call(self, layerID);
             }, 0);
 
             if (settings.content.url) { //远程加载
                 $.get(settings.content.url, function (html) {
                     $layer.find(".layer-box-content").html(html);
-                    layerUtil.centerLayer($layer.find(".layer-box-container"), settings);
                 });
             }
 
@@ -507,18 +493,19 @@
          * 绑定事件
          * @return 无返回
          */
-        bindEvents: function () {
+        bindEvents: function (layerID) {
+            var tlayer = _tlayer,
+                layerData = tlayer.layerData,
+                layers = layerData.layers,
+                stack = layerData.stack,
+                $layer = layers[layerID].layer,
+                settings = layers[layerID].settings;
+
             //绑定ESC键触发关闭layer操作
-            $(doc).on("keyup.tmenu", function (e) {
+            $(settings.win.document).off("keyup.tmenu").on("keyup.tmenu", function (e) {
                 var code = e.keyCode || e.which;
 
-                var tlayer = _tlayer;
-
                 if (code == 27 && tlayer && tlayer.layerData) {
-                    var layerData = tlayer.layerData,
-                        layers = layerData.layers,
-                        stack = layerData.stack;
-
                     if (stack.length != 0) {
                         var layerID = stack[stack.length - 1],  //关闭最上面一个
                             layer = layers[layerID],
@@ -528,7 +515,7 @@
                         if (layerID && settings.bindEsc) {
 
                             if (util.isFunction(settings.onEsc)) {
-                                util.runFunction(settings.onEsc, $layer, [layerID]);
+                                settings.onEsc.call($layer, layerID);
                             } else {
                                 //关闭layer
                                 methods.close(layerID);
@@ -542,35 +529,8 @@
                 }
             });
 
-            //绑定拖拽事件
-            $(doc).on('mousemove.layer_drag', function (e) {
-                if (dragObj.ele) {
-                    var oX = e.clientX - dragObj.oldX;
-                    var oY = e.clientY - dragObj.oldY;
-                    var target = dragObj.target;
-                    var w = target.outerWidth();
-                    var h = target.outerHeight();
-
-                    if (oX < 0) oX = 0;
-                    if (oY < 0) oY = 0;
-
-                    if (oX + w > $(win).width()) {
-                        oX = $(win).width() - w;
-                    }
-                    if (oY + h > $(win).height()) {
-                        oY = $(win).height() - h;
-                    }
-
-                    target.css({ "left": oX + "px", "top": oY + "px" });
-
-                    return false;
-                }
-            });
-
-            //绑定拖拽事件
-            $(doc).on('mouseup.layer_drag', function (e) {
-                dragObj.ele = null;
-            });
+            layerUtil.centerLayer.call(self, $layer.find(".layer-box-container"), settings);
+            layerUtil.drag.call(self, $layer.find(".layer-title"), $layer.find(".layer-box-container"), settings);
         },
         /**
          * 显示弹出框(动画类型, 例如：show, fadeIn, slideDown等)
@@ -660,7 +620,7 @@
                 }
 
                 if (layerData.stack.length == 0) {
-                    layerUtil.resetBodyScrollBar();
+                    layerUtil.resetBodyScrollBar(settings);
                 }
             });
         },
@@ -723,8 +683,18 @@
         /**
          * 拖动
          */
-        drag: function ($ele, $target) {
+        drag: function ($ele, $target, settings) {
             if ($ele.length == 0) return;
+
+            //拖动变量
+            var dragObj = {
+                ele: null,
+                target: null,
+                oldX: 0,
+                oldY: 0
+            };
+            var win = settings.win;
+            var doc = win.document;
 
             $ele.mousedown(function (e) {
                 dragObj.ele = $ele;
@@ -733,6 +703,36 @@
                 dragObj.oldY = e.clientY - $target.position().top;
 
                 return false;
+            });
+
+            //绑定拖拽事件
+            $(doc).off('mousemove.layer_drag').on('mousemove.layer_drag', function (e) {
+                if (dragObj.ele) {
+                    var oX = e.clientX - dragObj.oldX;
+                    var oY = e.clientY - dragObj.oldY;
+                    var target = dragObj.target;
+                    var w = target.outerWidth();
+                    var h = target.outerHeight();
+
+                    if (oX < 0) oX = 0;
+                    if (oY < 0) oY = 0;
+
+                    if (oX + w > $(win).width()) {
+                        oX = $(win).width() - w;
+                    }
+                    if (oY + h > $(win).height()) {
+                        oY = $(win).height() - h;
+                    }
+
+                    target.css({ "left": oX + "px", "top": oY + "px" });
+
+                    return false;
+                }
+            });
+
+            //绑定拖拽事件
+            $(doc).off('mouseup.layer_drag').on('mouseup.layer_drag', function (e) {
+                dragObj.ele = null;
             });
         },
 
@@ -744,8 +744,8 @@
         centerLayer: function ($container, settings) {
             var l, t;
 
-            var height = $(win).height();
-            var width = $(win).width();
+            var height = $(settings.win).height();
+            var width = $(settings.win).width();
             var cheight = $container.outerHeight();
             var cwidth = $container.outerWidth();
 
@@ -770,8 +770,8 @@
 
             var argumentsArr = arguments;
 
-            $(win).on("resize.centerLayer", function () {
-                $(win).off("resize.centerLayer");
+            $(settings.win).on("resize.centerLayer", function () {
+                $(settings.win).off("resize.centerLayer");
 
                 if (argumentsArr) {
                     argumentsArr.callee.apply(null, argumentsArr);
@@ -783,10 +783,11 @@
             var layerData = _tlayer.layerData,
                 layer = layerData.layers[layerID],
                 $layer = layer.layer,
-                settings = layerData.layers[layerID].settings;
+                settings = layerData.layers[layerID].settings,
+                doc = settings.win.document;
 
             var $body = $('body', doc);
-            var fullWindowWidth = win.innerWidth;
+            var fullWindowWidth = settings.win.innerWidth;
 
             if (!fullWindowWidth) { // workaround for missing window.innerWidth in IE8
               var documentElementRect = doc.documentElement.getBoundingClientRect();
@@ -819,7 +820,9 @@
          * @param  {[type]} layerID [description]
          * @return {[type]}         [description]
          */
-        resetBodyScrollBar: function () {
+        resetBodyScrollBar: function (settings) {
+            var doc = settings.win.document;
+            
             if ($('body', doc).hasClass('hide-scrollbar')) {
                 $('body', doc).removeClass('hide-scrollbar')
                     .css('padding-right', $('body', doc).originalBodyPad || '');
@@ -931,40 +934,7 @@
                 return true;
             }
             return false;
-        },
-        /**
-         * 如果fn为函数则运行该函数
-         * @param  {Function}  fn       函数名
-         * @param  {Object}    thisObj  函数的当前对象
-         * @param  {Array}     args     函数参数
-         * @return 无返回
-         */
-        runFunction: function (fn, thisObj, args) {
-            if (this.isFunction(fn)) {
-                var argus = arguments,
-                    argsl = argus.length;
-
-                //如果函数的参数列表存在1个参数
-                if (argsl == 1) {
-                    fn.apply(win);
-                }
-
-                //如果函数的参数列表存在2个参数
-                if (argsl == 2) {
-                    if (this.typeOf(thisObj) == "array") {
-                        fn.apply(win, thisObj);
-                    } else {
-                        fn.apply(thisObj);
-                    }
-                }
-
-                //如果函数的参数列表存在3个参数
-                if (argsl == 3) {
-                    fn.apply(thisObj || win, args);
-                }
-            }
         }
-
     };
 
     //定义各类弹出框
@@ -1331,15 +1301,11 @@
     //在methods对象中扩展方法
     $.extend(methods, tlayer);
     
-    $.tLayer = function (method) {
+    $.tlayer = function (method) {
         if (methods[method]) {
             return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
         } else {
             $.error('方法 ' + method + ' 在tlayer中未定义！');
         }
     };
-
-    //绑定esc键关闭layer弹窗
-    layerUtil.bindEvents();
-
 } (jQuery, window, undefined));

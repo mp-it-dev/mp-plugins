@@ -6,7 +6,8 @@ require.config({
         'uploadify': 'lib/jquery.uploadify',
         'tlayer': 'lib/jquery.tlayer',
         'plugins': 'lib/jquery.plugins',
-        'util': 'lib/util'
+        'util': 'lib/util',
+        'selector': '../plugins/selector/selector'
     },
     shim: {
         'bootstrap': {
@@ -20,6 +21,9 @@ require.config({
         },
         'plugins': {
             deps: ['jquery']
+        },
+        'selector': {
+            deps: ['jquery', 'tlayer']
         }
     },
     urlArgs: 'bust=' + (new Date()).getTime()   //开发环境下禁用缓存，生产环境要移除

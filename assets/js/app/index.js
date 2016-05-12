@@ -1,4 +1,6 @@
-require(['jquery', 'util', 'bootstrap', 'uploadify', 'tlayer', 'plugins'], function ($, util) {
+require(['jquery', 'util', 'selector', 'bootstrap', 'uploadify', 'tlayer', 'plugins'], function ($, util, selector) {
+	selector.baseUrl = './assets/plugins/selector/';
+
 	$('#cc').scrollbar();
 	$('#autoComplete').autoComplete({
 		async: {
@@ -71,91 +73,29 @@ require(['jquery', 'util', 'bootstrap', 'uploadify', 'tlayer', 'plugins'], funct
 
 	$('#upload').uploadify();
 
-	$('#singlePeople').click(function () {
-		$.content({
-			header: '单人',
-			content: {
-				width: 880,
-				height: 480,
-				src: 'http://eipdev.maipu.com/MpSelector/Selector/SinglePeople'
-			},
-			onInit: function() {
-				var t = Date.now();
+	$('.selector-organiztion').on('click', function () {
+		var type = $(this).data('type');
 
-				while (Date.now() - t < 3000) {}
-			}
-		});
+        selector[type]({
+            callback: function(data) {
+                $('#organiztion-result').val(JSON.stringify(data));
+                $.tlayer('close');
+            }
+        });
 	});
 
-	$('#multiPeople').click(function () {
-		$.content({
-			header: '多人',
-			content: {
-				width: 880,
-				height: 480,
-				src: 'http://eipdev.maipu.com/MpSelector/Selector/MultiPeople'
-			}
-		});
-	});
+	$('.selector-product').on('click', function () {
+		var level = $(this).data('level');
+        var multi = $(this).data('multi');
 
-	$('#singleDep').click(function () {
-		$.content({
-			theme: 'blue',
-			header: '单部门',
-			content: {
-				width: 430,
-				height: 380,
-				src: 'http://eipdev.maipu.com/MpSelector/Selector/SingleDep'
-			}
-		});
-	});
-
-	$('#multiDep').click(function () {
-		$.content({
-			theme: 'blue',
-			header: '多部门',
-			content: {
-				width: 780,
-				height: 410,
-				src: 'http://eipdev.maipu.com/MpSelector/Selector/MultiDep'
-			}
-		});
-	});
-
-	$('#singleJob').click(function () {
-		$.content({
-			theme: 'black',
-			header: '单职位',
-			content: {
-				width: 430,
-				height: 380,
-				src: 'http://eipdev.maipu.com/MpSelector/Selector/SingleJob'
-			}
-		});
-	});
-
-	$('#multiJob').click(function () {
-		$.content({
-			theme: 'black',
-			header: '多职位',
-			content: {
-				width: 780,
-				height: 410,
-				src: 'http://eipdev.maipu.com/MpSelector/Selector/MultiJob'
-			}
-		});
-	});
-
-	$('#singleJobList').click(function () {
-		$.content({
-			theme: 'black',
-			header: '单职位列表',
-			content: {
-				width: 430,
-				height: 410,
-				src: 'http://eipdev.maipu.com/MpSelector/Selector/SingleJobList'
-			}
-		});
+        selector.product({
+            level: level,
+            multi: multi,
+            callback: function(data) {
+                $('#product-result').val(JSON.stringify(data));
+                $.tlayer('close');
+            }
+        });
 	});
 
 	$('#msg').click(function () {
