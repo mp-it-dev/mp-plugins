@@ -999,5 +999,6 @@
 .ui-autoComplete-result table tr:hover {
     background-color: #eee;
     color: #0088cc;
+    cursor: default;
 }
 /*input自动补全 end*/
