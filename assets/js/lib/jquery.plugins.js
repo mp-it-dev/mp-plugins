@@ -272,8 +272,6 @@ PluginDep.resetBodyScrollbar = function (context) {
         this.init();
     }
 
-    //版本信息
-    Table.VERSION = '1.1';
     //默认配置
     Table.DEFAULTS = {
         //表格选项
