@@ -328,11 +328,9 @@ define('util', function () {
 
         //解析模板中的变量
         parseTpl: function (template, itemData) {
-            for (var d in itemData) {
-                template = template.replace(new RegExp('\\#\\{' + d + '\\}', 'g'), itemData[d]);
-            }
-            
-            return template;
+            return template.replace(/\#\{([\w]*)\}/g, function (s0, s1) {
+                return s1 == '' ? itemData : itemData[s1] || '';
+            });
         },
 
         //浏览器滚动条宽度
