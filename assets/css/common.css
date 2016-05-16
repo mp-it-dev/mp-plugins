@@ -1044,6 +1044,7 @@ input[type="submit"].btn::-moz-focus-inner {
 .item {
     position: relative;
     display: table;
+    width: 100%;
 }
 .item-row + .item-row {
     margin-top: 10px;

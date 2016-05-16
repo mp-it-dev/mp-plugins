@@ -291,7 +291,6 @@ PluginDep.resetBodyScrollbar = function (context) {
 
         /*
          * colOptions格式：[{
-         *     enable: true,                        //是否显示列
          *     name: 'ID',                          //列显示名称
          *     field: 'id',                         //列字段
          *     width: 100,                          //列宽
