@@ -896,6 +896,7 @@ input[type="submit"].btn::-moz-focus-inner {
 /*导航栏自定义样式 start*/
 .navbar {
     font-size: 14px;
+    border-top: 0;
 }
 .navbar-brand {
     line-height: 50px;

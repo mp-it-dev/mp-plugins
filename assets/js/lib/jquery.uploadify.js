@@ -120,9 +120,9 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 				// Setup the default options
 				var settings = $.extend({
 					// Required Settings
-					id       : $this.attr('id'), // The ID of the DOM object
-					swf      : './assets/js/lib/uploadify.swf',  // The path to the uploadify SWF file
-					uploader : 'uploadify.php',  // The path to the server-side upload script
+					id       		: $this.attr('id'), // The ID of the DOM object
+					swf      		: './assets/js/lib/uploadify.swf',  // The path to the uploadify SWF file
+					uploader 		: 'uploadify.php',  // The path to the server-side upload script
 					uploadDesc 		: false,			//上传说明
 					width 			: false,			//按钮高度
 					height 			: false,			//按钮高度

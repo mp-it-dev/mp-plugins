@@ -1,5 +1,10 @@
 @charset "utf-8";
 
+.navbar-gray .navbar-brand {
+    font-family: '隶书';
+    font-size: 20px;
+    color: #666;
+}
 .page-footer {
     padding: 15px 0;
     border-top: 1px solid #ddd;
@@ -13,7 +18,7 @@
 }
 .page-sidebar.fixed {
     position: fixed;
-    top: 50px;
+    top: 0;
 }
 .page-sidebar .nav > li > a {
     display: block;
@@ -76,6 +81,9 @@
     white-space: nowrap;
     background-color: transparent;
     border: 1px solid #ddd;
+}
+.doc-example.highlight {
+    padding-top: 30px;
 }
 .mce-panel {
 	overflow: hidden;

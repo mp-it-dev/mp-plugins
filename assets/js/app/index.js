@@ -3,19 +3,17 @@ require(['jquery', 'util', 'selector', 'bootstrap', 'uploadify', 'tlayer', 'plug
 
 	$('#cc').scrollbar();
 	$('#autoComplete').autoComplete({
+		width: '400px',
 		async: {
-            url: 'http://192.168.4.86:100/Selector/Product/GetCpxList',
+            url: 'http://10.0.0.5:8011/Selector/Product/SearchProduct',
             dataType: 'jsonp',
             dataField: null,
             searchField: 'keyword'
         },
-        //dataList: [{"id":"cpx_2","pid":0,"name":"交换机","isParent":true,"ActualId":2},{"id":"cpx_3","pid":0,"name":"路由器","isParent":true,"ActualId":3},{"id":"cpx_5","pid":0,"name":"安全","isParent":true,"ActualId":5},{"id":"cpx_4","pid":0,"name":"统一通信","isParent":true,"ActualId":4},{"id":"cpx_6","pid":0,"name":"网管运维软件","isParent":true,"ActualId":6},{"id":"cpx_7","pid":0,"name":"WLAN","isParent":true,"ActualId":7},{"id":"cpx_881","pid":0,"name":"迎客无限","isParent":true,"ActualId":881},{"id":"cpx_941","pid":0,"name":"商业产品","isParent":true,"ActualId":941},{"id":"cpx_11","pid":0,"name":"车载及媒推","isParent":true,"ActualId":11},{"id":"cpx_12","pid":0,"name":"其他","isParent":true,"ActualId":12},{"id":"cpx_1221","pid":0,"name":"欣点产品","isParent":true,"ActualId":1221}],
-        template: '<td>#{name}</td><td>#{id}</td>',
+        template: '<td>#{zhengjiBm}</td><td>#{zhengjiName}</td>',
         maxNum: 10,
-        //autoHide: true,
-        localSearchField: 'name',
         callback: function (data) {
-        	$('#autoComplete').val(data.name);
+        	$('#autoComplete').val(data.zhengjiName);
         }
 	});
 	

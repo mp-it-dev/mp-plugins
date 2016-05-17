@@ -3559,36 +3559,40 @@ PluginDep.resetBodyScrollbar = function (context) {
     }
 
     AutoComplete.DEFAULTS = {
-        width: false,
-        maxNum: null,
-        autoHide: false,
-        async: {
-            url: '',
-            type: 'GET',
-            data: false,
-            dataType: false,
-            dataField: 'data',
-            searchField: 'keyword'
+        async: {                        //远程请求获取数据参数，和ajax请求参数基本一致
+            url: '',                    //远程请求url
+            type: 'GET',                //请求方式
+            data: false,                //请求入参，不包括搜索关键字，搜索关键字会自动带入
+            dataType: false,            //返回数据类型，支持jsonp
+            dataField: 'data',          //返回数据的字段中那个字段表示数据列表，null表示返回数据即数据列表
+            searchField: 'keyword'      //搜索关键字名称
         },
-        dataList: [],
-        localSearchField: null,        
-        template: '<td>#{}</td>',
-        callback: false,
-        onInit: false
+        dataList: [],                   //数据列表，支持本地数据列表
+        localSearchField: null,         //本地搜索字段
+        template: '<td>#{}</td>',       //列表模板
+        listWidth: false,               //列表宽度
+        maxNum: null,                   //最大显示条数
+        autoHide: false,                //列表是否自动在3秒后隐藏
+        callback: false,                //选中数据之后的回掉，参数为选中的数据
+        onInit: false                   //组件初始化回调
     };
 
     AutoComplete.prototype.init = function () {
         var setting = this.setting;
 
         var styleObj = {
-            display: this.ele.css('display'),
-            width: setting.width || this.ele.outerWidth(true)
+            display: this.ele.css('display')
         };
 
-        var div = $('<div class="ui-autoComplete"></div>').css(styleObj);
-        this.ele.addClass('ui-autoComplete-input').wrap(div);
+        var outer = $('<div class="ui-autoComplete"></div>').css(styleObj);
+        var inner = $('<div class="ui-autoComplete-result"><table></table></div>');
+        this.ele.addClass('ui-autoComplete-input').wrap(outer);
         this.ele = this.ele.parent();
-        this.ele.append('<div class="ui-autoComplete-result"><table></table></div>');
+        this.ele.append(inner);
+
+        if (setting.width) {
+            inner.css('width', setting.width);
+        }
 
         if (typeof setting.onInit == 'function') {
             setting.onInit.call(this.ele, this);
@@ -3602,6 +3606,7 @@ PluginDep.resetBodyScrollbar = function (context) {
         var setting = this.setting;
         
         var table = ele.find('.ui-autoComplete-result table').empty();
+        var resultContainer = ele.find('.ui-autoComplete-result').hide();
         var len = setting.maxNum ? Math.min(setting.maxNum, setting.dataList.length) : setting.dataList.length;
 
         if (len > 0) {
@@ -3611,11 +3616,11 @@ PluginDep.resetBodyScrollbar = function (context) {
                 tr.data('data', setting.dataList[i]).appendTo(table);
             }
 
-            ele.find('.ui-autoComplete-result').show();
+            resultContainer.show();
 
             if (setting.autoHide) {
                 setTimeout(function () {
-                    ele.find('.ui-autoComplete-result').hide();
+                    resultContainer.hide();
                 }, 3000);
             }
         }        
@@ -3657,7 +3662,7 @@ PluginDep.resetBodyScrollbar = function (context) {
                     }
 
                     $.ajax(ajaxOpt);
-                }, 300);
+                }, 400);
             } else {
                 var originDataList = self.originDataList;
                 var field = setting.localSearchField;
