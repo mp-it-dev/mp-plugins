@@ -3,8 +3,7 @@
  * util.js 包含一些常用的工具函数
  * @author helin
  */
-
-define('util', function () {
+(function (global) {
     //扩展数据的forEach方法
     if (!Array.prototype.forEach) {
         Array.prototype.forEach = function (callback, thisArg) {
@@ -369,5 +368,11 @@ define('util', function () {
         }
     }
 
-    return util;
-});
+    if (typeof define === 'function' && define.amd) {
+        define([], function () {
+            return util;
+        });
+    } else {
+        global.util = util;
+    }
+})(this);

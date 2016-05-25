@@ -1,4 +1,4 @@
-(function (win) {
+(function (global) {
 	var selector = {
 		apiUrl: 'http://10.0.0.5:8011/Selector/',
 		baseUrl: './',
@@ -110,13 +110,13 @@
 		}
 	};
 
-	if (typeof define === "function" && define.amd) {
+	if (typeof define === 'function' && define.amd) {
 		define(['jquery', 'tlayer'], function() {
 			return selector;
 		});
 	} else {
 		if (jQuery && jQuery.content) {
-			window.selector = selector;
+			global.selector = selector;
 		} else {
 			throw new Error('selector depends on jQuery and tlayer');
 		}		
