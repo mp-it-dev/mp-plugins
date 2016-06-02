@@ -637,7 +637,10 @@ PluginDep.resetBodyScrollbar = function (context) {
                 $container.find('.table-th-resize').each(function () {
                     $(this).height($(this).parent().outerHeight());
                 });
-            }            
+            }
+
+            //设置拖动线高度
+            $container.find('.table-drag-line').height($container.height() - $container.find('.table-pager').outerHeight(true));
 
             //如果绑定过事件的话不需要再次绑定
             if (!$container.data('bindEvents')) {
@@ -1058,13 +1061,14 @@ PluginDep.resetBodyScrollbar = function (context) {
             $target = $container;
             oldX = e.clientX;
             oldLeft = 0;
+            oldLineLeft = oldX - $container.offset().left;
 
             for (var i = 0; i < index + 1; i++) {
                 oldLeft += $container.find('.holder th').eq(i).outerWidth(true);
             }
 
             $('body').addClass('table-drag');
-            $container.find('.table-drag-line').css('left', oldLeft).show();
+            $container.find('.table-drag-line').css('left', oldLineLeft).show();
 
             return false;
         });
@@ -1155,38 +1159,31 @@ PluginDep.resetBodyScrollbar = function (context) {
         });
     }
 
-    var oldX, oldLeft;
+    var oldX, oldLeft, oldLineLeft;
     var $target, index;
 
     //公用事件绑定
     function bindCommonEvents () {
         $(document).on('mousemove.drag', '.table-drag', function (e) {
-            var dragWidth = e.clientX - oldX;
-            var left = oldLeft + dragWidth - $target.find('.table-body').scrollLeft();
+            var $dragLine = $target.find('.table-drag-line');
+            var $thead_ths = $target.find('.table-head .holder th');
+            var newWidth = Math.max($thead_ths.eq(index).width() + e.clientX - oldX, 40);
+            var lineLeft = oldLineLeft - ($thead_ths.eq(index).width() - newWidth);
 
-            if (left < 0) {
-                left = 0;
-            }
-
-            if (left > $target.find('.table-head').width()) {
-                left = $target.find('.table-head').width();
-            }
-
-            $target.find('.table-drag-line').css('left', left);
+            $dragLine.css('left', lineLeft);
 
             return false;
         });
 
-        $(document).on('mouseup.drag', '.table-drag', function (e) {
-            var dragWidth = e.clientX - oldX;
-
-            //计算表格宽度
+        $(document).on('mouseup.drag', '.table-drag', function (e) {            
             var $thead_ths = $target.find('.table-head .holder th');
             var $tbody_ths = $target.find('.table-body .holder th');
+            var newWidth = Math.max($thead_ths.eq(index).width() + e.clientX - oldX, 40);
             var w = 0, totalW = 0;
 
-            $thead_ths.eq(index).width($thead_ths.eq(index).width() + dragWidth);
+            $thead_ths.eq(index).width(newWidth);
 
+            //计算表格宽度
             for (var i = 0, l = $thead_ths.length; i < l; i++) {
                 w = parseInt($thead_ths[i].style.width);
                 totalW += w;

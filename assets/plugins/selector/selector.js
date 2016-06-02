@@ -2,7 +2,8 @@
 	var selector = {
 		apiUrl: 'http://10.0.0.5:8011/Selector/',
 		baseUrl: './',
-		singlePeople: function(option) {
+		//单人
+		singlePeople: function (option) {
 			top.singlePeopleCallback = option.callback;
 
 			$.content({
@@ -16,7 +17,8 @@
 				}
 			});
 		},
-		multiPeople: function(option) {
+		//多人
+		multiPeople: function (option) {
 			top.multiPeopleCallback = option.callback;
 
 			$.content({
@@ -30,7 +32,8 @@
 				}
 			});
 		},
-		singleDep: function(option) {
+		//单部门
+		singleDep: function (option) {
 			top.singleDepCallback = option.callback;
 
 			$.content({
@@ -44,7 +47,8 @@
 				}
 			});
 		},
-		multiDep: function(option) {
+		//多部门
+		multiDep: function (option) {
 			top.multiDepCallback = option.callback;
 
 			$.content({
@@ -58,7 +62,8 @@
 				}
 			});
 		},
-		singleJob: function(option) {
+		//单职位
+		singleJob: function (option) {
 			top.singleJobCallback = option.callback;
 
 			$.content({
@@ -72,7 +77,8 @@
 				}
 			});
 		},
-		multiJob: function(option) {
+		//多职位
+		multiJob: function (option) {
 			top.multiJobCallback = option.callback;
 
 			$.content({
@@ -86,9 +92,8 @@
 				}
 			});
 		},
-
 		//选择产品结构
-		product: function(option) {
+		product: function (option) {
 			top.productCallback = option.callback;
 
 			var width = 530;

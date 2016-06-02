@@ -38,6 +38,7 @@ require(['jquery', 'util', 'selector', 'bootstrap', 'uploadify', 'tlayer', 'plug
 		colOptions: [{
 			name: '名称',
 			field: 'title',
+			width: 300,
 			edit: {
 				replace: function (rowData) {
 					return '<input value="'+rowData.title+'" />';
@@ -52,16 +53,20 @@ require(['jquery', 'util', 'selector', 'bootstrap', 'uploadify', 'tlayer', 'plug
 			}
 		}, {
 			name: '原始名称',
-			field: 'original_title'
+			field: 'original_title',
+			width: 300
 		}, {
 			name: '年代',
-			field: 'year'
+			field: 'year',
+			width: 200
 		}, {
 			name: '类型',
-			field: 'genres'
+			field: 'genres',
+			width: 200
 		}, {
 			name: '收藏数',
-			field: 'collect_count'
+			field: 'collect_count',
+			width: 200
 		}]
 	});	
 
