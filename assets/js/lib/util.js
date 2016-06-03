@@ -57,7 +57,7 @@
             if (arr != null && arr.length > 0) {
                 util.forEach(arr, function (item, idx) {
                     if (typeof item == 'object' && typeof key != 'undefined') {
-                        if (item[key] == value[key]) {
+                        if (item[key] == value) {
                             index = idx;
                         }
                     } else {

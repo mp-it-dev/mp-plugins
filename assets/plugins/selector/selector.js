@@ -4,7 +4,7 @@
 		baseUrl: './',
 		//单人
 		singlePeople: function (option) {
-			top.singlePeopleCallback = option.callback;
+			window.singlePeopleCallback = option.callback;
 
 			$.content({
 				theme: 'blue',
@@ -19,7 +19,7 @@
 		},
 		//多人
 		multiPeople: function (option) {
-			top.multiPeopleCallback = option.callback;
+			window.multiPeopleCallback = option.callback;
 
 			$.content({
 				theme: 'blue',
@@ -34,7 +34,7 @@
 		},
 		//单部门
 		singleDep: function (option) {
-			top.singleDepCallback = option.callback;
+			window.singleDepCallback = option.callback;
 
 			$.content({
 				theme: 'blue',
@@ -49,7 +49,7 @@
 		},
 		//多部门
 		multiDep: function (option) {
-			top.multiDepCallback = option.callback;
+			window.multiDepCallback = option.callback;
 
 			$.content({
 				theme: 'blue',
@@ -64,7 +64,7 @@
 		},
 		//单职位
 		singleJob: function (option) {
-			top.singleJobCallback = option.callback;
+			window.singleJobCallback = option.callback;
 
 			$.content({
 				theme: 'blue',
@@ -79,7 +79,7 @@
 		},
 		//多职位
 		multiJob: function (option) {
-			top.multiJobCallback = option.callback;
+			window.multiJobCallback = option.callback;
 
 			$.content({
 				theme: 'blue',
@@ -94,7 +94,7 @@
 		},
 		//选择产品结构
 		product: function (option) {
-			top.productCallback = option.callback;
+			window.productCallback = option.callback;
 
 			var width = 530;
 
