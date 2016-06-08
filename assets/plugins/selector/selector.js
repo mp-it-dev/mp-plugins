@@ -1,6 +1,6 @@
 (function (global) {
 	var selector = {
-		apiUrl: 'http://10.0.0.5:8011/Selector/',
+		apiUrl: 'http://webapi.maipu.com/Selector/',
 		baseUrl: './',
 		//单人
 		singlePeople: function (option) {
