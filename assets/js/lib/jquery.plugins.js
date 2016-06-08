@@ -588,11 +588,11 @@ PluginDep.resetBodyScrollbar = function (context) {
             }
 
             var $tbodyTable = $tbody.find('.table');
-            var $theadLastTh = $thead.find('.holder th:last');
+            var $theadLastTh = $thead.find('.holder th:visible:last');
 
-            //还原列宽
+            //还原最后一列列宽
             if ($thead.data('minusWidth')) {
-                var w = Math.max(parseInt($theadLastTh[0].style.width) || $theadLastTh.width(), 40);
+                //var w = Math.max(parseInt($theadLastTh[0].style.width) || $theadLastTh.width(), 40);
                 //$theadLastTh.width(w + sWidth);
                 $thead.css('padding-right', 1);
                 $tbody.css('padding-right', 1);
@@ -601,7 +601,7 @@ PluginDep.resetBodyScrollbar = function (context) {
 
             //出现竖直滚动条则设置padding-right
             if ($tbodyTable.outerHeight(true) > $tbody.outerHeight(true)) {
-                var w = Math.max(parseInt($theadLastTh[0].style.width) || $theadLastTh.width(), 40);
+                //var w = Math.max(parseInt($theadLastTh[0].style.width) || $theadLastTh.width(), 40);
                 //$theadLastTh.width(w - sWidth);
                 $thead.css('padding-right', sWidth + 1);
                 $tbody.css('padding-right', sWidth + 1);
@@ -624,7 +624,10 @@ PluginDep.resetBodyScrollbar = function (context) {
 
             for (var i = 0, l = $thead_ths.length; i < l; i++) {
                 w = Math.max(parseInt($thead_ths[i].style.width) || $thead_ths.eq(i).width(), 40);
-                totalW += w;
+
+                if ($thead_ths[i].is(':visible')) {
+                    totalW += w;
+                }
 
                 $tbody_ths.eq(i).width(w);
                 $thead_ths.eq(i).width(w);
@@ -1186,7 +1189,10 @@ PluginDep.resetBodyScrollbar = function (context) {
             //计算表格宽度
             for (var i = 0, l = $thead_ths.length; i < l; i++) {
                 w = parseInt($thead_ths[i].style.width);
-                totalW += w;
+
+                if ($thead_ths[i].is(':visible')) {
+                    totalW += w;
+                }
 
                 $tbody_ths.eq(i).width(w);
                 $thead_ths.eq(i).width(w);
