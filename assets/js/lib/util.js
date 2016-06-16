@@ -140,7 +140,7 @@
 
             if (matched.browser) {
                 browser[matched.browser] = true;
-                browser.version = +matched.version;
+                browser.version = +matched.version.split('.')[0];
             }
 
             //由于IE11没有msie标识，所以换一种方式判断IE

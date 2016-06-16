@@ -23,13 +23,13 @@ PluginDep.browser = (function () {
         [];
 
     var matched = {
-        browser: match[1] || "",
-        version: match[2] || "0"
+        browser: match[1] || '',
+        version: match[2] || '0'
     };
 
     if (matched.browser) {
         browser[matched.browser] = true;
-        browser.version = matched.version;
+        browser.version = +matched.version.split('.')[0];
     }
 
     //由于IE11没有msie标识，所以换一种方式判断IE
@@ -3569,7 +3569,7 @@ PluginDep.resetBodyScrollbar = function (context) {
             dataType: false,            //返回数据类型，支持jsonp
             dataField: 'data',          //返回数据的字段中那个字段表示数据列表，null表示返回数据即数据列表
             searchField: 'keyword',     //搜索关键字名称
-            delay: 200,                 //延迟加载时间
+            delay: 200                 	//延迟加载时间
         },
         dataList: [],                   //数据列表，支持本地数据列表
         localSearchField: null,         //本地搜索字段
@@ -3636,10 +3636,15 @@ PluginDep.resetBodyScrollbar = function (context) {
         var self = this;
         var timer = null;
 
-        // note: propertychange不能冒泡
-        ele.find('.ui-autoComplete-input').on('click input propertychange', function (e) {
+        // note: IE8 hack，由于propertychange在js设置value时也会触发，因此改为keyup
+        ele.on('click input keyup', '.ui-autoComplete-input', function (e) {
             var async = setting.async;
             var val = $(this).val();
+
+            //非IE8不处理keyup事件
+            if (e.type == 'keyup' && !(PluginDep.browser.msie && PluginDep.browser.version < 9)) {
+                return true;
+            }
 
             if (async.url) {
                 clearTimeout(timer);
@@ -3665,7 +3670,11 @@ PluginDep.resetBodyScrollbar = function (context) {
                         $.extend(true, ajaxOpt.data, typeof async.data == 'function' ? async.data() : async.data);
                     }
 
-                    $.ajax(ajaxOpt);
+                    if (self.ajax) {
+                        self.ajax.abort();
+                    }
+
+                    self.ajax = $.ajax(ajaxOpt);
                 }, async.delay);
             } else {
                 var originDataList = self.originDataList;
