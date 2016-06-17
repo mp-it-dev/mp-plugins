@@ -110,8 +110,11 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     });
 
     ///////////////
-    //事件绑定
+    // 事件绑定
     //////////////
+    var tableHead = $('#table-head');
+    var tableBody = $('#table-body');
+
     // 产品树选中结果
     $('#submitSelected').on('click', function() {
         if (typeof cb == 'function') {
@@ -148,8 +151,9 @@ require(['jquery', 'util', 'ztree'], function($, util) {
             cb(selectedData);
         }
     });
-
-    $('#table-body').on('click', 'tbody tr:not(.no-result)', function() {
+    
+    // 单击行操作。对于单选则选择该行结果，对于多选则勾选/取消勾选
+    tableBody.on('click', 'tbody tr:not(.no-result)', function() {
         if (multi == 'false') {
             if (typeof cb == 'function') {
                 var data = $(this).data('data');
@@ -163,14 +167,29 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                 cb(selectedData);
             }
         } else {
-            $('input[type="checkbox"]', this).prop('checked', true);
+            $('input[type="checkbox"]', this).prop('checked', !$('input[type="checkbox"]', this).prop('checked')).change();
         }        
     });
 
-    $('#table-body').on('click', 'tbody input[type="checkbox"]', function(e) {
+    // 阻止冒泡
+    tableBody.on('click', 'tbody input[type="checkbox"]', function(e) {
         e.stopPropagation();
     });
 
+    // 全选
+    tableHead.on('change', 'thead .selectAll', function () {
+        $('#table-body tbody input[type="checkbox"]').prop('checked', $(this).prop('checked'));
+    });
+
+    // 是否勾选全选按钮
+    tableBody.on('change', 'tbody input[type="checkbox"]', function () {
+        var totalLen = tableBody.find('tbody input[type="checkbox"]').length;
+        var currLen = tableBody.find('tbody input[type="checkbox"]:checked').length;
+
+        tableHead.find('thead .selectAll').prop('checked', currLen == totalLen);
+    });
+
+    // 搜索
     $('#search-btn').on('click', function() {
         search();
     });
@@ -181,6 +200,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         }
     });
 
+    // 返回产品树
     $('#backToTree').on('click', function() {
         $('#searchResult').hide();
         $('#ztree').show();

@@ -104,7 +104,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         }
     });
 
-    $('#search-btn').on('btn', function(e) {
+    $('#search-btn').on('click', function(e) {
         searchPeople();
     });
 

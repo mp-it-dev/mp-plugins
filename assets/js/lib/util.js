@@ -54,10 +54,10 @@
                 throw new TypeError(arr + ' is not a Array');
             }
 
-            if (arr != null && arr.length > 0) {
+            if (arr.length > 0) {
                 util.forEach(arr, function (item, idx) {
                     if (typeof item == 'object' && typeof key != 'undefined') {
-                        if (item[key] == value) {
+                        if (item[key] == value[key]) {
                             index = idx;
                         }
                     } else {
@@ -77,7 +77,7 @@
                 throw new TypeError(arr + ' is not a Array');
             }
 
-            var index = util.inArray(arr, value, key);
+            var index = util.indexOf(arr, value, key);
 
             arr.splice(index, 1);
         },
@@ -174,7 +174,7 @@
                 var arr = search.split('&');
                 var d;
 
-                arr.forEach(function (item) {
+                util.forEach(arr, function (item) {
                     d = item.split('=');
                     o[d[0]] = d[1];
                 });
