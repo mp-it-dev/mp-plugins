@@ -1052,12 +1052,11 @@ input[type="submit"].btn::-moz-focus-inner {
 }
 .item-name {
     width: 100px;
-    padding-top: 8px;
     margin-right: 10px;
     margin-bottom: 0;
     text-align: right;
     display: table-cell;
-    vertical-align: top;
+    vertical-align: middle;
 }
 .item-name.required {
     position: relative;
@@ -1070,13 +1069,12 @@ input[type="submit"].btn::-moz-focus-inner {
 }
 .item-control {
     display: table-cell;
-    vertical-align: top;
+    vertical-align: middle;
     padding-left: 5px;
 }
 .item-static {
     display: table-cell;
-    vertical-align: top;
+    vertical-align: middle;
     padding-left: 5px;
-    padding-top: 8px;
 }
 /*表单行item end*/

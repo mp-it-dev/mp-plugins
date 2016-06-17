@@ -76,7 +76,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     ///////////////
     //事件绑定
     //////////////
-    
+    // 查询职位下的员工
     $(document).on('click', '#jobList li', function() {
     	$('#jobList li').removeClass('selected');
     	$(this).addClass('selected');
@@ -84,14 +84,39 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     	searchPeople();
     });
 
-    $(document).on('click', '#peopleList tr, #selectedList tr', function() {    	
+    // 勾选员工列表加入选择或取消选择
+    $(document).on('click', '#peopleList tr', function() {
+        var selectedData = $('#selectedList').data('selectedData') || [];
+        var checked = !$(this).find('input[type="checkbox"]').prop('checked');
+        $(this).find('input[type="checkbox"]').prop('checked', checked);
+
+        var data = { 
+            Badge: $('td:eq(1)', this).text(),
+            Name: $('td:eq(2)', this).text(),
+            Email: $('td:eq(3)', this).text()
+        }
+
+        if (checked) {
+            selectedData.push(data);
+        } else {
+            util.removeOf(selectedData, data, 'Badge');
+        }
+
+        $('#selectedList').data('selectedData', selectedData);
+        showSelectedData();
+    });
+
+    // 勾选已选择列表
+    $(document).on('click', '#selectedList tr', function() {    	
     	$(this).find('input[type="checkbox"]').prop('checked', !$(this).find('input[type="checkbox"]').prop('checked'));
     });
 
+    // 阻止冒泡
     $(document).on('click', '#peopleList tr input[type="checkbox"], #selectedList tr input[type="checkbox"]', function(e) {      
         e.stopPropagation();
     });
 
+    // 全选
     $(document).on('change', '.js-select-all', function(e) {      
         var checked = $(this).prop('checked');
         var target = $(this).data('target');
@@ -109,26 +134,6 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         searchPeople();
     });
 
-    $('#addToSelected').on('click', function() {
-        var selectedData = $('#selectedList').data('selectedData') || [];
-
-        $('#peopleList input[type="checkbox"]:checked').each(function() {
-            var tr = $(this).parents('tr');
-            var data = { 
-                Badge: tr.find('td:eq(1)').text(),
-                Name: tr.find('td:eq(2)').text(),
-                Email: tr.find('td:eq(3)').text()
-            }
-
-            if (selectedData.inArray(data, 'Badge') == -1) {
-                selectedData.push(data);
-            }
-        });
-
-        $('#selectedList').data('selectedData', selectedData);
-        showSelectedData();
-    });
-
     $('#deleteSelected').on('click', function() {
         var selectedData = $('#selectedList').data('selectedData') || [];
         var delData = [];
@@ -139,7 +144,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         });
 
         for (var i = 0; i < delData.length; i++) {
-            selectedData.removeOf(delData[i], 'Badge');
+            util.removeOf(selectedData, delData[i], 'Badge');
         }
         
         $('#selectedList').data('selectedData', selectedData);

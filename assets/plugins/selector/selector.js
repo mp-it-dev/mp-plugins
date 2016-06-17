@@ -1,9 +1,10 @@
-(function (win) {
+(function (global) {
 	var selector = {
-		apiUrl: 'http://10.0.0.5:8011/Selector/',
+		apiUrl: 'http://webapi.maipu.com/Selector/',
 		baseUrl: './',
-		singlePeople: function(option) {
-			top.singlePeopleCallback = option.callback;
+		//单人
+		singlePeople: function (option) {
+			window.singlePeopleCallback = option.callback;
 
 			$.content({
 				theme: 'blue',
@@ -16,8 +17,9 @@
 				}
 			});
 		},
-		multiPeople: function(option) {
-			top.multiPeopleCallback = option.callback;
+		//多人
+		multiPeople: function (option) {
+			window.multiPeopleCallback = option.callback;
 
 			$.content({
 				theme: 'blue',
@@ -30,8 +32,9 @@
 				}
 			});
 		},
-		singleDep: function(option) {
-			top.singleDepCallback = option.callback;
+		//单部门
+		singleDep: function (option) {
+			window.singleDepCallback = option.callback;
 
 			$.content({
 				theme: 'blue',
@@ -44,8 +47,9 @@
 				}
 			});
 		},
-		multiDep: function(option) {
-			top.multiDepCallback = option.callback;
+		//多部门
+		multiDep: function (option) {
+			window.multiDepCallback = option.callback;
 
 			$.content({
 				theme: 'blue',
@@ -58,8 +62,9 @@
 				}
 			});
 		},
-		singleJob: function(option) {
-			top.singleJobCallback = option.callback;
+		//单职位
+		singleJob: function (option) {
+			window.singleJobCallback = option.callback;
 
 			$.content({
 				theme: 'blue',
@@ -72,8 +77,9 @@
 				}
 			});
 		},
-		multiJob: function(option) {
-			top.multiJobCallback = option.callback;
+		//多职位
+		multiJob: function (option) {
+			window.multiJobCallback = option.callback;
 
 			$.content({
 				theme: 'blue',
@@ -86,10 +92,9 @@
 				}
 			});
 		},
-
 		//选择产品结构
-		product: function(option) {
-			top.productCallback = option.callback;
+		product: function (option) {
+			window.productCallback = option.callback;
 
 			var width = 530;
 
@@ -110,13 +115,13 @@
 		}
 	};
 
-	if (typeof define === "function" && define.amd) {
+	if (typeof define === 'function' && define.amd) {
 		define(['jquery', 'tlayer'], function() {
 			return selector;
 		});
 	} else {
 		if (jQuery && jQuery.content) {
-			window.selector = selector;
+			global.selector = selector;
 		} else {
 			throw new Error('selector depends on jQuery and tlayer');
 		}		

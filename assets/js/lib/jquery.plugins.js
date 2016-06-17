@@ -23,13 +23,13 @@ PluginDep.browser = (function () {
         [];
 
     var matched = {
-        browser: match[1] || "",
-        version: match[2] || "0"
+        browser: match[1] || '',
+        version: match[2] || '0'
     };
 
     if (matched.browser) {
         browser[matched.browser] = true;
-        browser.version = matched.version;
+        browser.version = +matched.version.split('.')[0];
     }
 
     //由于IE11没有msie标识，所以换一种方式判断IE
@@ -588,11 +588,11 @@ PluginDep.resetBodyScrollbar = function (context) {
             }
 
             var $tbodyTable = $tbody.find('.table');
-            var $theadLastTh = $thead.find('.holder th:last');
+            var $theadLastTh = $thead.find('.holder th:visible:last');
 
-            //还原列宽
+            //还原最后一列列宽
             if ($thead.data('minusWidth')) {
-                var w = Math.max(parseInt($theadLastTh[0].style.width) || $theadLastTh.width(), 40);
+                //var w = Math.max(parseInt($theadLastTh[0].style.width) || $theadLastTh.width(), 40);
                 //$theadLastTh.width(w + sWidth);
                 $thead.css('padding-right', 1);
                 $tbody.css('padding-right', 1);
@@ -601,7 +601,7 @@ PluginDep.resetBodyScrollbar = function (context) {
 
             //出现竖直滚动条则设置padding-right
             if ($tbodyTable.outerHeight(true) > $tbody.outerHeight(true)) {
-                var w = Math.max(parseInt($theadLastTh[0].style.width) || $theadLastTh.width(), 40);
+                //var w = Math.max(parseInt($theadLastTh[0].style.width) || $theadLastTh.width(), 40);
                 //$theadLastTh.width(w - sWidth);
                 $thead.css('padding-right', sWidth + 1);
                 $tbody.css('padding-right', sWidth + 1);
@@ -624,7 +624,10 @@ PluginDep.resetBodyScrollbar = function (context) {
 
             for (var i = 0, l = $thead_ths.length; i < l; i++) {
                 w = Math.max(parseInt($thead_ths[i].style.width) || $thead_ths.eq(i).width(), 40);
-                totalW += w;
+
+                if ($thead_ths[i].is(':visible')) {
+                    totalW += w;
+                }
 
                 $tbody_ths.eq(i).width(w);
                 $thead_ths.eq(i).width(w);
@@ -637,7 +640,10 @@ PluginDep.resetBodyScrollbar = function (context) {
                 $container.find('.table-th-resize').each(function () {
                     $(this).height($(this).parent().outerHeight());
                 });
-            }            
+            }
+
+            //设置拖动线高度
+            $container.find('.table-drag-line').height($container.height() - $container.find('.table-pager').outerHeight(true));
 
             //如果绑定过事件的话不需要再次绑定
             if (!$container.data('bindEvents')) {
@@ -1058,13 +1064,14 @@ PluginDep.resetBodyScrollbar = function (context) {
             $target = $container;
             oldX = e.clientX;
             oldLeft = 0;
+            oldLineLeft = oldX - $container.offset().left;
 
             for (var i = 0; i < index + 1; i++) {
                 oldLeft += $container.find('.holder th').eq(i).outerWidth(true);
             }
 
             $('body').addClass('table-drag');
-            $container.find('.table-drag-line').css('left', oldLeft).show();
+            $container.find('.table-drag-line').css('left', oldLineLeft).show();
 
             return false;
         });
@@ -1155,41 +1162,37 @@ PluginDep.resetBodyScrollbar = function (context) {
         });
     }
 
-    var oldX, oldLeft;
+    var oldX, oldLeft, oldLineLeft;
     var $target, index;
 
     //公用事件绑定
     function bindCommonEvents () {
         $(document).on('mousemove.drag', '.table-drag', function (e) {
-            var dragWidth = e.clientX - oldX;
-            var left = oldLeft + dragWidth - $target.find('.table-body').scrollLeft();
+            var $dragLine = $target.find('.table-drag-line');
+            var $thead_ths = $target.find('.table-head .holder th');
+            var newWidth = Math.max($thead_ths.eq(index).width() + e.clientX - oldX, 40);
+            var lineLeft = oldLineLeft - ($thead_ths.eq(index).width() - newWidth);
 
-            if (left < 0) {
-                left = 0;
-            }
-
-            if (left > $target.find('.table-head').width()) {
-                left = $target.find('.table-head').width();
-            }
-
-            $target.find('.table-drag-line').css('left', left);
+            $dragLine.css('left', lineLeft);
 
             return false;
         });
 
-        $(document).on('mouseup.drag', '.table-drag', function (e) {
-            var dragWidth = e.clientX - oldX;
-
-            //计算表格宽度
+        $(document).on('mouseup.drag', '.table-drag', function (e) {            
             var $thead_ths = $target.find('.table-head .holder th');
             var $tbody_ths = $target.find('.table-body .holder th');
+            var newWidth = Math.max($thead_ths.eq(index).width() + e.clientX - oldX, 40);
             var w = 0, totalW = 0;
 
-            $thead_ths.eq(index).width($thead_ths.eq(index).width() + dragWidth);
+            $thead_ths.eq(index).width(newWidth);
 
+            //计算表格宽度
             for (var i = 0, l = $thead_ths.length; i < l; i++) {
                 w = parseInt($thead_ths[i].style.width);
-                totalW += w;
+
+                if ($thead_ths[i].is(':visible')) {
+                    totalW += w;
+                }
 
                 $tbody_ths.eq(i).width(w);
                 $thead_ths.eq(i).width(w);
@@ -3565,7 +3568,8 @@ PluginDep.resetBodyScrollbar = function (context) {
             data: false,                //请求入参，不包括搜索关键字，搜索关键字会自动带入
             dataType: false,            //返回数据类型，支持jsonp
             dataField: 'data',          //返回数据的字段中那个字段表示数据列表，null表示返回数据即数据列表
-            searchField: 'keyword'      //搜索关键字名称
+            searchField: 'keyword',     //搜索关键字名称
+            delay: 200                 	//延迟加载时间
         },
         dataList: [],                   //数据列表，支持本地数据列表
         localSearchField: null,         //本地搜索字段
@@ -3632,10 +3636,15 @@ PluginDep.resetBodyScrollbar = function (context) {
         var self = this;
         var timer = null;
 
-        // note: propertychange不能冒泡
-        ele.find('.ui-autoComplete-input').on('click input propertychange', function (e) {
+        // note: IE8 hack，由于propertychange在js设置value时也会触发，因此改为keyup
+        ele.on('click input keyup', '.ui-autoComplete-input', function (e) {
             var async = setting.async;
             var val = $(this).val();
+
+            //非IE8不处理keyup事件
+            if (e.type == 'keyup' && !(PluginDep.browser.msie && PluginDep.browser.version < 9)) {
+                return true;
+            }
 
             if (async.url) {
                 clearTimeout(timer);
@@ -3661,8 +3670,12 @@ PluginDep.resetBodyScrollbar = function (context) {
                         $.extend(true, ajaxOpt.data, typeof async.data == 'function' ? async.data() : async.data);
                     }
 
-                    $.ajax(ajaxOpt);
-                }, 400);
+                    if (self.ajax) {
+                        self.ajax.abort();
+                    }
+
+                    self.ajax = $.ajax(ajaxOpt);
+                }, async.delay);
             } else {
                 var originDataList = self.originDataList;
                 var field = setting.localSearchField;

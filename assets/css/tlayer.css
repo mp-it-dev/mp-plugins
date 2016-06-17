@@ -210,11 +210,7 @@
 }
 
 .layer-btn + .layer-btn {
-    margin-left: 10px;
-}
-
-.layer-btn:first-child {
-    margin-left: 0;
+    margin-left: 20px;
 }
 
 .layer-btn:hover,

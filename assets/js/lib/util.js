@@ -3,102 +3,124 @@
  * util.js 包含一些常用的工具函数
  * @author helin
  */
+(function (global) {
+    var util = {
+        // 是否是函数
+        isFunction: function (it) {
+            return Object.prototype.toString.call(it) === '[object Function]';
+        },
 
-define('util', function () {
-    //扩展数据的forEach方法
-    if (!Array.prototype.forEach) {
-        Array.prototype.forEach = function (callback, thisArg) {
-            if (this == null) {
-                throw new TypeError(" this is null or not defined");
+        // 是否是数组
+        isArray: function (it) {
+            return Object.prototype.toString.call(it) === '[object Array]';
+        },
+
+        // 是否是对象
+        isObject: function (it) {
+            return Object.prototype.toString.call(it) === '[object Object]';
+        },
+
+        //数组循环
+        forEach: function (arr, callback) {
+            if (!util.isArray(arr)) {
+                throw new TypeError(arr + ' is not a Array');
             }
 
-            var T, k;
-            var O = Object(this);
+            var k = 0;
+            var O = Object(arr);
             var len = O.length >>> 0;
 
-            if ({}.toString.call(callback) != "[object Function]") {
-                throw new TypeError(callback + " is not a function");
+            if (!util.isFunction(callback)) {
+                throw new TypeError(callback + ' is not a Function');
             }
 
-            if (thisArg) {
-                T = thisArg;
-            }
-
-            k = 0;
             while (k < len) {
                 var kValue;
 
                 if (k in O) {
                     kValue = O[k];
-                    callback.call(T, kValue, k, O);
+                    callback.call(O, kValue, k, O);
                 }
 
                 k++;
             }
-        };
-    }
+        },
 
-    //在数组中查询值的位置
-    Array.prototype.inArray = function (value, key) {
-        var index = -1;
-        var arr = Object(this);
+        //在数组中查找项的位置
+        indexOf: function (arr, value, key) {
+            var index = -1;
 
-        if (this != null && this.length > 0) {
-            arr.forEach(function (item, idx) {
-                if (typeof item == 'object' && typeof key != 'undefined') {
-                    if (item[key] == value[key]) {
-                        index = idx;
-                    }
-                } else {
-                    if (item == value) {
-                        index = idx;
-                    }
-                }
-            });
-        }        
-
-        return index;
-    }
-
-    //删除数组中匹配到的第一个元素
-    Array.prototype.removeOf = function (value, key) {
-        var arr = Object(this);
-        var index = arr.inArray(value, key);
-
-        arr.splice(index, 1);
-    }
-    
-    //格式化时间参数]
-    //参数： format 字符串，格式化形式，年月日用大写Y、M、D代表，时分秒分别用h、m、s代表，毫秒用S代表
-    Date.prototype.format = function (format) {
-        var o = {
-            "M+": this.getMonth() + 1,                      //month 
-            "D+": this.getDate(),                           //day 
-            "h+": this.getHours(),                          //hour 
-            "m+": this.getMinutes(),                        //minute 
-            "s+": this.getSeconds(),                        //second
-            "S": this.getMilliseconds()                     //millisecond 
-        }
-
-        if (/(Y+)/.test(format)) {      //格式化年份
-            format = format.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
-        }
-
-        for (var k in o) {
-            if (new RegExp("(" + k + ")").test(format)) {
-                format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ("00" + o[k]).substr(("" + o[k]).length));
+            if (!util.isArray(arr)) {
+                throw new TypeError(arr + ' is not a Array');
             }
-        }
 
-        return format;
-    }
+            if (arr.length > 0) {
+                util.forEach(arr, function (item, idx) {
+                    if (typeof item == 'object' && typeof key != 'undefined') {
+                        if (item[key] == value[key]) {
+                            index = idx;
+                        }
+                    } else {
+                        if (item == value) {
+                            index = idx;
+                        }
+                    }
+                });
+            }
 
-    //去掉字符串两边的空格
-    String.prototype.trim = function () {
-        return this.replace(/(^\s*)|(\s*$)/g, "");
-    }
+            return index;
+        },
 
-    var util = {
+        //删除数组中某一项
+        removeOf: function (arr, value, key) {
+            if (!util.isArray(arr)) {
+                throw new TypeError(arr + ' is not a Array');
+            }
+
+            var index = util.indexOf(arr, value, key);
+
+            arr.splice(index, 1);
+        },
+
+        //去掉字符串两边的空格
+        trim: function (str) {
+            if (typeof str !== 'string') {
+                throw new Error(str + ' is not a String');
+            }
+
+            return str.replace(/(^\s*)|(\s*$)/g, "");
+        },
+
+        //格式化时间参数
+        //参数1： date 日期对象
+        //参数2： format 字符串，格式化形式，年月日用大写Y、M、D代表，时分秒分别用h、m、s代表，毫秒用S代表
+        formatDate: function (date, format) {
+            if (!date instanceof Date) {
+                throw new Error(date + ' is not a Date object');
+            }
+
+            var o = {
+                'M+': date.getMonth() + 1,                      //month 
+                'D+': date.getDate(),                           //day 
+                'h+': date.getHours(),                          //hour 
+                'm+': date.getMinutes(),                        //minute 
+                's+': date.getSeconds(),                        //second
+                'S': date.getMilliseconds()                     //millisecond 
+            }
+
+            if (/(Y+)/.test(format)) {      //格式化年份
+                format = format.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
+            }
+
+            for (var k in o) {
+                if (new RegExp('(' + k + ')').test(format)) {
+                    format = format.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ('00' + o[k]).substr(("" + o[k]).length));
+                }
+            }
+
+            return format;
+        },
+
         //浏览器版本信息,结果形如{msie: true, version: "8.0"}
         browser: (function () {
             var ua = navigator.userAgent.toLowerCase();
@@ -108,20 +130,20 @@ define('util', function () {
                 /(webkit)[ \/]([\w.]+)/.exec(ua) ||
                 /(opera)(?:.*version|)[ \/]([\w.]+)/.exec(ua) ||
                 /(msie) ([\w.]+)/.exec(ua) ||
-                ua.indexOf("compatible") < 0 && /(mozilla)(?:.*? rv:([\w.]+)|)/.exec(ua) ||
+                ua.indexOf('compatible') < 0 && /(mozilla)(?:.*? rv:([\w.]+)|)/.exec(ua) ||
                 [];
 
             var matched = {
-                browser: match[1] || "",
-                version: match[2] || "0"
+                browser: match[1] || '',
+                version: match[2] || '0'
             };
 
             if (matched.browser) {
                 browser[matched.browser] = true;
-                browser.version = matched.version;
+                browser.version = +matched.version.split('.')[0];
             }
 
-            //由于IE11没有哦msie标识，所以换一种方式判断IE
+            //由于IE11没有msie标识，所以换一种方式判断IE
             if (window.ActiveXObject || 'ActiveXObject' in window) {
                 browser.msie = true;
                 delete browser['mozilla'];
@@ -152,7 +174,7 @@ define('util', function () {
                 var arr = search.split('&');
                 var d;
 
-                arr.forEach(function (item) {
+                util.forEach(arr, function (item) {
                     d = item.split('=');
                     o[d[0]] = d[1];
                 });
@@ -369,5 +391,11 @@ define('util', function () {
         }
     }
 
-    return util;
-});
+    if (typeof define === 'function' && define.amd) {
+        define([], function () {
+            return util;
+        });
+    } else {
+        global.util = util;
+    }
+})(this);
