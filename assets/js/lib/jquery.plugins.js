@@ -3641,10 +3641,13 @@ PluginDep.resetBodyScrollbar = function (context) {
             var async = setting.async;
             var val = $(this).val();
 
-            //非IE8不处理keyup事件
+            // 非IE8不处理keyup事件
             if (e.type == 'keyup' && !(PluginDep.browser.msie && PluginDep.browser.version < 9)) {
                 return true;
             }
+
+            // 隐藏其他的列表
+            $('.ui-autoComplete-result').hide();
 
             if (async.url) {
                 clearTimeout(timer);
