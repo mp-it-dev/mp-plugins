@@ -625,7 +625,7 @@ PluginDep.resetBodyScrollbar = function (context) {
             for (var i = 0, l = $thead_ths.length; i < l; i++) {
                 w = Math.max(parseInt($thead_ths[i].style.width) || $thead_ths.eq(i).width(), 40);
 
-                if ($thead_ths[i].is(':visible')) {
+                if ($thead_ths.eq(i).is(':visible')) {
                     totalW += w;
                 }
 
@@ -1190,7 +1190,7 @@ PluginDep.resetBodyScrollbar = function (context) {
             for (var i = 0, l = $thead_ths.length; i < l; i++) {
                 w = parseInt($thead_ths[i].style.width);
 
-                if ($thead_ths[i].is(':visible')) {
+                if ($thead_ths.eq(i).is(':visible')) {
                     totalW += w;
                 }
 
