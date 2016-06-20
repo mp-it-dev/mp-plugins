@@ -3539,6 +3539,8 @@ PluginDep.resetBodyScrollbar = function (context) {
     var pName = 'autoComplete';
     var namespace = 'ui.' + pName;
 
+    var ajaxArr = [];
+
     var methods = {
         init: function (option) {
             return this.each(function() {
@@ -3673,11 +3675,13 @@ PluginDep.resetBodyScrollbar = function (context) {
                         $.extend(true, ajaxOpt.data, typeof async.data == 'function' ? async.data() : async.data);
                     }
 
-                    if (self.ajax) {
-                        self.ajax.abort();
+                    // 终止其他的ajax请求
+                    for (var i in ajaxArr) {
+                        ajaxArr[i].abort();
                     }
 
-                    self.ajax = $.ajax(ajaxOpt);
+                    ajaxArr = [];
+                    ajaxArr.push($.ajax(ajaxOpt));
                 }, async.delay);
             } else {
                 var originDataList = self.originDataList;

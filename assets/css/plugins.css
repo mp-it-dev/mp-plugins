@@ -984,8 +984,8 @@
     z-index: 999;
     width: 100%;
     background-color: #fff;
-    border: solid #ddd;
-    border-width: 0 1px 1px;
+    border: 1px solid #ddd;
+    margin-top: -1px;
 }
 .ui-autoComplete-result table {
     width: 100%;
