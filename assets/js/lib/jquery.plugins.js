@@ -3358,7 +3358,7 @@ PluginDep.resetBodyScrollbar = function (context) {
         ele.on('blur', function () {
             var val = $(this).val();
 
-            if (!setting.regExp.test(val)) {
+            if (!self.regExp.test(val)) {
                 self.showTip();
             } else {
                 self.hideTip();
