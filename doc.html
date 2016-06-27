@@ -145,9 +145,59 @@ require.config({
 					
 					<div class="doc-section">
 						<h1 class="page-header" id="doc-updateRecord">更新记录</h1>
-						<ol>
-							<li>发布正式版本v1.0</li>
+						<ol class="order-list">
+							<li>
+								<span class="version">v1.2 (2016-06-28)</span>
+								<ul>
+									<li>增加正则表单验证提示组件</li>
+									<li>增加输入框enter键与按钮事件关联组件</li>
+									<li>修复自动补全组件请求未被终止掉的问题</li>
+									<li>修复选择器选择多人时自动勾选的问题</li>
+								</ul>
+							</li>
+							<li>
+								<span class="version">v1.1 (2016-06-20)</span>
+								<ul>
+									<li>修复表格组件拖拽问题</li>
+									<li>修复选择器组件问题，将top修改为window</li>
+									<li>修复自动补全组件的问题，后续请求abort掉前面请求</li>
+									<li>优化选择器使用</li>
+									<li>修复util工具集数组操作bug</li>
+								</ul>
+							</li>
+							<li>
+								<span class="version">v1.0 (2016-05-17)</span>
+								<ul>
+									<li>正式发布前端组件</li>
+								</ul>
+							</li>
 						</ol>
+					</div>
+
+					<div class="doc-section">
+						<h1 class="page-header" id="doc-validate">表单正则验证提示</h1>
+						<p>
+							表单正则验证提示组件提供在输入框失去焦点时进行正则验证，并把错误信息提示给用户。为输入框添加<code>data-uitype="validate"</code>属性即可使用该功能。
+						</p>
+						<pre class="highlight doc-example">
+							<code class="language-xml">
+&lt;input type="text" id="example-validate" data-uitype="validate" data-reg="/^\d[6-16]$/" data-msg="请输入6-16位数字！"&gt;
+							</code>
+						</pre>
+						<h2 class="title-normal">选项</h2>
+						<p>
+							表单正则验证提示组件接收一个对象参数，详细配置如下所示：
+						</p>
+						<pre class="highlight">
+							<code class="language-javascript">
+{
+    reg         : '',   // 正则表达式，优先级大于type
+    type        : '',   // 内置正则表达式email, idcard, tel, mobile
+    msg         : '',   // 错误提示信息
+    placement   : ''    // 提示框放置位置，默认自动计算
+}
+							</code>
+						</pre>
 					</div>
 
 					<div class="doc-section">
@@ -795,6 +845,76 @@ $('#example-gallery').click(function () {
 							</code>
 						</pre>
 					</div>
+
+					<div class="doc-section">
+						<h1 class="page-header" id="doc-rightMenu">右键菜单</h1>
+						<p>
+							功能如命。
+						</p>
+						<pre class="highlight doc-example">
+							<code class="language-javascript">
+// 实例化右键菜单
+var rMenu = $.rightMenu({
+	menu: [{
+		icon: '&lt;i class="glyphicon glyphicon-plus" style="color: green;">&lt;/i&gt;',
+		text: '新建目录',
+		callback: function (e, obj) {
+			console.log('新建目录');
+		}
+	}, {
+		icon: '&lt;i class="glyphicon glyphicon-remove" style="color: red;">&lt;/i&gt;',
+		text: '删除目录',
+		callback: function (e) {
+			console.log('删除目录');
+		}
+	}, {
+		icon: '&lt;i class="glyphicon glyphicon-upload" style="color: blue;"&gt;&lt;/i&gt;',
+		text: '上传文件',
+		callback: function (e) {
+			console.log('上传文件');
+		}
+	}]
+});
+
+// 显示菜单
+$('#table').on('contextmenu', '.table-body .table-tr', function (e) {
+	rMenu.show(e.clientX, e.clientY, this);		
+	e.preventDefault();
+});
+							</code>
+						</pre>
+						<p></p>
+						<h2 class="title-normal">选项</h2>
+						<div class="doc-api">
+							详细配置参数如下：
+						</div>
+						<pre class="highlight">
+							<code class="language-javascript">
+{
+    width: 100,                     // 宽度
+    autoHide : false,               // 是否自动隐藏
+    offsetLeft: 0,                  // 点击处偏移宽度
+    offsetTop: 0,                   // 点击处偏移高度
+    menu: [{                        // 菜单项选项
+        id: '',                     // 菜单id
+        icon: '',                   // 菜单图标
+        text: '',                   // 菜单文本
+        callback: function () {     // 菜单回调，参数为show方法的第三个参数开始的参数
+
+        }
+    }]
+}
+							</code>
+						</pre>
+						<h2 class="title-normal">方法</h2>
+						<h4 class="title-sm">
+							显示菜单 <code>show(x, y, arg1, arg2, ...)</code>
+						</h4>
+						<p class="doc-api">							
+							在指定位置显示菜单，并传入回调函数的参数。<br>
+							show方法的第三个参数起到最后的参数会被传入menu.callback中
+						</p>
+					</div>
 				</div>
 				<div class="col-md-3">
 					<div class="page-sidebar">
@@ -802,6 +922,7 @@ $('#example-gallery').click(function () {
 							<li class="active"><a href="#doc-overview">概述</a></li>
 							<li><a href="#doc-foreword">引言</a></li>
 							<li><a href="#doc-updateRecord">更新记录</a></li>
+							<li><a href="#doc-validate">表单正则验证</a></li>
 							<li><a href="#doc-autoComolete">文本框自动补全</a></li>
 							<li><a href="#doc-richtext">富文本框</a></li>
 							<li><a href="#doc-select">下拉框</a></li>
@@ -811,6 +932,7 @@ $('#example-gallery').click(function () {
 							<li><a href="#doc-gallery">照片查看器</a></li>
 							<li><a href="#doc-scrollbar">滚动条美化</a></li>
 							<li><a href="#doc-resize">宽度拖动</a></li>
+							<li><a href="#doc-rightMenu">右键菜单</a></li>
 						</ul>
 						<a href="#" class="back-to-top">返回顶部</a>
 					</div>

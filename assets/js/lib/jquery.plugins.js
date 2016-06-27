@@ -155,6 +155,11 @@ PluginDep.resetBodyScrollbar = function (context) {
     }
 }
 
+/**
+ * [获取css样式数值]
+ * @param  {[type]} $ [description]
+ * @return {[type]}   [description]
+ */
 ;(function ($) {
     $.extend($.fn, {
         getCss: function(name) {
@@ -625,7 +630,7 @@ PluginDep.resetBodyScrollbar = function (context) {
             for (var i = 0, l = $thead_ths.length; i < l; i++) {
                 w = Math.max(parseInt($thead_ths[i].style.width) || $thead_ths.eq(i).width(), 40);
 
-                if ($thead_ths[i].is(':visible')) {
+                if ($thead_ths.eq(i).is(':visible')) {
                     totalW += w;
                 }
 
@@ -1190,7 +1195,7 @@ PluginDep.resetBodyScrollbar = function (context) {
             for (var i = 0, l = $thead_ths.length; i < l; i++) {
                 w = parseInt($thead_ths[i].style.width);
 
-                if ($thead_ths[i].is(':visible')) {
+                if ($thead_ths.eq(i).is(':visible')) {
                     totalW += w;
                 }
 
@@ -1785,7 +1790,8 @@ PluginDep.resetBodyScrollbar = function (context) {
                     var d = {
                         value: $option.val(),
                         text: $option.text(),
-                        selected: $option.prop('selected')
+                        selected: $option.prop('selected'),
+                        disabled: $option.prop('disabled')
                     }
 
                     self.data.push(d);
@@ -1936,7 +1942,7 @@ PluginDep.resetBodyScrollbar = function (context) {
                         text = d.text;
                     }
 
-                    $('<li class="ui-select-li" data-value="' + d.value + '" title="' +d.text+'">'+icon+'<div class="ui-select-content">'+text+'</li>').appendTo($list);
+                    $('<li class="ui-select-li' + (d.disabled ? ' disabled' : '') + '" data-value="' + d.value + '" title="' +d.text+'">'+icon+'<div class="ui-select-content">'+text+'</li>').appendTo($list);
                 }
             }
         }
@@ -2521,9 +2527,9 @@ PluginDep.resetBodyScrollbar = function (context) {
             var h = $innerBarY.height();
             var w = $innerBarY.width();
 
-            $container.on('mousewheel', function (event, delta) {
+            $container.on('mousewheel', function (e, delta) {
                 //计算目标位置
-                var tarTop = $target.position().top + delta*100;
+                var tarTop = $target.position().top + delta * 100;
 
                 if (tarTop + totalH < trackH) {
                     tarTop = trackH - totalH;
@@ -2537,22 +2543,17 @@ PluginDep.resetBodyScrollbar = function (context) {
                 var percent = -tarTop / (totalH - trackH);
                 var t = (trackH - h) * percent;
 
-                $target.css({
-                    transition: 'all 0.05s linear',
-                    top: tarTop + 'px'
-                });
+                if (delta < 0 && percent != 1 || delta > 0 && percent != 0) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                }
 
-                $innerBarY.css({
-                    transition: 'all 0.05s linear',
-                    top: t + 'px'
-                });
+                $target.css('top', tarTop);
+                $innerBarY.css('top', t);
 
                 if (typeof options.onScroll === 'function') {
                     options.onScroll.call($container[0], options);
                 }
-
-                event.preventDefault();
-                return false;
             });
         }
 
@@ -3204,23 +3205,184 @@ PluginDep.resetBodyScrollbar = function (context) {
     var pName = 'validate';
     var namespace = 'ui.' + pName;
 
-    //值改变时触发验证事件
-    $(document).on('change.' + namespace, '[data-uitype="'+pName+'"]', function () {
-        var $this = $(this);
-        var val = $this.val();
-        var reg = $this.data('reg').split(' ');
+    var globalId = 0;
 
-        reg = new RegExp(reg[0], reg[1]);
-        var result = reg.test(val);
+    var methods = {
+        init: function (option) {
+            return this.each(function () {
+                var $this = $(this);
+                var setting = $.extend(true, {}, Validate.DEFAULTS, $this.data(), option); 
+                
+                $this.data(namespace, new Validate($this, setting));
+                globalId++;
+            });
+        }
+    }
 
-        if (result) {
-            $this.removeClass('form-control-error');
-        } else {
-            $this.addClass('form-control-error');
+    var Validate = function (ele, setting) {
+        this.ele = ele;
+        this.setting = setting;
+        this.targetId = 'validate-tip-' + globalId;
+
+        this.init();
+    };
+
+    Validate.DEFAULTS = {
+        reg         : '',   // 正则表达式，优先级大于type
+        type        : '',   // 内置正则表达式email, idcard, tel, mobile
+        msg         : '',   // 错误提示信息
+        placement   : ''    // 提示框放置位置，默认自动计算
+    };
+
+    Validate.prototype.init = function () {
+        var setting = this.setting;
+
+        if (!setting.reg) {
+            switch (setting.type) {
+                case 'email':
+                    setting.reg = '/^\\w+(\\.\\w+)*@\\w+(\\.\\w+){1,3}$/i';
+                    break;
+                case 'idcard':
+                    setting.reg = '/(^\\d{15}$)|(^\\d{17}([0-9]|X)$)/i';
+                    break;
+                case 'tel':
+                    setting.reg = '/^(0[0-9]{2,3}-?)?([2-9][0-9]{6,7})+(-[0-9]{1,4})?$/';
+                    break;
+                case 'mobile':
+                    setting.reg = '/^(\\+\\d{2})?\\d{11}$/';
+                    break;
+            }
         }
 
-        var e = $.Event('validate.' + namespace);
-        $this.trigger(e, [result]);
+        var reg = setting.reg;
+        var startIndex = reg.indexOf('/');
+        var lastIndex = reg.lastIndexOf('/');
+        var exp = reg.substring(startIndex + 1, lastIndex);
+        var prop = reg.substring(lastIndex + 1);
+
+        setting.originPlacement = setting.placement;
+
+        this.regExp = new RegExp(exp, prop);
+        this.tipDom = $(
+                            '<div class="validate-tip" id="' + this.targetId + '">' +
+                                '<span class="glyphicon glyphicon-warning-sign"></span>' + 
+                                '<span class="validate-tip-text"></span>' +
+                            '</div>'
+                        ).appendTo('body');
+        this.bindEvents();
+    };
+
+    // 显示提示框
+    Validate.prototype.showTip = function () {
+        var ele = this.ele;
+        var setting = this.setting;
+        
+        ele.addClass('validate-error');
+        this.setTip();
+    };
+
+    // 隐藏提示框
+    Validate.prototype.hideTip = function () {
+        var ele = this.ele;
+
+        ele.removeClass('validate-error');
+        $('#' + this.targetId).hide().removeClass('top right bottom left');
+    };
+
+    // 设置提示框内容和位置
+    Validate.prototype.setTip = function () {
+        var ele = this.ele;
+        var setting = this.setting;
+
+        var msg = typeof setting.msg == 'function' ? setting.msg.call(this, setting) : setting.msg;
+        var tip = $('#' + this.targetId).show();
+
+        tip.find('.validate-tip-text').html(msg);
+
+        var pos = this.getPosition(ele);
+        var viewportPos = this.getPosition($('body'));
+        var placement = setting.originPlacement;
+        var actualWidth = tip[0].offsetWidth;
+        var actualHeight = tip[0].offsetHeight;
+
+        // 自动设置提示框位置为右边
+        if (!/^((top)|(right)|(bottom)|(left))$/.test(placement)) {
+            placement = 'right';
+        }
+
+        // 校正位置，当前位置放不下则统一放到底部
+        placement = placement == 'top' && pos.top - actualHeight < viewportPos.top ? 'bottom' :
+                    placement == 'right' && pos.right + actualWidth > viewportPos.width ? 'bottom' :
+                    placement == 'left' && pos.left - actualWidth < viewportPos.left ? 'bottom' : placement;
+
+        var actualPos = this.calcActualPos(pos, placement, actualWidth, actualHeight);
+
+        tip.addClass(placement)
+            .css({
+                left: actualPos.left,
+                top: actualPos.top
+            });
+        setting.placement = placement;
+    };
+
+    // 计算元素的长宽及位置信息
+    Validate.prototype.getPosition = function (ele) {
+        var elRect = ele[0].getBoundingClientRect();
+        var body = $('body');
+
+        // IE8中没有width和height
+        if (elRect.width == null) {
+          elRect = $.extend({}, elRect, { width: elRect.right - elRect.left, height: elRect.bottom - elRect.top });
+        }
+
+        return $.extend({}, elRect, { scrollTop: body.scrollTop(), scrollLeft: body.scrollLeft() });
+    };
+
+    // 计算元素的真实位置
+    Validate.prototype.calcActualPos = function (pos, placement, actualWidth, actualHeight) {
+        pos.top += pos.scrollTop;
+        pos.left += pos.scrollLeft;
+
+        return placement == 'bottom' ? { top: pos.top + pos.height, left: pos.left + pos.width / 2 - actualWidth / 2 } :
+           placement == 'top' ? { top: pos.top - actualHeight, left: pos.left + pos.width / 2 - actualWidth / 2 } :
+           placement == 'left' ? { top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left - actualWidth } :
+            { top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left + pos.width };
+    };
+
+    // 绑定事件
+    Validate.prototype.bindEvents = function () {
+        var ele = this.ele;
+        var setting = this.setting;
+        var self = this;
+
+        ele.on('blur', function () {
+            var val = $(this).val();
+
+            if (!setting.regExp.test(val)) {
+                self.showTip();
+            } else {
+                self.hideTip();
+            }
+        });
+
+        ele.on('focus', function () {
+            self.hideTip();
+        });
+    };
+
+    $.fn.validate = function (method) {
+        if (methods[method]) {
+            return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
+        } else if (typeof method === 'object' || !method) {
+            return methods.init.apply(this, arguments);
+        } else {
+            $.error('The method ' + method + ' does not exist in $.validate');
+        }
+    };
+
+    // data-api
+    $(document).ready(function () {
+        $('[data-uitype="'+pName+'"]').validate();
     });
 })(jQuery);
 
@@ -3234,6 +3396,14 @@ PluginDep.resetBodyScrollbar = function (context) {
     var $container, $ele, opt, oldPoint;
 
     var methods = {
+        init: function (option) {
+            return this.each(function () {
+                var $this = $(this);
+                var settings = $.extend(true, {}, UiResize.DEFAULTS, $this.data(), option);
+
+                $this.data(namespace, new UiResize($this, settings));
+            });
+        },
         resizeStart: function (e, settings, container, ele) {
             var dragFlag = settings.onResizeStart.call(container[0], e);
 
@@ -3392,18 +3562,13 @@ PluginDep.resetBodyScrollbar = function (context) {
         if (methods[option]) {
             return methods[option].apply(this, Array.prototype.slice.call(arguments, 1));
         } else if (typeof option === 'object' || !option) {
-            return this.each(function () {
-                var $this = $(this);
-                var obj = $this.data(namespace);
-                var settings = $.extend(true, {}, UiResize.DEFAULTS, $this.data(), option);
-
-                $this.data(namespace, (obj = new UiResize($this, settings)));
-            });
+            return methods.init.apply(this, arguments);
         } else {
             $.error('The method ' + option + ' does not exist in $().UiResize');
         }
     }
 
+    // data-api
     $(document).ready(function () {
         $('[data-uitype="'+pName+'"]').uiResize();
     });
@@ -3416,13 +3581,7 @@ PluginDep.resetBodyScrollbar = function (context) {
     var pName = 'rightMenu';
     var namespace = 'ui.' + pName;
 
-    var globalVar = win[namespace];
-
-    if (!globalVar) {
-        globalVar = win[namespace] = {
-            elements: []
-        };
-    }
+    var elements = [];
 
     var RightMenu = function (option) {
         if (typeof option === 'object') {
@@ -3435,22 +3594,22 @@ PluginDep.resetBodyScrollbar = function (context) {
     }
 
     RightMenu.DEFAULTS = {
-        width: 100,
-        autoHide : false,
-        offsetLeft: 0,
-        offsetTop: 0,
-        menu: [{
-            id: '',
-            icon: '',
-            text: '',
-            callback: function () {
+        width: 100,                     // 宽度
+        autoHide : false,               // 是否自动隐藏
+        offsetLeft: 0,                  // 点击处偏移宽度
+        offsetTop: 0,                   // 点击处偏移高度
+        menu: [{                        // 菜单项选项
+            id: '',                     // 菜单id
+            icon: '',                   // 菜单图标
+            text: '',                   // 菜单文本
+            callback: function () {     // 菜单回调，参数为show方法的第三个参数开始的参数
 
             }
         }]
     }
 
     RightMenu.prototype.init = function () {
-        this.id = 'rMenu_' + globalVar.elements.length;
+        this.id = 'rMenu_' + elements.length;
 
         var setting = this.setting;
         var self = this;
@@ -3477,7 +3636,7 @@ PluginDep.resetBodyScrollbar = function (context) {
         }
 
         this.element = ul;
-        globalVar.elements.push(this);
+        elements.push(this);
     }
 
     RightMenu.prototype.show = function (left, top) {
@@ -3522,8 +3681,8 @@ PluginDep.resetBodyScrollbar = function (context) {
 
     //点击隐藏
     $(document).on('mousedown.' + namespace, function () {
-        for (var i = 0, l = win[namespace].elements.length; i < l; i++) {
-            win[namespace].elements[i].hide();
+        for (var i = 0, l = elements.length; i < l; i++) {
+            elements[i].hide();
         }
     });
 
@@ -3538,6 +3697,9 @@ PluginDep.resetBodyScrollbar = function (context) {
 (function ($, win) {
     var pName = 'autoComplete';
     var namespace = 'ui.' + pName;
+
+    // 全局控制显示哪个搜索框
+    var showTarget = null;
 
     var methods = {
         init: function (option) {
@@ -3574,7 +3736,8 @@ PluginDep.resetBodyScrollbar = function (context) {
         dataList: [],                   //数据列表，支持本地数据列表
         localSearchField: null,         //本地搜索字段
         template: '<td>#{}</td>',       //列表模板
-        listWidth: false,               //列表宽度
+        width: false,                   //列表宽度
+        maxHeight: 300,                 //列表最大高度
         maxNum: null,                   //最大显示条数
         autoHide: false,                //列表是否自动在3秒后隐藏
         callback: false,                //选中数据之后的回掉，参数为选中的数据
@@ -3594,9 +3757,12 @@ PluginDep.resetBodyScrollbar = function (context) {
         this.ele = this.ele.parent();
         this.ele.append(inner);
 
-        if (setting.width) {
-            inner.css('width', setting.width);
+        styleObj = {
+            width: setting.width,
+            maxHeight: setting.maxHeight
         }
+        
+        inner.css(styleObj);
 
         if (typeof setting.onInit == 'function') {
             setting.onInit.call(this.ele, this);
@@ -3608,9 +3774,13 @@ PluginDep.resetBodyScrollbar = function (context) {
     AutoComplete.prototype.showList = function () {
         var ele = this.ele;
         var setting = this.setting;
+
+        if (showTarget != ele) {
+            return;
+        }
         
         var table = ele.find('.ui-autoComplete-result table').empty();
-        var resultContainer = ele.find('.ui-autoComplete-result').hide();
+        var resultContainer = ele.find('.ui-autoComplete-result');
         var len = setting.maxNum ? Math.min(setting.maxNum, setting.dataList.length) : setting.dataList.length;
 
         if (len > 0) {
@@ -3632,6 +3802,7 @@ PluginDep.resetBodyScrollbar = function (context) {
 
     AutoComplete.prototype.bindEvents = function () {
         var ele = this.ele;
+        var resultContainer = ele.find('.ui-autoComplete-result')[0];
         var setting = this.setting;
         var self = this;
         var timer = null;
@@ -3640,13 +3811,24 @@ PluginDep.resetBodyScrollbar = function (context) {
         ele.on('click input keyup', '.ui-autoComplete-input', function (e) {
             var async = setting.async;
             var val = $(this).val();
+            
+            // 保存当前搜索框为显示的搜索框
+            showTarget = ele;
 
-            //非IE8不处理keyup事件
+            // 非IE8不处理keyup事件
             if (e.type == 'keyup' && !(PluginDep.browser.msie && PluginDep.browser.version < 9)) {
                 return true;
             }
 
+            // 隐藏其他的列表
+            $('.ui-autoComplete-result').each(function () {
+                if (this != resultContainer) {
+                    $(this).hide();
+                }
+            });
+
             if (async.url) {
+                // 连续触发时取消上一次请求
                 clearTimeout(timer);
 
                 timer = setTimeout(function () {
@@ -3670,11 +3852,7 @@ PluginDep.resetBodyScrollbar = function (context) {
                         $.extend(true, ajaxOpt.data, typeof async.data == 'function' ? async.data() : async.data);
                     }
 
-                    if (self.ajax) {
-                        self.ajax.abort();
-                    }
-
-                    self.ajax = $.ajax(ajaxOpt);
+                    $.ajax(ajaxOpt);
                 }, async.delay);
             } else {
                 var originDataList = self.originDataList;
@@ -3703,7 +3881,7 @@ PluginDep.resetBodyScrollbar = function (context) {
             var data = $(this).data('data');
 
             if (typeof setting.callback == 'function') {
-                setting.callback(data);
+                setting.callback.call(ele.find('.ui-autoComplete-input')[0], data);
             }
         });
     }
@@ -3721,4 +3899,21 @@ PluginDep.resetBodyScrollbar = function (context) {
             $.error('The method ' + method + ' does not exist in $.autoComplete');
         }
     }
+})(jQuery, window);
+
+/**
+ * [inputEnter 输入框enter键与按钮事件关联]
+ */
+(function ($, win) {
+    var pName = 'inputEnter';
+    var namespace = 'ui.' + pName;
+
+    // 输入框enter键与按钮事件关联
+    $(document).on('keydown.' + namespace, '[data-uitype="'+pName+'"]', function (e) {
+        if (e.which == 13) {
+            var ev = $(this).data('event') || 'click';
+            
+            $($(this).data('target')).trigger(ev);
+        }
+    });
 })(jQuery, window);

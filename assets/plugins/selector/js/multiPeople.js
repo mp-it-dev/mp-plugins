@@ -84,29 +84,41 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     	searchPeople();
     });
 
-    // 勾选员工列表加入选择或取消选择
+    // 点击行勾选/取消勾选复选框
     $(document).on('click', '#peopleList tr', function() {
-        var selectedData = $('#selectedList').data('selectedData') || [];
         var checked = !$(this).find('input[type="checkbox"]').prop('checked');
-        $(this).find('input[type="checkbox"]').prop('checked', checked);
+        $(this).find('input[type="checkbox"]').prop('checked', checked).trigger('change');
+    });
+
+    // 加入选择或取消选择
+    $(document).on('change', '#peopleList input[type="checkbox"]', function() {
+        var selectedData = $('#selectedList').data('selectedData') || [];
+        var tr = $(this).parents('tr');
 
         var data = { 
-            Badge: $('td:eq(1)', this).text(),
-            Name: $('td:eq(2)', this).text(),
-            Email: $('td:eq(3)', this).text()
+            Badge: $('td:eq(1)', tr).text(),
+            Name: $('td:eq(2)', tr).text(),
+            Email: $('td:eq(3)', tr).text()
         }
 
-        if (checked) {
-            selectedData.push(data);
+        if ($(this).prop('checked')) {
+            if (util.indexOf(selectedData, data, 'Badge') == -1) {
+                selectedData.push(data);
+            }            
         } else {
             util.removeOf(selectedData, data, 'Badge');
         }
 
         $('#selectedList').data('selectedData', selectedData);
         showSelectedData();
+
+        var totalNum = $('#peopleList input[type="checkbox"]').length;
+        var selectedNum = $('#peopleList input[type="checkbox"]:checked').length;
+
+        $('.js-select-all[data-target="#peopleList"]').prop('checked', totalNum == selectedNum);
     });
 
-    // 勾选已选择列表
+    // 勾选/取消勾选已选择列表
     $(document).on('click', '#selectedList tr', function() {    	
     	$(this).find('input[type="checkbox"]').prop('checked', !$(this).find('input[type="checkbox"]').prop('checked'));
     });
@@ -121,7 +133,9 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         var checked = $(this).prop('checked');
         var target = $(this).data('target');
 
-        $(target).find('input[type="checkbox"]').prop('checked', checked);
+        $(target).find('input[type="checkbox"]').each(function () {
+            $(this).prop('checked', checked).trigger('change');
+        });
     });
 
     $('#search-keyword').on('keydown', function(e) {

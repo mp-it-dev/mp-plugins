@@ -165,3 +165,12 @@ pre code.language-javascript:after {
 	color: #563d7c;
     text-decoration: none;
 }
+.order-list {
+    padding-left: 2em;
+    list-style-type: disc;
+}
+.order-list ul,
+.order-list ol {
+    padding-left: 2em;
+    list-style-type: circle;
+}

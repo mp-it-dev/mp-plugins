@@ -10,12 +10,16 @@ require.config({
 		'highlight/xml': ['highlight'],
 		'highlight/css': ['highlight'],
 		'highlight/javascript': ['highlight'],
+		'highlight': {
+			exports: 'hljs'
+		}
 	}
 });
 
-require(['jquery', 'highlight/xml', 'highlight/css', 'highlight/javascript', 'tinymce'], function ($) {
+require(['jquery', 'highlight', 'highlight/xml', 'highlight/css', 'highlight/javascript', 'tinymce'], function ($, hljs) {
+	
 	hljs.tabReplace = '    ';
-	hljs.initHighlightingOnLoad();
+	hljs.initHighlighting();
 
 	tinymce.init({
 		selector: "#example-richtext",	//textarea选择器

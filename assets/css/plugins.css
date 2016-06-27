@@ -283,11 +283,6 @@
     position: relative;
     line-height: 1.42857143;
 
-    background-image: -webkit-linear-gradient(top, #ffffff, #efefef);;
-    background-image: -moz-linear-gradient(top, #ffffff, #efefef);
-    background-image: -ms-linear-gradient(top, #ffffff, #efefef);
-    background-image: linear-gradient(top, #ffffff, #efefef);
-
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -307,7 +302,7 @@
 .ui-select-bar {
     display: table;
     width: 100%;
-    border: 1px solid #bbb;
+    border: 1px solid #ccc;
     border-radius: 3px;
     cursor: pointer;
 }
@@ -477,9 +472,6 @@
     display: inline-block;
     *display: inline;
 }
-.uploadify .btn {
-    font-size: 12px;
-}
 .btn-hover {
     color: #333333;
     text-decoration: none;
@@ -627,7 +619,6 @@
     top: 0;
     left: 0;
     background-color: #afbebe;
-    transition: all 0.2s;
 }
 .scrollbar-inner.ondrag {
     background-color: #fa0;
@@ -984,8 +975,8 @@
     z-index: 999;
     width: 100%;
     background-color: #fff;
-    border: solid #ddd;
-    border-width: 0 1px 1px;
+    border: 1px solid #ddd;
+    overflow: auto;
 }
 .ui-autoComplete-result table {
     width: 100%;
@@ -1002,3 +993,89 @@
     cursor: default;
 }
 /*input自动补全 end*/
+
+/*正则验证 start*/
+.validate-error {
+    border-color: #a94442;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+}
+.validate-error:focus {
+    border-color: #843534;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 6px #ce8483;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 6px #ce8483;
+}
+.validate-tip {
+    position: absolute;
+    display: none;
+    z-index: 1070;
+    padding: 3px 8px;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    background-color: #f2dede;
+    border-radius: 4px;
+}
+.validate-tip.top {
+    margin-top: -8px;
+}
+.validate-tip.right {
+    margin-left: 8px;
+}
+.validate-tip.bottom {
+    margin-top: 8px;
+}
+.validate-tip.left {
+    margin-left: -8px;
+}
+.validate-tip::before {
+    position: absolute;
+    width: 0;
+    height: 0;
+    content: "";
+    border: 5px solid transparent;
+}
+.validate-tip.top::before {
+    bottom: 0;
+    left: 50%;
+    margin-bottom: -5px;
+    margin-left: -5px;
+    border-bottom-width: 0;
+    border-top-color: #f2dede;
+}
+.validate-tip.right::before {
+    top: 50%;
+    left: 0;
+    margin-top: -5px;
+    margin-left: -5px;
+    border-left-width: 0;
+    border-right-color: #f2dede;
+}
+.validate-tip.bottom::before {
+    top: 0;
+    left: 50%;
+    margin-top: -5px;
+    margin-left: -5px;
+    border-top-width: 0;
+    border-bottom-color: #f2dede;
+}
+.validate-tip.left::before {
+    top: 50%;
+    right: 0;
+    margin-top: -5px;
+    margin-right: -5px;
+    border-right-width: 0;
+    border-left-color: #f2dede;
+}
+.validate-tip .glyphicon {
+    margin-right: 8px;
+    vertical-align: middle;
+    color: #a94442;
+}
+.validate-tip-text {
+    display: inline-block;
+    max-width: 200px;
+    vertical-align: middle;
+    text-align: left;
+}
+/*正则验证 end*/

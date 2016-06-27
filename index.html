@@ -53,21 +53,45 @@
 		<div class="container" id="cc" style="margin-top: 20px; margin-bottom: 20px;">
 			<form class="form-horizontal">
 				<div class="form-group">
-					<label class="col-md-2 control-label">Input框：</label>
+					<label class="col-md-2 control-label">邮箱：</label>
 					<div class="col-md-3">
-						<input type="text" id="aaaaa" class="form-control" data-uitype="validate" data-reg="^a$" />
+						<input type="text" class="form-control" data-uitype="validate" data-type="email" data-errormsg="邮箱格式不正确！" />
 					</div>
 				</div>
 				<div class="form-group">
-					<label class="col-md-2 control-label">带搜索Input框：</label>
+					<label class="col-md-2 control-label">身份证：</label>
 					<div class="col-md-3">
-						<input type="text" class="form-control" id="autoComplete" />
+						<input type="text" class="form-control" data-uitype="validate" data-type="idcard" data-errormsg="身份证格式不正确！" data-placement="top" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">固定电话：</label>
+					<div class="col-md-3">
+						<input type="text" class="form-control" data-uitype="validate" data-type="tel" data-errormsg="固定电话格式不正确！" data-placement="bottom" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">手机：</label>
+					<div class="col-md-3">
+						<input type="text" class="form-control" data-uitype="validate" data-type="mobile" data-errormsg="手机格式不正确！" data-placement="left" />
 					</div>
 				</div>
 				<div class="form-group">
 					<label class="col-md-2 control-label">Textarea框：</label>
-					<div class="col-md-3">
+					<div class="col-md-6">
 						<textarea class="form-control"></textarea>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">搜索产品树：</label>
+					<div class="col-md-3">
+						<input type="text" class="form-control" id="searchProductTree" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">搜索单个产品：</label>
+					<div class="col-md-3">
+						<input type="text" class="form-control" id="searchProductByWpbm" />
 					</div>
 				</div>
 				<div class="form-group">
@@ -158,6 +182,12 @@
 		                <button type="button" class="btn btn-danger selector-product" data-level="cp" data-multi="true">产品</button>
 				    </div>
 				</div>
+				<div class="form-group">
+					<label class="col-md-2 control-label">文件上传：</label>
+					<div class="col-md-10">
+						<button id="upload" class="btn btn-primary">文件上传</button>
+					</div>
+				</div>
 			</form>
 		</div>
 	    <div class="container">
@@ -167,7 +197,7 @@
 	    		</div>
 	    		<div class="col-md-3">
 	    			<div class="input-group">
-	    				<input type="text" class="form-control" id="keyword">
+	    				<input type="text" class="form-control" id="keyword" data-uitype="inputEnter" data-target="#search">
 			    		<span class="input-group-btn">
 			    			<button class="btn btn-default" id="search">
 			    				<span class="glyphicon glyphicon-search"></span>
@@ -178,9 +208,6 @@
 	    	</div>
 	    	<div id="table"></div>
 	    </div>
-	    <div class="container" style="margin-bottom: 20px;">
-	    	<button id="upload" class="btn btn-primary">文件上传</button>
-	    </div>
 	    <div class="container">
 	    	<h3 style="margin: 10px 0;">照片查看器</h3>
 			<ul class="imglist" data-uitype="gallery" data-errorimg="./img/error.png" data-loadingimg="./img/loading_32.gif" data-showlist="true">
@@ -189,11 +216,6 @@
 				<li><a href="#"><img src="./assets/img/gallery/3.jpg" alg="第三张"></a></li>
 				<li><a href="#"><img src="./assets/img/gallery/4.jpg" alg="第四张"></a></li>
 				<li><a href="#"><img src="./assets/img/gallery/5.jpg" alg="第五张"></a></li>
-			</ul>
-	    </div>
-	    <div class="container">
-	    	<h3 style="margin: 10px 0;">照片查看器</h3>
-			<ul class="imglist" data-uitype="gallery" data-errorimg="./img/error.png" data-loadingimg="./img/loading_32.gif" data-showlist="true">
 				<li><a href="#"><img src="./assets/img/gallery/6.jpg" alt="第六张"></a></li>
 				<li><a href="#"><img src="./assets/img/gallery/7.jpg" alt="第七张"></a></li>
 				<li><a href="#"><img src="./assets/img/gallery/8.jpg" alt="第八张"></a></li>
