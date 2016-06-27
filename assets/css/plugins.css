@@ -1030,14 +1030,14 @@
 .validate-tip.left {
     margin-left: -8px;
 }
-.validate-tip::before {
+.validate-tip:before {
     position: absolute;
     width: 0;
     height: 0;
     content: "";
     border: 5px solid transparent;
 }
-.validate-tip.top::before {
+.validate-tip.top:before {
     bottom: 0;
     left: 50%;
     margin-bottom: -5px;
@@ -1045,7 +1045,7 @@
     border-bottom-width: 0;
     border-top-color: #f2dede;
 }
-.validate-tip.right::before {
+.validate-tip.right:before {
     top: 50%;
     left: 0;
     margin-top: -5px;
@@ -1053,7 +1053,7 @@
     border-left-width: 0;
     border-right-color: #f2dede;
 }
-.validate-tip.bottom::before {
+.validate-tip.bottom:before {
     top: 0;
     left: 50%;
     margin-top: -5px;
@@ -1061,7 +1061,7 @@
     border-top-width: 0;
     border-bottom-color: #f2dede;
 }
-.validate-tip.left::before {
+.validate-tip.left:before {
     top: 50%;
     right: 0;
     margin-top: -5px;
