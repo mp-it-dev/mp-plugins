@@ -79,7 +79,9 @@
 
             var index = util.indexOf(arr, value, key);
 
-            arr.splice(index, 1);
+            if (index >= 0) {
+                arr.splice(index, 1);
+            }
         },
 
         //去掉字符串两边的空格

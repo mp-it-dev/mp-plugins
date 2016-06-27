@@ -2,18 +2,32 @@ require(['jquery', 'util', 'selector', 'bootstrap', 'uploadify', 'tlayer', 'plug
 	selector.baseUrl = './assets/plugins/selector/';
 
 	$('#cc').scrollbar();
-	$('#autoComplete').autoComplete({
+	$('#searchProductTree').autoComplete({
 		width: '400px',
 		async: {
-            url: 'http://10.0.0.5:8011/Selector/Product/SearchProduct',
+            url: 'http://192.168.4.86:100/Selector/Product/SearchProduct',
             dataType: 'jsonp',
             dataField: null,
             searchField: 'keyword'
         },
-        template: '<td>#{zhengjiBm}</td><td>#{zhengjiName}</td>',
+        template: '<td>#{cpBm}</td><td>#{cpName}</td><td>#{zhengjiName}</td>',
         maxNum: 10,
         callback: function (data) {
-        	$('#autoComplete').val(data.zhengjiName);
+        	$(this).val(data.zhengjiName);
+        }
+	});
+	$('#searchProductByWpbm').autoComplete({
+		async: {
+            url: 'http://192.168.4.86:100/Selector/Product/SearchProductByFilter',
+            dataType: 'jsonp',
+            dataField: null,
+            searchField: 'wpbm',
+            delay: 0
+        },
+        template: '<td>#{cpBm}</td><td>#{cpName}</td>',
+        maxNum: 10,
+        callback: function (data) {
+        	$(this).val(data.cpName);
         }
 	});
 	
@@ -71,7 +85,7 @@ require(['jquery', 'util', 'selector', 'bootstrap', 'uploadify', 'tlayer', 'plug
 	});	
 
 	$('#search').click(function () {
-		table.table('reload', {type: 'he'});
+		table.table('reload');
 	});
 
 	$('#upload').uploadify();
@@ -81,7 +95,7 @@ require(['jquery', 'util', 'selector', 'bootstrap', 'uploadify', 'tlayer', 'plug
 
         selector[type]({
             callback: function(data) {
-                $('#organiztion-result').val(JSON.stringify(data));
+                console.log(data);
                 $.tlayer('close');
             }
         });
@@ -95,7 +109,7 @@ require(['jquery', 'util', 'selector', 'bootstrap', 'uploadify', 'tlayer', 'plug
             level: level,
             multi: multi,
             callback: function(data) {
-                $('#product-result').val(JSON.stringify(data));
+                console.log(data);
                 $.tlayer('close');
             }
         });
@@ -182,26 +196,25 @@ require(['jquery', 'util', 'selector', 'bootstrap', 'uploadify', 'tlayer', 'plug
 			icon: '<i class="glyphicon glyphicon-plus" style="color: green;"></i>',
 			text: '新建目录',
 			callback: function (e, obj) {
-				console.log('新建目录')
+				console.log('新建目录');
 			}
 		}, {
 			icon: '<i class="glyphicon glyphicon-remove" style="color: red;"></i>',
 			text: '删除目录',
 			callback: function (e) {
-				console.log('删除目录')
+				console.log('删除目录');
 			}
 		}, {
 			icon: '<i class="glyphicon glyphicon-upload" style="color: blue;"></i>',
 			text: '上传文件',
 			callback: function (e) {
-				console.log('上传文件')
+				console.log('上传文件');
 			}
 		}]
 	});
 
 	$('#table').on('contextmenu', '.table-body .table-tr', function (e) {
 		rMenu.show(e.clientX, e.clientY, this);
-			
-		return false;
+		e.preventDefault();
 	});
 });

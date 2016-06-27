@@ -897,6 +897,7 @@ input[type="submit"].btn::-moz-focus-inner {
 .navbar {
     font-size: 14px;
     border-top: 0;
+    border-radius: 0;
 }
 .navbar-brand {
     line-height: 50px;
