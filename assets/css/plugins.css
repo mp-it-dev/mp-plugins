@@ -1007,6 +1007,8 @@
 }
 .validate-tip {
     position: absolute;
+    top: 0;
+    left: 0;
     display: none;
     z-index: 1070;
     padding: 3px 8px;
