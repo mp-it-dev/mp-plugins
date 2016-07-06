@@ -283,6 +283,7 @@ PluginDep.resetBodyScrollbar = function (context) {
         tableClass      : '',                       //自定义table类名
         maxHeight       : false,                    //table容器最大高度
         height          : false,                    //table容器高度
+        headerClass     : 'info',                   //表头行类
 
         //单元格选项
         checkbox        : false,                    //是否显示checkbox
@@ -716,7 +717,7 @@ PluginDep.resetBodyScrollbar = function (context) {
             colOptions = options.colOptions,
             colLen = colOptions.length;
 
-        var html = '<tr class="table-tr">';
+        var html = '<tr class="table-tr ' + (options.headerClass || '') + '">';
 
         //复选框
         if (options.checkbox) {
