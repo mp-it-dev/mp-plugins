@@ -192,12 +192,10 @@
 .paging-btn {
     display: inline-block;
     *display: inline;
-    width: 30px;
-    height: 30px;
-    line-height: 30px;
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 2px 11px;
     font-size: 12px;
+    line-height: 2;
     text-align: center;
     border: 1px solid #d4d4d4;
     border-right: none;
