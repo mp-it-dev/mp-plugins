@@ -8,6 +8,7 @@
 			var t = new Date().getTime();
 
 			$.content({
+				layerID: option.layerID || false,
 				theme: 'blue',
 				header: '单人',
 				content: {
@@ -24,6 +25,7 @@
 			var t = new Date().getTime();
 
 			$.content({
+				layerID: option.layerID || false,
 				theme: 'blue',
 				header: '多人',
 				content: {
@@ -40,6 +42,7 @@
 			var t = new Date().getTime();
 
 			$.content({
+				layerID: option.layerID || false,
 				theme: 'blue',
 				header: '单部门',				
 				content: {
@@ -56,6 +59,7 @@
 			var t = new Date().getTime();
 
 			$.content({
+				layerID: option.layerID || false,
 				theme: 'blue',
 				header: '多部门',
 				content: {
@@ -72,6 +76,7 @@
 			var t = new Date().getTime();
 
 			$.content({
+				layerID: option.layerID || false,
 				theme: 'blue',
 				header: '单职位',
 				content: {
@@ -88,6 +93,7 @@
 			var t = new Date().getTime();
 
 			$.content({
+				layerID: option.layerID || false,
 				theme: 'blue',
 				header: '多职位',
 				content: {
@@ -109,6 +115,7 @@
 			}
 
 			$.content({
+				layerID: option.layerID || false,
 				theme: 'blue',
 				header: '产品选择',
 				content: {
