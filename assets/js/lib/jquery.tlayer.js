@@ -14,7 +14,15 @@
 
     //标记是否正在关闭中，防止不出现layer-box-mask
     var isClosing = false;
-    var layerShow = false;
+    var maskLength = 0;
+
+    //拖动变量
+    var dragObj = {
+        ele: null,
+        target: null,
+        oldX: 0,
+        oldY: 0
+    };
 
     //弹出框的方法
     var methods = {
@@ -295,7 +303,7 @@
                 layerData = this.layerData,
                 settings = layerData.layers[layerID].settings;
 
-            if (settings.showMask && !layerShow) {
+            if (settings.showMask && !maskLength) {
                 layerData.layers[layerID].layer.prepend('<div class="layer-box-mask">&nbsp;</div>');
             }
         },
@@ -550,7 +558,7 @@
             //判断layer是否已显示，否则不允许再显示
             if (util.inArray(layerID, layerData.stack) > -1) { return false; }
 
-            layerShow = true;
+            maskLength++;
 
             //显示类型
             var animation = {
@@ -596,7 +604,7 @@
                 settings = layer.settings,
                 layerID = $layer.attr('id');
 
-            layerShow = false;
+            maskLength--;
 
             //显示类型
             var animation = {
@@ -686,16 +694,6 @@
         drag: function ($ele, $target, settings) {
             if ($ele.length == 0) return;
 
-            //拖动变量
-            var dragObj = {
-                ele: null,
-                target: null,
-                oldX: 0,
-                oldY: 0
-            };
-            var win = settings.win;
-            var doc = win.document;
-
             $ele.mousedown(function (e) {
                 dragObj.ele = $ele;
                 dragObj.target = $target;
@@ -703,36 +701,6 @@
                 dragObj.oldY = e.clientY - $target.position().top;
 
                 return false;
-            });
-
-            //绑定拖拽事件
-            $(doc).off('mousemove.layer_drag').on('mousemove.layer_drag', function (e) {
-                if (dragObj.ele) {
-                    var oX = e.clientX - dragObj.oldX;
-                    var oY = e.clientY - dragObj.oldY;
-                    var target = dragObj.target;
-                    var w = target.outerWidth();
-                    var h = target.outerHeight();
-
-                    if (oX < 0) oX = 0;
-                    if (oY < 0) oY = 0;
-
-                    if (oX + w > $(win).width()) {
-                        oX = $(win).width() - w;
-                    }
-                    if (oY + h > $(win).height()) {
-                        oY = $(win).height() - h;
-                    }
-
-                    target.css({ "left": oX + "px", "top": oY + "px" });
-
-                    return false;
-                }
-            });
-
-            //绑定拖拽事件
-            $(doc).off('mouseup.layer_drag').on('mouseup.layer_drag', function (e) {
-                dragObj.ele = null;
             });
         },
 
@@ -1294,6 +1262,41 @@
             return false;           
         }
     };
+
+    (function () {
+        var win = window;
+        var doc = win.document;
+
+        //绑定拖拽事件
+        $(doc).on('mousemove.layer_drag', function (e) {
+            if (dragObj.ele) {
+                var oX = e.clientX - dragObj.oldX;
+                var oY = e.clientY - dragObj.oldY;
+                var target = dragObj.target;
+                var w = target.outerWidth();
+                var h = target.outerHeight();
+
+                if (oX < 0) oX = 0;
+                if (oY < 0) oY = 0;
+
+                if (oX + w > $(win).width()) {
+                    oX = $(win).width() - w;
+                }
+                if (oY + h > $(win).height()) {
+                    oY = $(win).height() - h;
+                }
+
+                target.css({ "left": oX + "px", "top": oY + "px" });
+
+                return false;
+            }
+        });
+
+        //解除拖拽事件
+        $(doc).on('mouseup.layer_drag', function (e) {
+            dragObj.ele = null;
+        });
+    })();
 
     //直接在jQuery对象上扩展方法
     $.extend(tlayer);
