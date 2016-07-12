@@ -283,6 +283,7 @@ PluginDep.resetBodyScrollbar = function (context) {
         tableClass      : '',                       //自定义table类名
         maxHeight       : false,                    //table容器最大高度
         height          : false,                    //table容器高度
+        headerClass     : 'info',                   //表头行类
 
         //单元格选项
         checkbox        : false,                    //是否显示checkbox
@@ -716,7 +717,7 @@ PluginDep.resetBodyScrollbar = function (context) {
             colOptions = options.colOptions,
             colLen = colOptions.length;
 
-        var html = '<tr class="table-tr">';
+        var html = '<tr class="table-tr ' + (options.headerClass || '') + '">';
 
         //复选框
         if (options.checkbox) {
@@ -1551,9 +1552,9 @@ PluginDep.resetBodyScrollbar = function (context) {
      */
     Pager.prototype.firstPage = function () {
         if (this.options.pageIndex > 1) {
-            return "<a class='paging-btn paging-btn-first' title='首页' data-topage='1'>&lt;&lt;</a>";
+            return "<a class='paging-btn paging-btn-first' title='首页' data-topage='1'>«</a>";
         } else {
-            return "<a class='paging-btn paging-btn-first paging-btn-disabled' title='首页'>&lt;&lt;</a>";
+            return "<a class='paging-btn paging-btn-first paging-btn-disabled' title='首页'>«</a>";
         }
     },
 
@@ -1567,9 +1568,9 @@ PluginDep.resetBodyScrollbar = function (context) {
             totalPage = options.totalPage;
 
         if (pageIndex < totalPage) {
-            return "<a class='paging-btn paging-btn-last' title='尾页' data-topage='"+totalPage+"'>&gt;&gt;</a>";
+            return "<a class='paging-btn paging-btn-last' title='尾页' data-topage='"+totalPage+"'>»</a>";
         } else {
-            return "<a class='paging-btn paging-btn-last paging-btn-disabled' title='尾页'>&gt;&gt;</a>";
+            return "<a class='paging-btn paging-btn-last paging-btn-disabled' title='尾页'>»</a>";
         }
     },
 

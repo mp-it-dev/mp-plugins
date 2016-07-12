@@ -5,7 +5,6 @@
 
 /*table start*/
 .table-container {
-    margin: 10px 0;
     position: relative;
 }
 .table-container .table-head {
@@ -42,13 +41,6 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
-    border-top: 1px solid #ddd;
-}
-/*解决IE中设置th为position: relative;后，背景色会覆盖border的问题，IE9+可以通过background-clip: padding-box;解决，IE8中直接去掉背景色*/
-@media screen and (min-width: 0) {
-    .table-container .table-th {
-        background-color: #eee;
-    }
 }
 .table-container .table-th-text {
     white-space: nowrap;
@@ -199,12 +191,10 @@
 .paging-btn {
     display: inline-block;
     *display: inline;
-    width: 30px;
-    height: 30px;
-    line-height: 30px;
-    margin: 0px;
-    padding: 0px;
+    margin: 0;
+    padding: 2px 11px;
     font-size: 12px;
+    line-height: 2;
     text-align: center;
     border: 1px solid #d4d4d4;
     border-right: none;
@@ -471,53 +461,6 @@
     position: relative;
     display: inline-block;
     *display: inline;
-}
-.btn-hover {
-    color: #333333;
-    text-decoration: none;
-    background-position: 0 -15px;
-    outline: 0;
-    -webkit-transition: background-position 0.1s linear;
-     -moz-transition: background-position 0.1s linear;
-       -o-transition: background-position 0.1s linear;
-          transition: background-position 0.1s linear;
-}
-.btn-default.btn-hover {
-    color: #333333;
-    background-color: #e6e6e6;
-    border-color: #e6e6e6 #e6e6e6 #bfbfbf;
-    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
-    border-bottom-color: #b3b3b3;
-}
-.btn-primary.btn-hover {
-    color: #fff;
-    background-color: #04c;
-    border-color: #0044cc #0044cc #002a80;
-    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
-}
-.btn-success.btn-hover {
-    color: #ffffff;
-    background-color: #51a351;
-    border-color: #51a351 #51a351 #387038;
-    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
-}
-.btn-info.btn-hover {
-    color: #ffffff;
-    background-color: #2f96b4;
-    border-color: #2f96b4 #2f96b4 #1f6377;
-    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
-}
-.btn-warning.btn-hover {
-    color: #ffffff;
-    background-color: #f89406;
-    border-color: #f89406 #f89406 #ad6704;
-    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
-}
-.btn-danger.btn-hover {
-    color: #ffffff;
-    background-color: #bd362f;
-    border-color: #bd362f #bd362f #802420;
-    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
 }
 .uploadify-desc {
     display: inline-block;
