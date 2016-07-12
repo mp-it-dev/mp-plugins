@@ -78,7 +78,7 @@
 			$.content({
 				layerID: option.layerID || false,
 				theme: 'blue',
-				header: '单职位',
+				header: '单部门职位',
 				content: {
 					width: 530,
 					height: 480,
@@ -95,7 +95,7 @@
 			$.content({
 				layerID: option.layerID || false,
 				theme: 'blue',
-				header: '多职位',
+				header: '多部门职位',
 				content: {
 					width: 530,
 					height: 480,
