@@ -62,6 +62,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     //事件绑定
     //////////////
     
+    // 选中
     $('#submitSelected').on('click', function() {
         var cb = parent[util.queryString('callback')];
 

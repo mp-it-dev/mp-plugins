@@ -70,9 +70,9 @@
 				}
 			});
 		},
-		//单职位
-		singleJob: function (option) {
-			window.singleJobCallback = option.callback;
+		//单部门职位
+		singleDepJob: function (option) {
+			window.singleDepJobCallback = option.callback;
 			var t = new Date().getTime();
 
 			$.content({
@@ -83,13 +83,13 @@
 					width: 530,
 					height: 480,
 					padding: 0,
-					src: this.baseUrl + 'singleJob.html?callback=singleJobCallback&apiurl=' + encodeURIComponent(this.apiUrl) + '&t=' + t
+					src: this.baseUrl + 'singleDepJob.html?callback=singleDepJobCallback&apiurl=' + encodeURIComponent(this.apiUrl) + '&t=' + t
 				}
 			});
 		},
-		//多职位
-		multiJob: function (option) {
-			window.multiJobCallback = option.callback;
+		//多部门职位
+		multiDepJob: function (option) {
+			window.multiDepJobCallback = option.callback;
 			var t = new Date().getTime();
 
 			$.content({
@@ -100,10 +100,10 @@
 					width: 530,
 					height: 480,
 					padding: 0,
-					src: this.baseUrl + 'multiJob.html?callback=multiJobCallback&apiurl=' + encodeURIComponent(this.apiUrl) + '&t=' + t
+					src: this.baseUrl + 'multiDepJob.html?callback=multiDepJobCallback&apiurl=' + encodeURIComponent(this.apiUrl) + '&t=' + t
 				}
 			});
-		},
+		},		
 		//选择产品结构
 		product: function (option) {
 			window.productCallback = option.callback;
