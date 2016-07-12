@@ -154,6 +154,10 @@
             }
 
             layerUtil.hideLayer(layer, function () {
+                if (layer.layer.find('.layer-box-mask').length) {
+                    maskLength--;
+                }
+
                 layer.layer.remove();
 
                 //出栈
@@ -304,6 +308,7 @@
                 settings = layerData.layers[layerID].settings;
 
             if (settings.showMask && !maskLength) {
+                maskLength++;
                 layerData.layers[layerID].layer.prepend('<div class="layer-box-mask">&nbsp;</div>');
             }
         },
@@ -558,8 +563,6 @@
             //判断layer是否已显示，否则不允许再显示
             if (util.inArray(layerID, layerData.stack) > -1) { return false; }
 
-            maskLength++;
-
             //显示类型
             var animation = {
                 "fade"      : "fadeIn",
@@ -603,8 +606,6 @@
                 $layer = layer.layer,
                 settings = layer.settings,
                 layerID = $layer.attr('id');
-
-            maskLength--;
 
             //显示类型
             var animation = {
