@@ -1,4 +1,4 @@
-require(['jquery', 'util', 'selector', 'bootstrap', 'uploadify', 'tlayer', 'plugins'], function ($, util, selector) {
+require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], function ($, util, selector) {
 	selector.baseUrl = './assets/plugins/selector/';
 
 	$('#cc').scrollbar();
@@ -33,10 +33,14 @@ require(['jquery', 'util', 'selector', 'bootstrap', 'uploadify', 'tlayer', 'plug
 	
 	var table = $("#table").table({
 		height: 400,
-		url: "https://api.douban.com/v2/movie/top250?start=1",
+		tableClass: 'table-border',
+		menu: {
+			cellFilter: '#tableCellFilter',
+			colShow: '#tableColShow'
+		},
+		url: "https://api.douban.com/v2/movie/top250",
 		dataType: 'jsonp',
 		jsonp: 'callback',
-		tableClass: 'table-border',
 		data: function () {
 			return {
 				keyword: $('#keyword').val()
@@ -52,7 +56,6 @@ require(['jquery', 'util', 'selector', 'bootstrap', 'uploadify', 'tlayer', 'plug
 		colOptions: [{
 			name: '名称',
 			field: 'title',
-			width: 300,
 			edit: {
 				replace: function (rowData) {
 					return '<input value="'+rowData.title+'" />';
