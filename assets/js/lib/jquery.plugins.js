@@ -165,14 +165,16 @@ PluginDep.resetBodyScrollbar = function (context) {
  */
 PluginDep.getPosition = function (ele) {
     var elRect = ele[0].getBoundingClientRect();
-    var body = $('body');
 
     // IE8中没有width和height
     if (elRect.width == null) {
       elRect = $.extend({}, elRect, { width: elRect.right - elRect.left, height: elRect.bottom - elRect.top });
     }
 
-    return $.extend({}, elRect, { scrollTop: body.scrollTop(), scrollLeft: body.scrollLeft() });
+    return $.extend({}, elRect, { 
+        scrollTop: document.documentElement.scrollTop || document.body.scrollTop,
+        scrollLeft: document.documentElement.scrollLeft || document.body.scrollLeft 
+    });
 };
 
 /**
@@ -443,7 +445,7 @@ PluginDep.getPosition = function (ele) {
      */
     Table.prototype.initMenu = function () {
         var options = this.options,
-            colOptions = options.colOptions;
+            colOptions = options.colOptions,
             menu = options.menu;
 
         if (menu.colShow) {
