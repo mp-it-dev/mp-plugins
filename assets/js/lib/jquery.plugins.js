@@ -3,6 +3,9 @@
  * @author helin
  */
 
+// IIEF包括，独立命名空间
+(function () {
+
 /**
  * [pluginDep 插件依赖的公用函数]
  */
@@ -33,7 +36,7 @@ PluginDep.browser = (function () {
     }
 
     //由于IE11没有msie标识，所以换一种方式判断IE
-    if (window.ActiveXObject || "ActiveXObject" in window) { 
+    if (window.ActiveXObject || 'ActiveXObject' in window) { 
         browser.msie = true;
         delete browser['mozilla'];
     }
@@ -156,6 +159,23 @@ PluginDep.resetBodyScrollbar = function (context) {
 }
 
 /**
+ * [getPosition 计算元素的长宽及位置信息]
+ * @param  {[type]} ele [description]
+ * @return {[type]}     [description]
+ */
+PluginDep.getPosition = function (ele) {
+    var elRect = ele[0].getBoundingClientRect();
+    var body = $('body');
+
+    // IE8中没有width和height
+    if (elRect.width == null) {
+      elRect = $.extend({}, elRect, { width: elRect.right - elRect.left, height: elRect.bottom - elRect.top });
+    }
+
+    return $.extend({}, elRect, { scrollTop: body.scrollTop(), scrollLeft: body.scrollLeft() });
+};
+
+/**
  * [获取css样式数值]
  * @param  {[type]} $ [description]
  * @return {[type]}   [description]
@@ -179,7 +199,7 @@ PluginDep.resetBodyScrollbar = function (context) {
  * 使用说明：
  * 需要引入 common.css
  */
-;(function($, global) {
+;(function($) {
     var pName = 'table';
     var namespace = 'ui.' + pName;
 
@@ -284,6 +304,18 @@ PluginDep.resetBodyScrollbar = function (context) {
         maxHeight       : false,                    //table容器最大高度
         height          : false,                    //table容器高度
         headerClass     : 'info',                   //表头行类
+        menu            : false,                    //菜单栏
+
+        /*
+         * {
+         *     cellFilter: {
+         *         button: 'selector'
+         *     },
+         *     colShow: {
+         *         button: 'selector'
+         *     }
+         * }         
+         */
 
         //单元格选项
         checkbox        : false,                    //是否显示checkbox
@@ -306,7 +338,7 @@ PluginDep.resetBodyScrollbar = function (context) {
          *     },
          *     align: false,                        //对齐方式
          *     headerAlign: false,                  //表头对齐方式
-         *     css: false,                          //设置css样式
+         *     hide: false,                         //是否显示列
          *     class: false,                        //自定义类
          *     sort: {
          *         sname: 'id',                     //排序字段
@@ -390,9 +422,7 @@ PluginDep.resetBodyScrollbar = function (context) {
                         '</div>'+
                     '</div>';
 
-        this.container = $container.html(html).find('.table-container');
-        //表头最后一个拖动条隐藏
-        $container.find('.table-head .table-tr th:last .table-th-resize').addClass('table-th-resize-last');
+        $container.html(html);
 
         for (var i = 0, l = $container.find('.table-head .holder th').length; i < l; i++) {
             $container.find('.table-head .table-tr th').eq(i).attr('data-index', i);
@@ -403,12 +433,26 @@ PluginDep.resetBodyScrollbar = function (context) {
             self.setGroupHeaders(options.groupHeaders);
         }
 
+        this.initMenu();
         this.initData();
     }
 
     /**
+     * [initMenu 初始化菜单]
+     * @return {[type]} [description]
+     */
+    Table.prototype.initMenu = function () {
+        var options = this.options,
+            colOptions = options.colOptions;
+            menu = options.menu;
+
+        if (menu.colShow) {
+            this.colShow = $('<ul class="dropdown-menu table-columns">').appendTo('body');
+        }
+    }
+
+    /**
      * [initData 处理数据并返回到回调]
-     * @param  {[type]} options [参数列表]
      * @return {[type]} [description]
      */
     Table.prototype.initData = function () {
@@ -498,7 +542,7 @@ PluginDep.resetBodyScrollbar = function (context) {
                 }
             }
 
-            var $pager = $('<div class="table-pager"></div>').appendTo($container);
+            var $pager = $('<div class="table-pager"></div>').appendTo($container.find('.table-container'));
 
             $pager.pager(ajaxOpt);
             options.paging.pager = $pager.data('ui.pager').options;
@@ -548,7 +592,7 @@ PluginDep.resetBodyScrollbar = function (context) {
     }
 
     /**
-     * [createTable 生成表格]
+     * [createTable 生成表格体]
      * @return {[type]} [description]
      */
     Table.prototype.createTable = function () {
@@ -685,22 +729,19 @@ PluginDep.resetBodyScrollbar = function (context) {
 
         for (var i = 0; i < colLen; i++) {
             var col = colOptions[i];
-
             var dis = '';
 
-            if (col.width) {
-                if (!isNaN(col.width)) {
-                    dis += 'width: ' + col.width + 'px;';
-                } else {
-                    dis += 'width: ' + col.width + ';';
+            if (!col.hide) {
+                if (col.width) {
+                    if (!isNaN(col.width)) {
+                        dis += 'width: ' + col.width + 'px;';
+                    } else {
+                        dis += 'width: ' + col.width + ';';
+                    }
                 }
+
+                html += '<th style="' + dis + '"></th>';
             }            
-
-            if (col.css && col.css.display) {
-                dis = ' display: ' + col.css.display + ';';
-            }
-
-            html += '<th style="' + dis + '"></th>';
         }
 
         html += '</tr>';
@@ -735,6 +776,11 @@ PluginDep.resetBodyScrollbar = function (context) {
 
         for (var i = 0; i < colLen; i++) {
             var col = colOptions[i];
+
+            if (col.hide) {
+                continue;
+            }
+
             var attr = 'data-field="'+col.field+'" data-field-index="' + i + '" onselectstart="return false;"', 
                 stl = [],
                 sort = col.sort;
@@ -745,14 +791,6 @@ PluginDep.resetBodyScrollbar = function (context) {
             }
 
             var $th = $('<th class="table-th' + (col.sort ? ' table-sort' : '') + '" ' + attr +'"></th>');
-
-            if (col.css) {
-                $th.css(col.css);
-            }
-
-            if (col['class']) {
-                $th.addClass(col['class']);
-            }
 
             if (col.headerAlign || options.headerAlign) {
                 $th.css('text-align', col.headerAlign || options.headerAlign);
@@ -818,6 +856,10 @@ PluginDep.resetBodyScrollbar = function (context) {
                 var col = colOptions[j];
                 var text;
 
+                if (col.hide) {
+                    continue;
+                }
+
                 if (typeof col.handler === 'function') {
                     var val;
 
@@ -861,14 +903,6 @@ PluginDep.resetBodyScrollbar = function (context) {
                     $td.data('editData', col.edit);
                 }
 
-                if (col.css) {
-                    $td.css(col.css);
-                }
-
-                if (col['class']) {
-                    $td.addClass(col['class']);
-                }
-
                 if (col.align || options.align) {
                     $td.css('text-align', col.align || options.align);
                 }
@@ -900,7 +934,7 @@ PluginDep.resetBodyScrollbar = function (context) {
     }
 
     /**
-     * [reload 重新加载表格]
+     * [reload 重新请求数据并加载表格]
      * @return {[type]} [description]
      */
     Table.prototype.reload = function (data) {
@@ -931,6 +965,39 @@ PluginDep.resetBodyScrollbar = function (context) {
         } else {
             this.getPageData();
         }
+    }
+
+    /**
+     * [refresh 以当前数据刷新表格]
+     * @return {[type]} [description]
+     */
+    Table.prototype.refresh = function () {
+        var self = this,
+            options = this.options,
+            $container = this.container;
+
+        $container.find('.table-head').html(
+            '<table class="table ' + options.tableClass + '">' + 
+                '<thead>' + this.initHolder() + this.initThead() + '</thead>'+
+            '</table>' 
+        );
+        $container.find('.table-body').html(
+            '<div class="table-loading">努力加载中...</div>'+
+            '<table class="table table-hover ' + options.tableClass + '">' + 
+                '<thead>' + this.initHolder() + '</thead>' +
+            '</table>'
+        );
+
+        for (var i = 0, l = $container.find('.table-head .holder th').length; i < l; i++) {
+            $container.find('.table-head .table-tr th').eq(i).attr('data-index', i);
+        }
+
+        //执行多列参数设置
+        if (options.groupHeaders) {
+            self.setGroupHeaders(options.groupHeaders);
+        }
+
+        this.createTable();
     }
 
     /**
@@ -1042,7 +1109,10 @@ PluginDep.resetBodyScrollbar = function (context) {
      */
     Table.prototype.bindEvents = function () {
         var self = this,
-            $container = this.container;
+            $container = this.container,
+            options = this.options,
+            colOptions = options.colOptions,
+            menu = options.menu;
 
         $container.data('bindEvents', true);
 
@@ -1166,6 +1236,91 @@ PluginDep.resetBodyScrollbar = function (context) {
         $container.on('blur', '.table-td-editEle', function (e) {
             $(this).trigger('change');
         });
+
+        // 列显示事件
+        if (menu.colShow) {
+            $(menu.colShow).on('click', function (e) {
+                if (self.colShow.is(':hidden')) {
+                    var pos = PluginDep.getPosition($(this));
+                    self.colShow.empty();
+
+                    for (var i = 0, l = colOptions.length; i < l; i++) {
+                        $(
+                            '<li data-index="' + i + '">'+
+                                '<label>' +
+                                    '<input type="checkbox"' + (!colOptions[i].hide ? ' checked' : '') + '> ' + 
+                                    colOptions[i].name +
+                                '</label>' +
+                            '</li>'
+                        ).appendTo(self.colShow);
+                    }
+
+                    self.colShow.show().css({
+                        left: pos.left + pos.scrollLeft,
+                        top: pos.top + pos.scrollTop + pos.height
+                    });
+                } else {
+                    self.colShow.hide();
+                }
+
+                e.stopPropagation();           
+            });
+
+            self.colShow.on('click', function (e) {
+                e.stopPropagation();
+            });
+
+            self.colShow.on('change', 'input', function (e) {
+                var index = +$(this).parents('li').data('index');
+                var col = colOptions[index];
+
+                col.hide = !$(this).prop('checked');
+                self.refresh();
+            });
+
+            $(document).on('click', function () {
+                self.colShow.hide();
+            });
+        }
+
+        // 列筛选
+        if (menu.cellFilter) {
+            $container.on('click', '.table-td', function (e) {
+                $container.find('.table-td').removeClass('table-td-filter');
+                $(this).addClass('table-td-filter');
+                e.stopPropagation();
+            });
+
+            $(menu.cellFilter).on('click', function (e) {
+                var filterTd = $container.find('.table-td-filter').removeClass('table-td-filter');
+
+                if (!filterTd.length) {
+                    if ($(this).hasClass('active')) {
+                        $container.find('.table-body tbody .table-tr').show();
+                        $(this).removeClass('active');
+                    }
+
+                    return;
+                }
+
+                var idx = filterTd.index();
+                var html = filterTd.html();
+
+                $container.find('.table-body tbody .table-tr').each(function () {
+                    if ($('.table-td', this).eq(idx).html() != html) {
+                        $(this).hide();
+                    } else {
+                        $(this).show();
+                    }
+                });
+
+                $(this).addClass(('active'));
+            });
+
+            $(document).on('click', function () {
+                $container.find('.table-td-filter').removeClass('table-td-filter');
+            });
+        }
     }
 
     var oldX, oldLeft, oldLineLeft;
@@ -1271,14 +1426,14 @@ PluginDep.resetBodyScrollbar = function (context) {
             $.error('The method ' + method + ' does not exist in $.table');
         }
     }
-})(jQuery, typeof window !== "undefined" ? window : this);
+})(jQuery);
 
 /**
  * [pager 分页插件]
  * 使用说明：
  * 需要引入 plugin.css
  */
-(function($, window, undefined) {
+;(function($) {
     var pName = 'pager';
     var namespace = 'ui.' + pName;
 
@@ -1661,14 +1816,14 @@ PluginDep.resetBodyScrollbar = function (context) {
             $.error('The method ' + method + ' does not exist in $.select');
         }
     }
-})(jQuery, window, undefined);
+})(jQuery);
 
 /**
  * [uiSelect下拉菜单插件]
  * 使用说明：
  * 需要引入 plugin.css
  */
-(function($, window, undefined) {
+;(function($) {
     var pName = 'select';
     var namespace = 'ui.' + pName;
 
@@ -1721,19 +1876,19 @@ PluginDep.resetBodyScrollbar = function (context) {
      * [DEFAULTS 默认配置]
      */
     UiSelect.DEFAULTS = {
-        name        	: '',                      //作为表单的name
-        data        	: false,                   //数据
+        name            : '',                      //作为表单的name
+        data            : false,                   //数据
         fields          : [],
         /*[{
             name        : 'text',                  //多列字段的名称
             width       : '100%'                   //多列字段所占宽度
         }]*/
-        width       	: 0,                       //宽度
-        seprator 	    : ';',                     //多选值分隔符
+        width           : 0,                       //宽度
+        seprator        : ';',                     //多选值分隔符
         disabled        : false,                   //是否禁用
-        before      	: false,                   //是否在前方插入
-        searchbox   	: false,                   //是否显示搜索框
-        multiple    	: false                    //是否多选以及多选框类型
+        before          : false,                   //是否在前方插入
+        searchbox       : false,                   //是否显示搜索框
+        multiple        : false                    //是否多选以及多选框类型
     }
 
     /**
@@ -2371,14 +2526,14 @@ PluginDep.resetBodyScrollbar = function (context) {
     $(document).ready(function () {
         $('[data-uitype="'+pName+'"]').uiSelect();
     });
-})(jQuery, window, undefined);
+})(jQuery);
 
 /**
  * [scrollbar 滚动条插件]
  * 使用说明：
  * 需要引入 plugin.css
  */
-(function($, window, undefined) {
+;(function($) {
     var pName = 'scrollbar';
     var namespace = 'ui.' + pName;
 
@@ -2682,14 +2837,14 @@ PluginDep.resetBodyScrollbar = function (context) {
     $(document).ready(function () {
         $('[data-uitype="' + pName + '"]').scrollbar();
     });
-})(jQuery, window, undefined);
+})(jQuery);
 
 /**
  * [序列化表单为json]
  * @param  {[type]} $ [description]
  * @return {[type]}   [description]
  */
-(function ($) {  
+;(function ($) {  
     $.fn.serializeJson = function () {
         var serializeObj = {};
         var array = this.serializeArray();
@@ -3300,8 +3455,8 @@ PluginDep.resetBodyScrollbar = function (context) {
 
         tip.find('.validate-tip-text').html(msg);
 
-        var pos = this.getPosition(ele);
-        var viewportPos = this.getPosition($('body'));
+        var pos = PluginDep.getPosition(ele);
+        var viewportPos = PluginDep.getPosition($('body'));
         var placement = setting.originPlacement;
         var actualWidth = tip[0].offsetWidth;
         var actualHeight = tip[0].offsetHeight;
@@ -3324,19 +3479,6 @@ PluginDep.resetBodyScrollbar = function (context) {
                 top: actualPos.top
             });
         setting.placement = placement;
-    };
-
-    // 计算元素的长宽及位置信息
-    Validate.prototype.getPosition = function (ele) {
-        var elRect = ele[0].getBoundingClientRect();
-        var body = $('body');
-
-        // IE8中没有width和height
-        if (elRect.width == null) {
-          elRect = $.extend({}, elRect, { width: elRect.right - elRect.left, height: elRect.bottom - elRect.top });
-        }
-
-        return $.extend({}, elRect, { scrollTop: body.scrollTop(), scrollLeft: body.scrollLeft() });
     };
 
     // 计算元素的真实位置
@@ -3391,7 +3533,7 @@ PluginDep.resetBodyScrollbar = function (context) {
  * [resize 宽度拖动]
  * @return {[type]} [description]
  */
-;(function () {
+;(function ($) {
     var pName = 'resize';
     var namespace = 'ui.' + pName;
     var $container, $ele, opt, oldPoint;
@@ -3695,7 +3837,7 @@ PluginDep.resetBodyScrollbar = function (context) {
 /**
  * [AutoComplete input框自动补全]
  */
-(function ($, win) {
+(function ($) {
     var pName = 'autoComplete';
     var namespace = 'ui.' + pName;
 
@@ -3732,7 +3874,7 @@ PluginDep.resetBodyScrollbar = function (context) {
             dataType: false,            //返回数据类型，支持jsonp
             dataField: 'data',          //返回数据的字段中那个字段表示数据列表，null表示返回数据即数据列表
             searchField: 'keyword',     //搜索关键字名称
-            delay: 200                 	//延迟加载时间
+            delay: 200                  //延迟加载时间
         },
         dataList: [],                   //数据列表，支持本地数据列表
         localSearchField: null,         //本地搜索字段
@@ -3900,12 +4042,12 @@ PluginDep.resetBodyScrollbar = function (context) {
             $.error('The method ' + method + ' does not exist in $.autoComplete');
         }
     }
-})(jQuery, window);
+})(jQuery);
 
 /**
  * [inputEnter 输入框enter键与按钮事件关联]
  */
-(function ($, win) {
+(function ($) {
     var pName = 'inputEnter';
     var namespace = 'ui.' + pName;
 
@@ -3917,4 +4059,6 @@ PluginDep.resetBodyScrollbar = function (context) {
             $($(this).data('target')).trigger(ev);
         }
     });
-})(jQuery, window);
+})(jQuery);
+
+})();

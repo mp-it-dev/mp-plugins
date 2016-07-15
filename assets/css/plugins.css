@@ -92,6 +92,9 @@
 .table-container .table-td-rownum {
     text-align: center;
 }
+.table-container .table-td-filter {
+    background-color: #ddd;
+}
 .table-container .table-th-resize {
     position: absolute;
     right: 0px;
@@ -104,9 +107,6 @@
 }
 .table-container .table-border .table-th-resize {
     right: -1px;
-}
-.table-container .table-th-resize-last {
-    background-color: transparent;
 }
 .table-container .table-body .table-tr:first-child td {
     border-top: 0;
@@ -171,6 +171,13 @@
     background: #fff url(../img/loading_16.gif) no-repeat 10px center;
     border: 2px solid #fbd850;
     display: none;
+}
+.table-columns li label {
+    display: block;
+    padding: 3px 20px;
+    clear: both;
+    font-weight: normal;
+    line-height: 1.428571429;
 }
 /*table end*/
 
