@@ -3385,58 +3385,74 @@ PluginDep.getPosition = function (ele) {
         this.init();
     };
 
-    Validate.DEFAULTS = {
-        reg         : '',   // 正则表达式，优先级大于type
-        type        : '',   // 内置正则表达式email, idcard, tel, mobile
-        msg         : '',   // 错误提示信息
-        placement   : ''    // 提示框放置位置，默认自动计算
+    Validate.DEFAULTS = {        
+        rules               : [],       // 校验规则
+        /*
+         * [{
+         *     reg          : '',       // 正则表达式，优先级大于type
+         *     type         : '',       // 内置正则表达式email, idcard, tel, mobile
+         *     msg          : ''        // 错误提示信息
+         * }]
+         */
+        placement           : '',       // 提示框放置位置，默认自动计算
+        isForcePlacement    : false     // 是否强制位置
     };
 
     Validate.prototype.init = function () {
         var setting = this.setting;
 
-        if (!setting.reg) {
-            switch (setting.type) {
-                case 'email':
-                    setting.reg = '/^\\w+(\\.\\w+)*@\\w+(\\.\\w+){1,3}$/i';
-                    break;
-                case 'idcard':
-                    setting.reg = '/(^\\d{15}$)|(^\\d{17}([0-9]|X)$)/i';
-                    break;
-                case 'tel':
-                    setting.reg = '/^(0[0-9]{2,3}-?)?([2-9][0-9]{6,7})+(-[0-9]{1,4})?$/';
-                    break;
-                case 'mobile':
-                    setting.reg = '/^(\\+\\d{2})?\\d{11}$/';
-                    break;
-            }
+        if (typeof setting.rules == 'string') {
+            setting.rules = eval(setting.rules);
         }
 
-        var reg = setting.reg;
-        var startIndex = reg.indexOf('/');
-        var lastIndex = reg.lastIndexOf('/');
-        var exp = reg.substring(startIndex + 1, lastIndex);
-        var prop = reg.substring(lastIndex + 1);
-
         setting.originPlacement = setting.placement;
-
-        this.regExp = new RegExp(exp, prop);
         this.tipDom = $(
                             '<div class="validate-tip" id="' + this.targetId + '">' +
                                 '<span class="glyphicon glyphicon-warning-sign"></span>' + 
                                 '<span class="validate-tip-text"></span>' +
                             '</div>'
                         ).appendTo('body');
+        this.createRegExp();
         this.bindEvents();
     };
 
+    // 生成正则表达式
+    Validate.prototype.createRegExp = function () {
+        var rules = this.setting.rules;
+
+        for (var i = 0, l = rules.length; i < l; i++) {
+            var rule = rules[i];
+
+            if (!rule.reg) {
+                switch (rule.type) {
+                    case 'email':
+                        rule.reg = /^\w+(\\.\\w+)*@\w+(\.\w+){1,3}$/i;
+                        break;
+                    case 'idcard':
+                        rule.reg = /(^\d{15}$)|(^\d{17}([0-9]|X)$)/i;
+                        break;
+                    case 'tel':
+                        rule.reg = /^(0[0-9]{2,3}-?)?([2-9][0-9]{6,7})+(-[0-9]{1,4})?$/;
+                        break;
+                    case 'mobile':
+                        rule.reg = /^(\+\d{2})?\d{11}$/;
+                        break;
+                }
+            }
+
+            if (!rule.reg instanceof RegExp) {
+                throw new Error(reg + ' is not a instance of RegExp');
+            }
+        }
+    };
+
     // 显示提示框
-    Validate.prototype.showTip = function () {
+    Validate.prototype.showTip = function (msg) {
         var ele = this.ele;
         var setting = this.setting;
         
         ele.addClass('validate-error');
-        this.setTip();
+        this.setTip(msg);
     };
 
     // 隐藏提示框
@@ -3448,11 +3464,10 @@ PluginDep.getPosition = function (ele) {
     };
 
     // 设置提示框内容和位置
-    Validate.prototype.setTip = function () {
+    Validate.prototype.setTip = function (msg) {
         var ele = this.ele;
         var setting = this.setting;
 
-        var msg = typeof setting.msg == 'function' ? setting.msg.call(this, setting) : setting.msg;
         var tip = $('#' + this.targetId).show();
 
         tip.find('.validate-tip-text').html(msg);
@@ -3468,10 +3483,12 @@ PluginDep.getPosition = function (ele) {
             placement = 'right';
         }
 
-        // 校正位置，当前位置放不下则统一放到底部
-        placement = placement == 'top' && pos.top - actualHeight < viewportPos.top ? 'bottom' :
-                    placement == 'right' && pos.right + actualWidth > viewportPos.width ? 'bottom' :
-                    placement == 'left' && pos.left - actualWidth < viewportPos.left ? 'bottom' : placement;
+        if (!setting.isForcePlacement) {
+            // 校正位置，当前位置放不下则统一放到底部
+            placement = placement == 'top' && pos.top - actualHeight < viewportPos.top ? 'bottom' :
+                placement == 'right' && pos.right + actualWidth > viewportPos.width ? 'bottom' :
+                placement == 'left' && pos.left - actualWidth < viewportPos.left ? 'bottom' : placement;
+        }        
 
         var actualPos = this.calcActualPos(pos, placement, actualWidth, actualHeight);
 
@@ -3498,15 +3515,24 @@ PluginDep.getPosition = function (ele) {
     Validate.prototype.bindEvents = function () {
         var ele = this.ele;
         var setting = this.setting;
+        var rules = setting.rules;
         var self = this;
 
         ele.on('blur', function () {
             var val = $(this).val();
 
-            if (!self.regExp.test(val)) {
-                self.showTip();
-            } else {
-                self.hideTip();
+            self.hideTip();
+
+            for (var i = 0, l = rules.length; i < l; i++) {
+                var rule = rules[i];
+                var ev = $.Event('validate.ui.validate');
+
+                ele.trigger(ev, [rule, setting, self]);
+
+                if (!rule.reg.test(val)) {
+                    self.showTip(rule.msg);
+                    break;
+                }
             }
         });
 
