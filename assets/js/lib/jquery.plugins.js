@@ -211,6 +211,8 @@ PluginDep.getPosition = function (ele) {
      */
     var methods = {
         init: function (options) {
+            methods.destroy.call(this);
+
             return this.each(function () {
                 var $this = $(this);
 
@@ -273,6 +275,10 @@ PluginDep.getPosition = function (ele) {
             });
         },
 
+        /**
+         * [getSelectedRowData 回去当前表格中选中的行数据]
+         * @return {[type]} [description]
+         */
         getSelectedRowData: function () {
             var container = this.eq(0).data(namespace).container;
             var selectedRow = [];
@@ -285,9 +291,26 @@ PluginDep.getPosition = function (ele) {
             return selectedRow;
         },
 
+        /**
+         * [setGroupHeaders 合并表头]
+         * @param {[type]} o [description]
+         */
         setGroupHeaders: function (o) {
             return this.each(function () {
                 $(this).data(namespace).setGroupHeaders(o);
+            });
+        },
+
+        /**
+         * [destroy 销毁表格]
+         * @param  {[type]} argument [description]
+         * @return {[type]}          [description]
+         */
+        destroy: function (argument) {
+            return this.each(function () {
+                if ($(this).data(namespace)) {
+                    $(this).data(namespace).destroy();
+                }
             });
         }
     }
@@ -698,7 +721,7 @@ PluginDep.getPosition = function (ele) {
             $container.find('.table-drag-line').height($container.height() - $container.find('.table-pager').outerHeight(true));
 
             //如果绑定过事件的话不需要再次绑定
-            if (!$container.data('bindEvents')) {
+            if (!self.isBindedEvent) {
                 self.bindEvents();
             }
 
@@ -1106,6 +1129,17 @@ PluginDep.getPosition = function (ele) {
     }
 
     /**
+     * [destroy 销毁组件]
+     * @return {[type]} [description]
+     */
+    Table.prototype.destroy = function () {
+        this.container
+            .off()
+            .removeData(namespace)
+            .empty();
+    }
+
+    /**
      * [bindEvents 绑定事件]
      * @return {[type]} [description]
      */
@@ -1116,7 +1150,7 @@ PluginDep.getPosition = function (ele) {
             colOptions = options.colOptions,
             menu = options.menu;
 
-        $container.data('bindEvents', true);
+        this.isBindedEvent = true;
 
         //固定表头滚动
         $container.find('.table-body').on('scroll', function (e) {
@@ -1318,10 +1352,6 @@ PluginDep.getPosition = function (ele) {
 
                 $(this).addClass(('active'));
             });
-
-            $(document).on('click', function () {
-                $container.find('.table-td-filter').removeClass('table-td-filter');
-            });
         }
     }
 
@@ -1368,20 +1398,9 @@ PluginDep.getPosition = function (ele) {
             return false;
         });
 
-        //解决window.resize再回到原来尺寸时高度比原来大的问题
-        /*if (PluginDep.isBelowIE9) {
-            var resizeTimes = 0;
-            $(window).resize(function () {
-                if (resizeTimes % 2 == 0) {
-                    $('.table-container .table-body').addClass('resize-hack');
-                    setTimeout(function () {
-                        $('.table-container .table-body').removeClass('resize-hack');
-                    }, 50);
-                }
-
-                resizeTimes++;
-            });
-        }*/
+        $(document).on('click', function () {
+            $('.table-container .table-td-filter').removeClass('table-td-filter');
+        });
     }
 
     bindCommonEvents();
@@ -1441,6 +1460,8 @@ PluginDep.getPosition = function (ele) {
 
     var methods = {
         init: function (options) {
+            methods.destroy.call(this);
+
             return this.each(function () {
                 var settings = $.extend(true, {}, Pager.DEFAULTS, $(this).data(), options);
 
@@ -1462,9 +1483,16 @@ PluginDep.getPosition = function (ele) {
             pager.requestData(1);
         },
 
-        //销毁
+        /**
+         * [destroy 销毁组件]
+         * @return {[type]} [description]
+         */
         destroy: function () {
-            $(this).data(namespace).destroy();
+            return this.each(function () {
+                if ($(this).data(namespace)) {
+                    $(this).data(namespace).destroy();
+                }
+            });
         }
     };
 
@@ -1758,9 +1786,10 @@ PluginDep.getPosition = function (ele) {
 
     //销毁组件
     Pager.prototype.destroy = function () {
-        this.container.off();
-        this.container.removeData(namespace);
-        this.container.empty();
+        this.container
+            .off()
+            .removeData(namespace)
+            .empty();
     }
 
     /**
@@ -1815,7 +1844,7 @@ PluginDep.getPosition = function (ele) {
         } else if (typeof method === 'object' || !method) {
             return methods.init.apply(this, arguments);
         } else {
-            $.error('The method ' + method + ' does not exist in $.select');
+            $.error('The method ' + method + ' does not exist in $.pager');
         }
     }
 })(jQuery);
@@ -3869,9 +3898,6 @@ PluginDep.getPosition = function (ele) {
     var pName = 'autoComplete';
     var namespace = 'ui.' + pName;
 
-    // 全局控制显示哪个搜索框
-    var showTarget = null;
-
     var methods = {
         init: function (option) {
             return this.each(function() {
@@ -3939,16 +3965,14 @@ PluginDep.getPosition = function (ele) {
             setting.onInit.call(this.ele, this);
         }
 
+        // 记录请求次数
+        this.requestTimes = 0;
         this.bindEvents();
     }
 
     AutoComplete.prototype.showList = function () {
         var ele = this.ele;
         var setting = this.setting;
-
-        if (showTarget != ele) {
-            return;
-        }
         
         var table = ele.find('.ui-autoComplete-result table').empty();
         var resultContainer = ele.find('.ui-autoComplete-result');
@@ -3982,9 +4006,6 @@ PluginDep.getPosition = function (ele) {
         ele.on('click input keyup', '.ui-autoComplete-input', function (e) {
             var async = setting.async;
             var val = $(this).val();
-            
-            // 保存当前搜索框为显示的搜索框
-            showTarget = ele;
 
             // 非IE8不处理keyup事件
             if (e.type == 'keyup' && !(PluginDep.browser.msie && PluginDep.browser.version < 9)) {
@@ -4001,30 +4022,35 @@ PluginDep.getPosition = function (ele) {
             if (async.url) {
                 // 连续触发时取消上一次请求
                 clearTimeout(timer);
+                self.requestTimes++;
 
-                timer = setTimeout(function () {
-                    var ajaxOpt = {
-                        url: async.url,
-                        type: async.type,
-                        data: {},
-                        success: function (res) {
-                            setting.dataList = async.dataField ? res[async.dataField] : res;
-                            self.showList();
+                timer = setTimeout((function (currTimes) {
+                    return function () {
+                        var ajaxOpt = {
+                            url: async.url,
+                            type: async.type,
+                            data: {},
+                            success: function (res) {
+                                if (currTimes == self.requestTimes) {
+                                    setting.dataList = async.dataField ? res[async.dataField] : res;
+                                    self.showList();
+                                }
+                            }
+                        };
+
+                        if (async.dataType) {
+                            ajaxOpt.dataType = async.dataType;
                         }
-                    };
 
-                    if (async.dataType) {
-                        ajaxOpt.dataType = async.dataType;
+                        ajaxOpt.data[async.searchField] = val;
+
+                        if (async.data) {
+                            $.extend(true, ajaxOpt.data, typeof async.data == 'function' ? async.data() : async.data);
+                        }
+
+                        $.ajax(ajaxOpt);
                     }
-
-                    ajaxOpt.data[async.searchField] = val;
-
-                    if (async.data) {
-                        $.extend(true, ajaxOpt.data, typeof async.data == 'function' ? async.data() : async.data);
-                    }
-
-                    $.ajax(ajaxOpt);
-                }, async.delay);
+                })(self.requestTimes), async.delay);
             } else {
                 var originDataList = self.originDataList;
                 var field = setting.localSearchField;
