@@ -1,4 +1,21 @@
-(function (global) {
+/**
+ * [selector 组织架构、产品选择器]
+ * 依赖jquery、tlayer
+ * @return {[type]}         [description]
+ */
+(function (factory) {
+    // AMD
+    if (typeof define === 'function' && define.amd) {
+        define(['jquery', 'tlayer'], factory);
+    } else {
+        if (!jQuery || !jQuery.tlayer) {
+            throw new Error('jquery plugin depends on jquery, tlayer');
+        }
+
+        factory(jQuery, window);
+    }
+}
+(function ($, global) {
 	var selector = {
 		apiUrl: 'http://webapi.maipu.com/Selector/',
 		baseUrl: './',
@@ -128,15 +145,9 @@
 		}
 	};
 
-	if (typeof define === 'function' && define.amd) {
-		define(['jquery', 'tlayer'], function() {
-			return selector;
-		});
-	} else {
-		if (jQuery && jQuery.content) {
-			global.selector = selector;
-		} else {
-			throw new Error('selector depends on jQuery and tlayer');
-		}		
+	if (global) {
+		global.selector = selector;
 	}
-})(this);
+
+	return selector;
+}));

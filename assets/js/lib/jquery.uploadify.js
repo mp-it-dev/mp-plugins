@@ -101,8 +101,21 @@ Uploadify v3.2.1
 Copyright (c) 2012 Reactive Apps, Ronnie Garcia
 Released under the MIT License <http://www.opensource.org/licenses/mit-license.php> 
 */
+(function (factory) {
+    // AMD
+    if (typeof define === 'function' && define.amd) {
+        define(['jquery'], factory);
+    } else {
+        if (!jQuery) {
+            throw new Error('uploadify depends on jquery');
+        }
 
+        factory(jQuery);
+    }
+}
 (function($) {
+	var namespace = 'ui.uploadiyf';
+	var uploadifyId = 0;
 
 	// These methods can be called by adding them as the first argument in the uploadify plugin call
 	var methods = {
@@ -122,14 +135,11 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 					// Required Settings
 					id       		: $this.attr('id'), // The ID of the DOM object
 					swf      		: './assets/js/lib/uploadify.swf',  // The path to the uploadify SWF file
-					uploader 		: 'uploadify.php',  // The path to the server-side upload script
+					uploader 		: '',  				// The path to the server-side upload script
 					uploadDesc 		: false,			//上传说明
-					width 			: false,			//按钮高度
-					height 			: false,			//按钮高度
 					// Options
 					auto            : true,               // Automatically upload files when added to the queue
 					buttonCursor    : 'hand',             // The cursor to use with the browse buttonto an image to use for the Flash browse button if not using CSS to style the button
-					buttonText      : $this.text() || '选择文件',     	// The text to use for the browse button
 					checkExisting   : false,              // The path to a server-side script that checks for existing files on the server
 					debug           : false,              // Turn on swfUpload debugging mode
 					fileObjName     : 'Filedata',         // The name of the file object to use in your server-side script
@@ -173,6 +183,11 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 					onUploadStart    // Triggered immediately before a file upload starts
 					*/
 				}, options);
+
+				if (!settings.id) {
+					settings.id = 'uploadify-' + uploadifyId++;
+					$(this).attr('id', settings.id);
+				}
 
 				// Prepare settings for SWFUpload
 				var swfUploadSettings = {
@@ -232,52 +247,41 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 					var swfuploadify = window['uploadify_' + settings.id];
 
 					// Add the SWFUpload object to the elements data object
-					$this.data('uploadify', swfuploadify);
+					$this.data(namespace, swfuploadify);
 					
 					// Wrap the instance
-					var $wrapper = $('<div class="uploadify" id="' + settings.id + '"><span class="uploadify-wraper"></span></div>');
+					var $wrapper = $('<div class="uploadify" id="' + settings.id + '"><span class="uploadify-wrapper"></span></div>');
 					$('#' + swfuploadify.movieName).wrap($wrapper);
 					// Recreate the reference to wrapper
 					$wrapper = $('#' + settings.id);
 					// Add the data object to the wrapper 
-					$wrapper.data('uploadify', swfuploadify);
+					$wrapper.data(namespace, swfuploadify);
+					// 修改button的id
+					$(this).attr('id', settings.id + '-button');
 
-					// Create the button
-					var $button = $('<button />', {
-						'id'    : settings.id + '-button',
-						'class' : $(this).attr('class')
-					});
-					$button.html(settings.buttonText);
-					// Append the button to the wrapper
-					$wrapper.append($button);
+					// 包裹button
+					$wrapper.append(
+						'<div class="uploadify-option">' +
+							this.outerHTML +
+						'</div>'
+					);
+					var $button = $('#' + settings.id + '-button');
 
 					//添加上传描述
 					if (settings.uploadDesc) {
-						$wrapper.append('<div class="uploadify-desc">' + settings.uploadDesc + '</div>');
+						$wrapper.find('.uploadify-option').append('<span class="uploadify-desc">' + settings.uploadDesc + '</span>');
 					}
 
 					// Adjust the styles of the movie
 					$('#' + swfuploadify.movieName).css({
 						'position' : 'absolute',
 						'z-index'  : 1
-					}).attr({
-						'width': $button.outerWidth(),
-						'height': $button.outerHeight()
-					});
-
-					$wrapper.find('.uploadify-wraper').hover(function () {
-						$button.addClass('btn-hover');
-					}, function() {
-						$button.removeClass('btn-hover');
 					});
 					
 					// Create the file queue
 					if (!settings.queueID) {
-						var $queue = $('<div />', {
-							'id'    : settings.id + '-queue',
-							'class' : 'uploadify-queue'
-						});
-						$wrapper.after($queue);
+						var $queue = $('<div class="uploadify-queue" id="' + settings.id + '-queue"></div>').appendTo($wrapper);
+
 						swfuploadify.settings.queueID      = settings.id + '-queue';
 						swfuploadify.settings.defaultQueue = true;
 					}
@@ -328,7 +332,7 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 			this.each(function() {
 				// Create a reference to the jQuery DOM object
 				var $this        = $(this),
-					swfuploadify = $this.data('uploadify'),
+					swfuploadify = $this.data(namespace),
 					settings     = swfuploadify.settings,
 					delay        = -1;
 
@@ -389,7 +393,7 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 			this.each(function() {
 				// Create a reference to the jQuery DOM object
 				var $this        = $(this),
-					swfuploadify = $this.data('uploadify'),
+					swfuploadify = $this.data(namespace),
 					settings     = swfuploadify.settings;
 
 				// Destroy the SWF object and 
@@ -417,7 +421,7 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 			this.each(function() {
 				// Create a reference to the jQuery DOM object
 				var $this        = $(this),
-					swfuploadify = $this.data('uploadify'),
+					swfuploadify = $this.data(namespace),
 					settings     = swfuploadify.settings;
 
 				// Call the user-defined event handlers
@@ -444,7 +448,7 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 			this.each(function() {
 				// Create a reference to the jQuery DOM object
 				var $this        = $(this),
-					swfuploadify = $this.data('uploadify'),
+					swfuploadify = $this.data(namespace),
 					settings     = swfuploadify.settings;
 
 				if (typeof(args[0]) == 'object') {
@@ -527,7 +531,7 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 			this.each(function() {
 				// Create a reference to the jQuery DOM object
 				var $this        = $(this),
-					swfuploadify = $this.data('uploadify');
+					swfuploadify = $this.data(namespace);
 
 				// Reset the queue information
 				swfuploadify.queueData.averageSpeed  = 0;
@@ -548,7 +552,7 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 			this.each(function() {
 				// Create a reference to the jQuery DOM object
 				var $this        = $(this),
-					swfuploadify = $this.data('uploadify');
+					swfuploadify = $this.data(namespace);
 
 				// Reset the queue information
 				swfuploadify.queueData.averageSpeed  = 0;
@@ -671,17 +675,18 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 			if (settings.onSelect) {
 				settings.onSelect.apply(this, arguments);
 			} else if (settings.defaultTemplate) {
-				var itemTemplate = '<div id="${fileID}" class="uploadify-queue-item">\
-					<span class="icon waiting"></span>\
-					<span class="file-name" title="${origin_name}">${fileName}</span>\
-					<div class="uploadify-progress">\
-						<div class="uploadify-progress-bar">&nbsp;</div>\
-					</div>\
-					<span class="data">Waiting</span>\
-					<span class="file-operate">\
-						<a class="cancel-upload" href="#" onclick="$(\'#${instanceID}\').uploadify(\'cancel\', \'${fileID}\');return false;">取消</a>\
-					</span>\
-				</div>';
+				var itemTemplate = 
+					'<div id="${fileID}" class="uploadify-queue-item">\
+						<span class="icon"></span>\
+						<span class="file-name" title="${origin_name}">${fileName}</span>\
+						<span class="uploadify-progress">\
+							<span class="uploadify-progress-bar">&nbsp;</span>\
+						</span>\
+						<span class="data">Waiting</span>\
+						<span class="file-operate">\
+							<a class="file-cancel" href="#" onclick="$(\'#${instanceID}\').uploadify(\'cancel\', \'${fileID}\');return false;">取消</a>\
+						</span>\
+					</div>';
 
 				// Create the file data object
 				var itemData = {
@@ -880,12 +885,10 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 			if (settings.onUploadError) {
 				settings.onUploadError.call(this, file, errorCode, errorMsg, errorString);
 			} else if (settings.defaultTemplate) {
-				if (errorCode != SWFUpload.UPLOAD_ERROR.FILE_CANCELLED && errorCode != SWFUpload.UPLOAD_ERROR.UPLOAD_STOPPED) {
-					$('#' + file.id).addClass('error-queue-item');
-				}
-
 				// Reset the progress bar
-				$('#' + file.id).find('.uploadify-progress-bar').css('width','1px');
+				$('#' + file.id)
+					.attr('class', 'uploadify-queue-item error')
+					.find('.uploadify-progress-bar').css('width','1px');
 			}
 		},
 
@@ -975,8 +978,9 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 			if (settings.onUploadStart) {
 				settings.onUploadStart.call(this, file); 
 			} else if (settings.defaultTemplate) {
-				//更换icon
-				$('#' + file.id).find(".upload-icon").removeClass("waiting").addClass("uploading");
+				//更新状态
+				$('#' + file.id)
+					.attr('class', 'uploadify-queue-item uploading');
 			}
 		},
 
@@ -992,11 +996,13 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 			if (settings.onUploadSuccess) {
 				settings.onUploadSuccess.call(this, file, data, response); 
 			} else if (settings.defaultTemplate) {
-				var html = '<div id="'+file.id+'" class="finish-queue-item">' +
+				var html = '<div id="'+file.id+'" class="uploadify-queue-item success">' +
                     '<span class="icon ' + Util.getFileIcon(file.name) + '"></span>' +
                     '<span class="file-name" title="'+file.name+'">' + file.name + "</span>" +
                     '<span class="file-size">' + Util.getFileSize(file.size) + '</span>' +
-                    '<a class="file-operate file-del" href="#">删除</a>' +
+                    '<span class="file-operate">' +
+                        '<a class="file-del" href="#">删除</a>'+
+                    '</span>' +
                 '</div>';
 
 				var $item = $('#' + file.id).replaceWith(html);
@@ -1105,5 +1111,4 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 		}
 
 	}
-
-})($);
+}));

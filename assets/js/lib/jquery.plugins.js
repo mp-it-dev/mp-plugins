@@ -2,9 +2,19 @@
  * jQuery 插件集
  * @author helin
  */
+(function (factory) {
+    // AMD
+    if (typeof define === 'function' && define.amd) {
+        define(['jquery'], factory);
+    } else {
+        if (!jQuery) {
+            throw new Error('jquery plugin depends on jquery');
+        }
 
-// IIEF包括，独立命名空间
-(function () {
+        factory(jQuery);
+    }
+}
+(function ($) {
 
 /**
  * [pluginDep 插件依赖的公用函数]
@@ -182,26 +192,24 @@ PluginDep.getPosition = function (ele) {
  * @param  {[type]} $ [description]
  * @return {[type]}   [description]
  */
-;(function ($) {
-    $.extend($.fn, {
-        getCss: function(name) {
-            var value = parseInt(this.css(name));
+$.extend($.fn, {
+    getCss: function(name) {
+        var value = parseInt(this.css(name));
 
-            if (isNaN(value)) {
-                return null;
-            }
-
-            return value;
+        if (isNaN(value)) {
+            return null;
         }
-    });
-})(jQuery)
+
+        return value;
+    }
+});
 
 /**
  * [table 自动生成表格插件]
  * 使用说明：
  * 需要引入 common.css
  */
-;(function($) {
+;(function() {
     var pName = 'table';
     var namespace = 'ui.' + pName;
 
@@ -1447,14 +1455,14 @@ PluginDep.getPosition = function (ele) {
             $.error('The method ' + method + ' does not exist in $.table');
         }
     }
-})(jQuery);
+})();
 
 /**
  * [pager 分页插件]
  * 使用说明：
  * 需要引入 plugin.css
  */
-;(function($) {
+;(function() {
     var pName = 'pager';
     var namespace = 'ui.' + pName;
 
@@ -1847,14 +1855,14 @@ PluginDep.getPosition = function (ele) {
             $.error('The method ' + method + ' does not exist in $.pager');
         }
     }
-})(jQuery);
+})();
 
 /**
  * [uiSelect下拉菜单插件]
  * 使用说明：
  * 需要引入 plugin.css
  */
-;(function($) {
+;(function() {
     var pName = 'select';
     var namespace = 'ui.' + pName;
 
@@ -2557,14 +2565,14 @@ PluginDep.getPosition = function (ele) {
     $(document).ready(function () {
         $('[data-uitype="'+pName+'"]').uiSelect();
     });
-})(jQuery);
+})();
 
 /**
  * [scrollbar 滚动条插件]
  * 使用说明：
  * 需要引入 plugin.css
  */
-;(function($) {
+;(function() {
     var pName = 'scrollbar';
     var namespace = 'ui.' + pName;
 
@@ -2868,14 +2876,14 @@ PluginDep.getPosition = function (ele) {
     $(document).ready(function () {
         $('[data-uitype="' + pName + '"]').scrollbar();
     });
-})(jQuery);
+})();
 
 /**
  * [序列化表单为json]
  * @param  {[type]} $ [description]
  * @return {[type]}   [description]
  */
-;(function ($) {  
+;(function () {  
     $.fn.serializeJson = function () {
         var serializeObj = {};
         var array = this.serializeArray();
@@ -2895,19 +2903,19 @@ PluginDep.getPosition = function (ele) {
 
         return serializeObj;
     };
-})(jQuery);
+})();
 
 /**
  * mousewheel事件扩展
  */
-;(function(a){function d(b){var c=b||window.event,d=[].slice.call(arguments,1),e=0,f=!0,g=0,h=0;return b=a.event.fix(c),b.type="mousewheel",c.wheelDelta&&(e=c.wheelDelta/120),c.detail&&(e=-c.detail/3),h=e,c.axis!==undefined&&c.axis===c.HORIZONTAL_AXIS&&(h=0,g=-1*e),c.wheelDeltaY!==undefined&&(h=c.wheelDeltaY/120),c.wheelDeltaX!==undefined&&(g=-1*c.wheelDeltaX/120),d.unshift(b,e,g,h),(a.event.dispatch||a.event.handle).apply(this,d)}var b=["DOMMouseScroll","mousewheel"];if(a.event.fixHooks)for(var c=b.length;c;)a.event.fixHooks[b[--c]]=a.event.mouseHooks;a.event.special.mousewheel={setup:function(){if(this.addEventListener)for(var a=b.length;a;)this.addEventListener(b[--a],d,!1);else this.onmousewheel=d},teardown:function(){if(this.removeEventListener)for(var a=b.length;a;)this.removeEventListener(b[--a],d,!1);else this.onmousewheel=null}},a.fn.extend({mousewheel:function(a){return a?this.bind("mousewheel",a):this.trigger("mousewheel")},unmousewheel:function(a){return this.unbind("mousewheel",a)}})})(jQuery);
+;(function(a){function d(b){var c=b||window.event,d=[].slice.call(arguments,1),e=0,f=!0,g=0,h=0;return b=a.event.fix(c),b.type="mousewheel",c.wheelDelta&&(e=c.wheelDelta/120),c.detail&&(e=-c.detail/3),h=e,c.axis!==undefined&&c.axis===c.HORIZONTAL_AXIS&&(h=0,g=-1*e),c.wheelDeltaY!==undefined&&(h=c.wheelDeltaY/120),c.wheelDeltaX!==undefined&&(g=-1*c.wheelDeltaX/120),d.unshift(b,e,g,h),(a.event.dispatch||a.event.handle).apply(this,d)}var b=["DOMMouseScroll","mousewheel"];if(a.event.fixHooks)for(var c=b.length;c;)a.event.fixHooks[b[--c]]=a.event.mouseHooks;a.event.special.mousewheel={setup:function(){if(this.addEventListener)for(var a=b.length;a;)this.addEventListener(b[--a],d,!1);else this.onmousewheel=d},teardown:function(){if(this.removeEventListener)for(var a=b.length;a;)this.removeEventListener(b[--a],d,!1);else this.onmousewheel=null}},a.fn.extend({mousewheel:function(a){return a?this.bind("mousewheel",a):this.trigger("mousewheel")},unmousewheel:function(a){return this.unbind("mousewheel",a)}})})($);
 
 /**
  * [Gallery 照片查看器]
  * 使用说明：
  * 需要引入 plugin.css
  */
-;(function ($) {
+;(function () {
     var pName = 'gallery';
     var namespace = 'ui.' + pName;
 
@@ -3381,14 +3389,14 @@ PluginDep.getPosition = function (ele) {
 
         return false;
     });
-})(jQuery);
+})();
 
 /**
  * [表单正则表达式验证]
  * 使用说明：
  * 需要引入 plugin.css
  */
-;(function ($) {
+;(function () {
     var pName = 'validate';
     var namespace = 'ui.' + pName;
 
@@ -3584,13 +3592,13 @@ PluginDep.getPosition = function (ele) {
     $(document).ready(function () {
         $('[data-uitype="'+pName+'"]').validate();
     });
-})(jQuery);
+})();
 
 /**
  * [resize 宽度拖动]
  * @return {[type]} [description]
  */
-;(function ($) {
+;(function () {
     var pName = 'resize';
     var namespace = 'ui.' + pName;
     var $container, $ele, opt, oldPoint;
@@ -3772,12 +3780,12 @@ PluginDep.getPosition = function (ele) {
     $(document).ready(function () {
         $('[data-uitype="'+pName+'"]').uiResize();
     });
-})(jQuery);
+})();
 
 /**
  * [RightMenu 右键菜单]
  */
-(function ($, win) {
+(function (win) {
     var pName = 'rightMenu';
     var namespace = 'ui.' + pName;
 
@@ -3889,12 +3897,12 @@ PluginDep.getPosition = function (ele) {
     $.rightMenu = function (option) {
         return new RightMenu(option);
     }
-})(jQuery, window);
+})(window);
 
 /**
  * [AutoComplete input框自动补全]
  */
-(function ($) {
+(function () {
     var pName = 'autoComplete';
     var namespace = 'ui.' + pName;
 
@@ -4096,12 +4104,12 @@ PluginDep.getPosition = function (ele) {
             $.error('The method ' + method + ' does not exist in $.autoComplete');
         }
     }
-})(jQuery);
+})();
 
 /**
  * [inputEnter 输入框enter键与按钮事件关联]
  */
-(function ($) {
+(function () {
     var pName = 'inputEnter';
     var namespace = 'ui.' + pName;
 
@@ -4113,6 +4121,6 @@ PluginDep.getPosition = function (ele) {
             $($(this).data('target')).trigger(ev);
         }
     });
-})(jQuery);
-
 })();
+
+}));

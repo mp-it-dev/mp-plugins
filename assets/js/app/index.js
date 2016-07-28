@@ -91,7 +91,9 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 		table.table('reload');
 	});
 
-	$('#upload').uploadify();
+	$('#upload').uploadify({
+		uploader: 'http://192.168.4.86:100/test/home/uploadFile'
+	});
 
 	$('.selector-organiztion').on('click', function () {
 		var type = $(this).data('type');
