@@ -10,7 +10,7 @@
     if (typeof define === 'function' && define.amd) {
         define(['jquery', 'util'], factory);
     } else {
-        if (!jQuery ||  util) {
+        if (!jQuery || !util) {
             throw new Error('uploadify depends on jquery, util');
         }
 
