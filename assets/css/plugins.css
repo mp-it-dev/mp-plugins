@@ -486,10 +486,11 @@
     line-height: 25px;
     vertical-align: middle;
 }
-.uploadify-queue .queued .icon {
+.uploadify-queue .icon.queued,
+.uploadify-queue .icon.error  {
     background: transparent url(../img/icon_waiting.gif) center center no-repeat;
 }
-.uploadify-queue .uploading .icon {
+.uploadify-queue .icon.uploading {
     background: transparent url(../img/icon_uploading.gif) center center no-repeat;
 }
 .uploadify-queue .file-name {
@@ -532,7 +533,7 @@
     color: #f00;
     text-decoration: underline;
 }
-.uploadify-queue-item.error {
+.uploadify-queue-item[data-status="error"] {
     background-color: #FDE5DD !important;
 }
 .uploadify-input-file {
