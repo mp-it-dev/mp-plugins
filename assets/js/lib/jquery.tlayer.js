@@ -1,7 +1,19 @@
 /**
  * [弹出框插件]
  */
-;(function ($, window, undefined) {
+(function (factory) {
+    // AMD
+    if (typeof define === 'function' && define.amd) {
+        define(['jquery'], factory);
+    } else {
+        if (!jQuery) {
+            throw new Error('jquery tlayer depends on jquery');
+        }
+
+        factory(jQuery);
+    }
+}
+(function ($) {
     //弹出窗数据保存到jquery上
     var _tlayer = $.tlayer = $.tlayer || {};
 
@@ -1312,4 +1324,4 @@
             $.error('方法 ' + method + ' 在tlayer中未定义！');
         }
     };
-} (jQuery, window, undefined));
+}));

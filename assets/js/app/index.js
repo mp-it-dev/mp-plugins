@@ -5,10 +5,10 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 	$('#searchProductTree').autoComplete({
 		width: '400px',
 		async: {
-            url: 'http://192.168.4.86:100/Selector/Product/SearchProduct',
+            url: 'http://webapi.maipu.com/Selector/Product/SearchProduct',
             dataType: 'jsonp',
             dataField: null,
-            searchField: 'keyword'
+            searchField: 'wpbm'
         },
         template: '<td>#{cpBm}</td><td>#{cpName}</td><td>#{zhengjiName}</td>',
         maxNum: 10,
@@ -91,7 +91,9 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 		table.table('reload');
 	});
 
-	$('#upload').uploadify();
+	$('#upload').uploadify({
+		uploader: 'http://192.168.4.86:100/test/home/uploadFile'
+	});
 
 	$('.selector-organiztion').on('click', function () {
 		var type = $(this).data('type');

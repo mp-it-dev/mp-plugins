@@ -486,14 +486,11 @@
     line-height: 25px;
     vertical-align: middle;
 }
-.uploadify-queue .waiting {
+.uploadify-queue .queued .icon {
     background: transparent url(../img/icon_waiting.gif) center center no-repeat;
 }
-.uploadify-queue .uploading {
+.uploadify-queue .uploading .icon {
     background: transparent url(../img/icon_uploading.gif) center center no-repeat;
-}
-.uploadify-queue .success {
-    background: transparent url(../img/icon_success.gif) center center no-repeat;
 }
 .uploadify-queue .file-name {
     width: 250px;
@@ -515,6 +512,7 @@
     background-color: #fafafa;
 }
 .uploadify-progress-bar {
+    display: block;
     width: 0;
     height: 100%;
     background-color: #a5dd3d;
@@ -534,10 +532,12 @@
     color: #f00;
     text-decoration: underline;
 }
-.error-queue-item {
+.uploadify-queue-item.error {
     background-color: #FDE5DD !important;
 }
-
+.uploadify-input-file {
+    display: none !important;
+}
 /*滚动条 start*/
 .scroll-target {
     position: relative;
