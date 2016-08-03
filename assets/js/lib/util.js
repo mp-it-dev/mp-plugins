@@ -3,7 +3,14 @@
  * util.js 包含一些常用的工具函数
  * @author helin
  */
-(function (global) {
+(function (factory, global) {
+    if (typeof define === 'function' && define.amd) {
+        define([], factory);
+    } else {
+        global.util = factory();
+    }
+})
+(function () {
     var util = {
         // 是否是函数
         isFunction: function (it) {
@@ -394,11 +401,5 @@
         }
     }
 
-    if (typeof define === 'function' && define.amd) {
-        define([], function () {
-            return util;
-        });
-    } else {
-        global.util = util;
-    }
-})(this);
+    return util;
+}, window));
