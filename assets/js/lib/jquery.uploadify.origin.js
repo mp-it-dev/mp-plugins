@@ -10,7 +10,7 @@
     if (typeof define === 'function' && define.amd) {
         define(['jquery', 'util'], factory);
     } else {
-        if (!jQuery ||  util) {
+        if (!jQuery || !util) {
             throw new Error('uploadify depends on jquery, util');
         }
 
@@ -57,6 +57,11 @@
         stop: function () {
             return this.each(function() {
                 $(this).data(namespace).stop();
+            });
+        },
+        cancel: function (id) {
+            return this.each(function() {
+                $(this).data(namespace).cancel(id);
             });
         },
         destroy: function () {
@@ -114,10 +119,11 @@
     Uploadify.DEFAULTS = {
         id                  : '',           // 组件id
         uploader            : '',           // 服务器接收地址
+        uploadDesc          : '',           // 上传描述
         auto                : true,         // 是否自动上传
         multi               : true,         // 是否多选
         method              : 'POST',       // 自定义参数发送方式
-        formData            : false,        // 自定义参数
+        formData            : {},           // 自定义参数
         fileObjName         : 'FileData',   // 文件发送到服务器端时的名称
         defaultTemplate     : true,         // 是否采用默认模板
         fileTypeExts        : '',           // 文件类型限制
@@ -194,8 +200,8 @@
         } else if (setting.defaultTemplate) {
             // 在DOM中创建上传模板
             var itemTemplate = 
-                '<div id="#{id}" class="uploadify-queue-item queued">\
-                    <span class="icon"></span>\
+                '<div id="#{id}" class="uploadify-queue-item" data-status="queued">\
+                    <span class="icon queued"></span>\
                     <span class="file-name" title="#{name}">#{name}</span>\
                     <span class="uploadify-progress">\
                         <span class="uploadify-progress-bar">&nbsp;</span>\
@@ -221,9 +227,7 @@
         var formData = new FormData();
         var s = {
             url: setting.uploader,
-            processData: false,
-            cache: false,
-            type: 'POST'
+            type: 'POST',
         };
 
         // 添加用户数据到formData中或者url中
@@ -263,7 +267,8 @@
                 setting.onUploadStart.call(self, file); 
             } else if (setting.defaultTemplate) {
                 //更新状态
-                $('#' + file.id).attr('class', 'uploadify-queue-item uploading');
+                $('#' + file.id).attr('data-status', ' uploading');
+                $('#' + file.id).find('.icon').attr('class','icon uploading');
             }
         };
 
@@ -305,7 +310,7 @@
             setting.onUploadSuccess.call(this, file, data, response); 
         } else if (setting.defaultTemplate) {
             var html = 
-                '<div id="'+file.id+'" class="uploadify-queue-item success">' +
+                '<div id="'+file.id+'" class="uploadify-queue-item" data-status="success">' +
                     '<span class="icon ' + util.getFileIcon(file.name) + '"></span>' +
                     '<span class="file-name" title="'+file.name+'">' + file.name + "</span>" +
                     '<span class="file-size">' + util.getFileSize(file.size) + '</span>' +
@@ -332,9 +337,9 @@
                 alert('上传出错，错误代码：' + errorCode + '。错误信息：' + errorMsg);
 
                 // 设置错误样式
-                $('#' + file.id)
-                    .attr('class', 'uploadify-queue-item error')
-                    .find('.uploadify-progress-bar').css('width','1px');
+                $('#' + file.id).attr('data-status', ' error');
+                $('#' + file.id).find('.icon').attr('class','icon error');
+                $('#' + file.id).find('.uploadify-progress-bar').css('width','1px');
             }
         }
     };
@@ -361,6 +366,7 @@
     };
 
     Uploadify.prototype.cancel = function (id) {
+        var setting = this.setting;
         var file = this.queueData.files[id];
 
         file.filestatus = FILE_STATUS.CANCELLED;
@@ -370,6 +376,10 @@
         }
 
         $('#' + id).remove();
+
+        if (setting.onCancel) {
+            setting.onCancel.call(this, file);
+        }
     };
 
     Uploadify.prototype.destroy = function () {

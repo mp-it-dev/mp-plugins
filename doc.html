@@ -289,16 +289,14 @@ tinymce.init({
 						</p>
 						<pre class="highlight doc-example">
 							<code class="language-xml">
-&lt;select name="country" class="form-control" data-uitype="select"&gt;
-	&lt;option value="1"&gt;中国&lt;/option&gt;
-	&lt;option value="2"&gt;日本&lt;/option&gt;
-	&lt;option value="3"&gt;美国&lt;/option&gt;
-	&lt;option value="4"&gt;英国&lt;/option&gt;
-	&lt;option value="5"&gt;韩国&lt;/option&gt;
-	&lt;option value="6"&gt;法国&lt;/option&gt;
-	&lt;option value="7"&gt;巴西&lt;/option&gt;
-	&lt;option value="8"&gt;俄罗斯&lt;/option&gt;
-&lt;/select&gt;
+&lt;div id="multi-ui-select"&gt;&lt;/div&gt;
+							</code>
+							<code class="language-javascript">
+$('#multi-ui-select').uiSelect({
+	dataList: ['中国', '美国', '日本', '英国', '法国', '俄罗斯', '印度', '巴西'],
+	name: 'test_multi_select',
+	multi: true
+});
 							</code>
 						</pre>
 						<h2 class="title-normal">参数</h2>
@@ -306,19 +304,15 @@ tinymce.init({
 						<pre class="highlight">
 							<code class="language-javascript">
 {
-    name        : '',                      //作为表单的name
-    data        : false,                   //数据
-    fields      : [],
-    /*[{
-        name    : 'text',                  //多列字段的名称
-        width   : '100%'                   //多列字段所占宽度
-    }]*/
-    width       : 0,                       //宽度
-    seprator    : ';',                     //多选值分隔符
-    disabled    : false,                   //是否禁用
-    before      : false,                   //是否在前方插入
-    searchbox   : false,                   //是否显示搜索框
-    multiple    : false                    //是否多选以及多选框类型
+    name            : '',               // 作为表单的name
+    dataList        : [],               // 数据项
+    template        : '<td>#{}</td>',   // 模板
+    textField       : '',               // text字段名
+    valueField      : '',               // value字段名
+    seprator        : ',',              // 多选值分隔符
+    disabled        : false,            // 是否禁用
+    searchbox       : false,            // 是否显示搜索框
+    multi           : false             // 是否多选
 }
 							</code>
 						</pre>
@@ -494,64 +488,29 @@ $('#example-uploadify').uploadify();
 						</pre>
 						<h2 class="title-normal">选项</h2>
 						<div class="doc-api">
-							上传插件接收一系列可选参数进行配置，如下所示：
+							上传组件提供两种类型，一种是基于flash的封装，用于在IE10以下使用，另一种是基于HTML5原生的封装，使用者自己判断引入哪个文件。两者都接收一系列可选参数进行配置，如下所示：
 						</div>
 						<pre class="highlight">
 							<code class="language-javascript">
 {
-	// Required Settings
-	id       		: $this.attr('id'), // The ID of the DOM object
-	swf      		: './assets/js/lib/uploadify.swf',  // The path to the uploadify SWF file
-	uploader 		: 'uploadify.php',  // The path to the server-side upload script
-	uploadDesc 		: false,			//上传说明
-	width 			: false,			//按钮高度
-	height 			: false,			//按钮高度
-	// Options
-	auto            : true,               // Automatically upload files when added to the queue
-	buttonCursor    : 'hand',             // The cursor to use with the browse buttonto an image to use for the Flash browse button if not using CSS to style the button
-	buttonText      : $this.text() || '选择文件',     	// The text to use for the browse button
-	checkExisting   : false,              // The path to a server-side script that checks for existing files on the server
-	debug           : false,              // Turn on swfUpload debugging mode
-	fileObjName     : 'Filedata',         // The name of the file object to use in your server-side script
-	fileSizeLimit   : '2048 MB',                  // The maximum size of an uploadable file in KB (Accepts units B KB MB GB if string, 0 for no limit)
-	fileTypeDesc    : 'All Files',        // The description for file types in the browse dialog
-	fileTypeExts    : '*.*',              // Allowed extensions in the browse dialog (server-side validation should also be used)
-	formData        : {},                 // An object with additional data to send to the server-side upload script with every file upload
-	method          : 'post',             // The method to use when sending files to the server-side upload script
-	multi           : true,               // Allow multiple file selection in the browse dialog
-	preventCaching  : true,               // Adds a random value to the Flash URL to prevent caching of it (conflicts with existing parameters)
-	progressData    : 'percentage',       // ('percentage' or 'speed') Data to show in the queue item during a file upload
-	queueID         : false,              // The ID of the DOM object to use as a file queue (without the #)
-	queueSizeLimit  : 999,                // The maximum number of files that can be in the queue at one time
-	removeCompleted : true,               // Remove queue items from the queue when they are done uploading
-	removeTimeout   : 3,                  // The delay in seconds before removing a queue item if removeCompleted is set to true
-	requeueErrors   : false,              // Keep errored files in the queue and keep trying to upload them
-	successTimeout  : 30,                 // The number of seconds to wait for Flash to detect the server's response after the file has finished uploading
-	uploadLimit     : 0,                  // The maximum number of files you can upload
-	
-	defaultTemplate : true,          // 默认模板
-	// Events
-	overrideEvents  : []             // (Array) A list of default event handlers to skip
-	/*
-	onCancel         // Triggered when a file is cancelled from the queue
-	onClearQueue     // Triggered during the 'clear queue' method
-	onDestroy        // Triggered when the uploadify object is destroyed
-	onDialogClose    // Triggered when the browse dialog is closed
-	onDialogOpen     // Triggered when the browse dialog is opened
-	onDisable        // Triggered when the browse button gets disabled
-	onEnable         // Triggered when the browse button gets enabled
-	onFallback       // Triggered is Flash is not detected    
-	onInit           // Triggered when Uploadify is initialized
-	onQueueComplete  // Triggered when all files in the queue have been uploaded
-	onSelectError    // Triggered when an error occurs while selecting a file (file size, queue size limit, etc.)
-	onSelect         // Triggered for each file that is selected
-	onSWFReady       // Triggered when the SWF button is loaded
-	onUploadComplete // Triggered when a file upload completes (success or error)
-	onUploadError    // Triggered when a file upload returns an error
-	onUploadSuccess  // Triggered when a file is uploaded successfully
-	onUploadProgress // Triggered every time a file progress is updated
-	onUploadStart    // Triggered immediately before a file upload starts
-	*/
+	id                  : '',           // 组件id
+    uploader            : '',           // 服务器接收地址
+    uploadDesc          : '',           // 上传描述
+    auto                : true,         // 是否自动上传
+    multi               : true,         // 是否多选
+    method              : 'POST',       // 自定义参数发送方式
+    formData            : {},           // 自定义参数
+    fileObjName         : 'FileData',   // 文件发送到服务器端时的名称
+    defaultTemplate     : true,         // 是否采用默认模板
+    fileTypeExts        : '',           // 文件类型限制
+    fileSizeLimit       : '2048 MB',    // 文件大小限制
+    onSelect            : false,        // 选择文件回调，每一个文件回调一次
+    onQueueComplete     : false,        // 队列完成回调
+    onUploadStart       : false,        // 上传开始回调
+    onUploadProgress    : false,        // 上传中回调
+    onUploadSuccess     : false,        // 上传成功回调
+    onUploadError       : false,        // 上传出错回调
+    onUploadComplete    : false         // 上传完成回调
 }
 							</code>
 						</pre>

@@ -1,7 +1,7 @@
 require.config({
     baseUrl: './assets/js',
     paths: {
-        'jquery': 'lib/jquery-1.11.3.min',
+        'jquery': 'lib/jquery-1.11.3',
         'bootstrap': 'lib/bootstrap.min',
         'uploadify': FormData && FileList ? 'lib/jquery.uploadify.origin': 'lib/jquery.uploadify',
         'tlayer': 'lib/jquery.tlayer',

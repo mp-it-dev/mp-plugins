@@ -885,10 +885,10 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 			if (settings.onUploadError) {
 				settings.onUploadError.call(this, file, errorCode, errorMsg, errorString);
 			} else if (settings.defaultTemplate) {
-				// Reset the progress bar
-				$('#' + file.id)
-					.attr('class', 'uploadify-queue-item error')
-					.find('.uploadify-progress-bar').css('width','1px');
+				//更新状态
+				$('#' + file.id).attr('data-status', 'error');
+				$('#' + file.id).find('icon').attr('class', 'icon error');
+				$('#' + file.id).find('.uploadify-progress-bar').css('width','1px');
 			}
 		},
 
@@ -979,8 +979,8 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 				settings.onUploadStart.call(this, file); 
 			} else if (settings.defaultTemplate) {
 				//更新状态
-				$('#' + file.id)
-					.attr('class', 'uploadify-queue-item uploading');
+				$('#' + file.id).attr('data-status', 'uploading');
+				$('#' + file.id).find('icon').attr('class', 'icon uploading');
 			}
 		},
 
@@ -991,6 +991,10 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 			var stats    = this.getStats();
 			this.queueData.uploadsSuccessful = stats.successful_uploads;
 			this.queueData.queueBytesUploaded += file.size;
+
+			if (typeof data == 'string') {
+				data = $.parseJSON(data);
+			}
 
 			// Call the user-defined event handler
 			if (settings.onUploadSuccess) {
@@ -1010,7 +1014,7 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 
 				$('#' + file.id).on('click', '.file-del', function () {
 				    $('#' + file.id).remove();
-				    if (settings.onDelete) settings.onDelete.call(self, file, data);
+				    if (settings.onCancel) settings.onCancel.call(self, file);
 				    return false;
 				});
 			}
