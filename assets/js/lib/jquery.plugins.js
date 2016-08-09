@@ -21,6 +21,27 @@
  */
 var PluginDep = {};
 
+// 在数组中查找项的位置
+PluginDep.indexOf = function (arr, value, key) {
+    var index = -1;
+
+    if (arr.length > 0) {
+        for (var i = 0, l = arr.length; i < l; i++) {
+            if (typeof arr[i] == 'object' && typeof key != 'undefined') {
+                if (arr[i][key] == value[key]) {
+                    index = i;
+                }
+            } else {
+                if (arr[i] == value) {
+                    index = i;
+                }
+            }
+        }
+    }
+
+    return index;
+};
+
 /**
  * [browser 浏览器信息]
  */
@@ -65,7 +86,7 @@ PluginDep.browser = (function () {
  * 是否是IE9以下
  */
 PluginDep.isBelowIE9 = (function () {
-    return PluginDep.browser.msie && parseInt(PluginDep.browser.version) < 9;
+    return PluginDep.browser.msie && PluginDep.browser.version < 9;
 })();
 
 /**
@@ -235,28 +256,6 @@ $.extend($.fn, {
         },
 
         /**
-         * [getObject 获取table对象]
-         * @return {[type]} [description]
-         */
-        getObject: function () {
-            return this.eq(0).data(namespace);
-        },
-
-        /**
-         * [getOptions 获取选项]
-         * @return {[type]} [description]
-         */
-        getOptions: function (option) {
-            var options = this.eq(0).data(namespace).options;
-
-            if (arguments.length == 0) {
-                return options;
-            } else {
-                return options[option];
-            }
-        },
-
-        /**
          * [getRowData 获取行数据]
          * @param  {[type]} id [行号或行对象]
          * @return {[type]}    [description]
@@ -276,8 +275,6 @@ $.extend($.fn, {
          * @return {[type]} [description]
          */
         reload: function (data) {
-            var argLen = arguments.length;
-
             return this.each(function () {
                 $(this).data(namespace).reload(data);                
             });
@@ -1482,13 +1479,9 @@ $.extend($.fn, {
          * @return {[type]} [description]
          */
         reload: function (data) {
-            var pager = this.data(namespace);
-
-            if (typeof data != 'undefined') {
-                pager.options.data = data;
-            }
-
-            pager.requestData(1);
+            return this.each(function () {
+                $(this).data(namespace).reload(data);
+            });            
         },
 
         /**
@@ -1792,6 +1785,19 @@ $.extend($.fn, {
         return html;
     }
 
+    /**
+     * [reload 重新加载第一页]
+     * @param  {[type]} data [description]
+     * @return {[type]}      [description]
+     */
+    Pager.prototype.reload = function (data) {        
+        if (typeof data != 'undefined') {
+            this.options.data = data;
+        }
+
+        this.requestData(1);
+    }
+
     //销毁组件
     Pager.prototype.destroy = function () {
         this.container
@@ -1867,68 +1873,83 @@ $.extend($.fn, {
     var namespace = 'ui.' + pName;
 
     var methods = {
+        // 组件初始化
         init: function (options) {
-            var settings = $.extend(true, {}, UiSelect.DEFAULTS, $(this).data(), options);
-            $(this).data(namespace, new UiSelect($(this), settings));
+            methods.destroy.call(this);
+
+            return this.each(function () {
+                var $this = $(this);
+                var setting = $.extend(true, {}, UiSelect.DEFAULTS, $this.data(), options);
+
+                $this.data(namespace, new UiSelect($this, setting));
+            });
         },
 
-        //设置选定值
-        //如果value为数组，则设置多个值选定
+        //设置选定值，如果value为数组，则设置多个值选定
         setValue: function (value) {
-            $(this).data(namespace).setValue(value);
+            return this.each(function () {
+                $(this).data(namespace).setValue(value);
+            });
         },
 
         //销毁组件
         destroy: function () {
-            $(this).data(namespace).destroy();
+            return this.each(function () {
+                if ($(this).data(namespace)) {
+                    $(this).data(namespace).destroy();
+                }
+            });
         },
 
         //禁用组件
         disable: function () {
-            $(this).data(namespace).setDisabled(true);
+            return this.each(function () {
+                $(this).data(namespace).setDisabled(true);
+            });
         },
 
         //启用组件
         enable: function () {
-            $(this).data(namespace).setDisabled(false);
+            return this.each(function () {
+                $(this).data(namespace).setDisabled(false);
+            });
         },
 
         //全选
         selectAll: function (selected) {
-            $(this).data(namespace).selectAll(selected);
+            return this.each(function () {
+                $(this).data(namespace).selectAll(selected);
+            });
         }
-    }
+    };
 
     /**
      * [UiSelect 下拉框插件对象]
      */
-    var UiSelect = function (ele, settings) {
-        this.ele = ele;
-        this.settings = settings;
-        this.data = [];
-        this.selectData = [];
+    var UiSelect = function (container, setting) {
+        this.container = container;
+        this.setting = setting;
+        this.showDataList = setting.dataList;
+        this.selectedData = [];
+        this.searchFields = [];
 
         this.init();
-    }
+    };
 
     /**
      * [DEFAULTS 默认配置]
      */
     UiSelect.DEFAULTS = {
-        name            : '',                      //作为表单的name
-        data            : false,                   //数据
-        fields          : [],
-        /*[{
-            name        : 'text',                  //多列字段的名称
-            width       : '100%'                   //多列字段所占宽度
-        }]*/
-        width           : 0,                       //宽度
-        seprator        : ';',                     //多选值分隔符
-        disabled        : false,                   //是否禁用
-        before          : false,                   //是否在前方插入
-        searchbox       : false,                   //是否显示搜索框
-        multiple        : false                    //是否多选以及多选框类型
-    }
+        name            : '',               // 作为表单的name
+        dataList        : [],               // 数据项
+        template        : '<td>#{}</td>',   // 模板
+        textField       : '',               // text字段名
+        valueField      : '',               // value字段名
+        seprator        : ',',              // 多选值分隔符
+        disabled        : false,            // 是否禁用
+        searchbox       : false,            // 是否显示搜索框
+        multi           : false             // 是否多选
+    };
 
     /**
      * [initData 初始化数据]
@@ -1936,209 +1957,73 @@ $.extend($.fn, {
      * 2、如果选项中没有数据列表则表示是从select中提取数据
      */
     UiSelect.prototype.init = function () {
+        var setting = this.setting;
         var self = this;
-        var settings = this.settings;
 
-        settings.width = Math.max(this.ele.outerWidth(true), 70);
+        this.ele = $(
+            '<div class="ui-select' + (setting.disabled ? ' disabled' : '') + '">' +
+                '<div class="ui-select-bar">' +
+                    '<input class="ui-select-text" readonly>' +
+                    '<div class="ui-select-caret"><b></b></div>' +
+                '</div>' +
+                '<div class="ui-select-box">'+
+                    (setting.searchbox ? '<div class="ui-select-search"><input type="text"></div>' : '') +
+                    '<div class="ui-select-list"><table></table></div>' +
+                '</div>' +
+                '<input class="ui-select-value" type="hidden" name="' + setting.name + '" />' +
+            '</div>'
+        ).appendTo(this.container);
 
-        if (settings.data) {
-            this.type = 0;
-            this.data = settings.data;
-
-            if (!settings.name) {
-                settings.name = this.ele.data('name');
-            }
-        } else {
-            this.type = 1;
-
-            var $select = this.ele;
-            var $optgroup = $select.find('optgroup');
-
-            settings.position = $select.position();
-            settings.disabled = $select.prop('disabled');
-
-            if ($optgroup.length > 0) {
-                $optgroup.each(function () {
-                    var label = $(this).attr('label');
-                    var $options = $(this).children('option');
-                    var data = {
-                        label: label,
-                        children: []
-                    }
-
-                    $options.each(function () {
-                        var $option = $(this);
-                        var d = {
-                            value: $option.val(),
-                            text: $option.text(),
-                            selected: $option.prop('selected')
-                        }
-
-                        data.children.push(d);
-                    });
-
-                    self.data.push(data);
-                });
-            } else {
-                $select.find('option').each(function () {
-                    var $option = $(this);
-                    var d = {
-                        value: $option.val(),
-                        text: $option.text(),
-                        selected: $option.prop('selected'),
-                        disabled: $option.prop('disabled')
-                    }
-
-                    self.data.push(d);
-                });
-            }   
-        }
-
-        //查找选中数据
-        outloop:
-        for (var i = 0, l = this.data.length; i < l; i++) {
-            if (typeof this.data[i] == 'string') {
-                this.data[i] = {
-                    value: this.data[i],
-                    text: this.data[i]
-                }
+        // 保存将要进行搜索的字段名
+        setting.template.replace(/\#\{([\w]*)\}/g, function (s0, s1) {
+            if (s1 !== '') {
+                self.searchFields.push(s1);
             }
 
-            if (this.data[i].children) {
-                for (var j = 0, jLen = this.data[i].children.length; j < jLen; j++) {
-                    if (this.data[i].children[j].selected) {
-                        this.selectData.push({
-                            value: this.data[i].children[j].value,
-                            text: this.data[i].children[j].text
-                        });
+            return s1;
+        });
 
-                        if (!settings.multiple) {
-                            break outloop;
-                        }
-                    }
-                }
-            } else {
-                if (this.data[i].selected) {
-                    this.selectData.push({
-                        value: this.data[i].value,
-                        text: this.data[i].text
-                    });
-
-                    if (!settings.multiple) {
-                        break outloop;
-                    }
-                }
-            }
+        // 如果数据为空则抛出异常
+        if (!setting.dataList || !setting.dataList.length) {
+            throw new Error('$.uiSelect require more than one data!');
         }
 
-        //如果没有数据则销毁组件
-        if (this.data.length == 0) {
-            this.destroy();
-            return;
+        if (!setting.multi) { // 如果是单选则默认选中第一个
+            this.selectedData.push(setting.dataList[0]);
+        } else {    // 多选添加图标
+            setting.template = '<td><span class="ui-select-checkbox"></span></td>' + setting.template;
         }
 
-        //如果是单选，且没有选中数据则默认选中第一个
-        if (this.selectData.length == 0 && !settings.multiple) {
-            var d = this.data[0].children ? this.data[0].children[0] : this.data[0];
-            this.selectData.push({
-                value: d.value,
-                text: d.text
-            });
-        }
-
-        this.originalData = this.data.slice(0);      //保存原始数据，便于搜索
-        this.initDom();
-    }
-
-    /**
-     * [initDom 生成DOM结构]
-     * @return {[type]} [description]
-     */
-    UiSelect.prototype.initDom = function () {
-        var settings = this.settings;
-        var $ele = this.ele;
-
-        var $target =  $('<div class="ui-select'+(settings.disabled ? ' disabled' : '')+'">' +
-                            '<div class="ui-select-bar'+(settings.multiple == 2 ? ' noexpand' : '')+'">' +
-                                '<div class="ui-select-v"></div>' + 
-                                '<div class="ui-select-icon"><b></b></div>' +
-                            '</div>' +
-                            '<div class="ui-select-box">'+
-                                (settings.searchbox ? '<div class="ui-select-input"><input /></div>' : '') +
-                                '<ul class="ui-select-list"></ul>' +
-                            '</div>' +
-                            '<input type="hidden" name="'+settings.name+'" />' +
-                        '</div>');
-
-        if (this.type == 0) {
-            $ele.append($target);
-        } else {
-            if (settings.before) {
-                $ele.hide().before($target);
-            } else {
-                $ele.hide().after($target);
-            }
-        }
-
-        this.target = $target;
-        this.target.width(settings.width);
         this.createList();
         this.bindEvents();
-    }
+    };
 
     /**
      * [createList 创建下拉列表]
      * @return {[type]} [description]
      */
     UiSelect.prototype.createList = function () {
-        var settings = this.settings;
-        var data     = this.data;
-        var $target  = this.target;
-        var $list    = $target.find('.ui-select-list').empty();
-        var icon     = settings.multiple ? '<span class="ui-select-checkbox"></span>' : '';
+        var setting = this.setting;
+        var dataList = this.showDataList;
+        var ele  = this.ele;
+        var template = setting.template;
+        var table = ele.find('.ui-select-list table').empty();
 
-        if (data.length == 0) {
-            $('<li class="disabled">无数据</li>').appendTo($list);
+        if (dataList.length == 0) {
+            $('<tr class="disabled"><td>无数据</td></tr>').appendTo(table);
         } else {
-            if (settings.multiple) {
-                $('<li class="ui-select-checkAll">'+icon+'全选</li>').appendTo($list);
+            for (var i = 0, l = dataList.length; i < l; i++) {
+                var data = dataList[i];
+                var key = setting.valueField ? data[setting.valueField] : data;
+                var html = PluginDep.parseTpl('<tr data-key="' + key + '">' + template + '</tr>', data);
+
+                $(html).appendTo(table).data('data', data);
             }
 
-            for (var i = 0, l = data.length; i < l; i++) {
-                if (data[i].children) {
-                    var label = data[i].label;
-                    var children = data[i].children;
-                    
-                    $('<li class="optgroup">'+label+'</li>').appendTo($list);
-
-                    for (var j = 0, jLen = children.length; j < jLen; j++) {
-                        var d = children[j];
-
-                        var text = '';
-                        $.each(settings.fields, function (k, field) {
-                            text += '<div style="float: left; width: '+field.width+';">'+d[field.name]+'</div>';
-                        });
-
-                        if (text == '') {
-                            text = d.text;
-                        }
-
-                        $('<li class="ui-select-li" data-value="'+d.value+'" title="'+d.text+'">'+icon+'<div class="ui-select-content">'+text+'</div></li>').appendTo($list);
-                    }
-                } else {
-                    var d = data[i];
-
-                    var text = '';
-                    $.each(settings.fields, function (k, field) {
-                        text += '<div style="float: left; width: '+field.width+';">'+d[field.name]+'</div>';
-                    });
-
-                    if (text == '') {
-                        text = d.text;
-                    }
-
-                    $('<li class="ui-select-li' + (d.disabled ? ' disabled' : '') + '" data-value="' + d.value + '" title="' +d.text+'">'+icon+'<div class="ui-select-content">'+text+'</li>').appendTo($list);
-                }
+            // 多选全选按钮
+            if (setting.multi) {
+                var colSpan = table.find('tr:eq(0) td').length - 1;
+                $('<tr class="ui-select-checkAll"><td width="30"><span class="ui-select-checkbox"></span></td><td colspan="' + colSpan + '">全选</td></tr>').prependTo(table);
             }
         }
 
@@ -2146,83 +2031,55 @@ $.extend($.fn, {
     }
 
     /**
-     * [setSelect 设置选中项]
+     * [setSelect 设置全选项]
+     * @param {[type]} isTriggerChangeEvent [是否触发change事件]
      */
-    UiSelect.prototype.setSelect = function (changeFlag) {
-        if (this.data.length == 0) {
-            return false;
-        }
+    UiSelect.prototype.setSelect = function (isTriggerChangeEvent) {
+        var setting = this.setting;
+        var selectedData = this.selectedData;
+        var ele = this.ele;
 
-        var settings   = this.settings;
-        var selectData = this.selectData;
-        var $target    = this.target;
-        var value      = [];
-        var text       = [];
+        var textInput = ele.find('.ui-select-text');
+        var valueInput = ele.find('.ui-select-value');
+        var table = ele.find('.ui-select-list table');
+        var bar = ele.find('.ui-select-bar');
+        var selectedValue = [];
+        var selectedText = [];
 
-        var $vbox      = $target.find('.ui-select-v').empty();
-        var $input     = $target.find('input[type="hidden"]');
-        var $box       = $target.find('.ui-select-box');
-        var $bar       = $target.find('.ui-select-bar');
+        table.find('tr').removeClass('active');
 
-        $box.find('li').removeClass('active');
+        if (setting.multi) {
+            for (var i = 0, l = selectedData.length; i < l; i++) {
+                var data = selectedData[i];
+                var key = setting.valueField ? data[setting.valueField] : data;
+                var item = setting.textField ? data[setting.textField] : data;
 
-        if (settings.multiple) {
-            if (selectData.length == 0) {
-                $vbox.append('<span class="holder">&nbsp;</span>');
-            } else {
-                for (var i = 0, l = selectData.length; i < l; i++) {                    
-                    $box.find('li[data-value="'+selectData[i].value+'"]').addClass('active');
-                    value.push(selectData[i].value);
-                    text.push(selectData[i].text);
-
-                    if (settings.multiple != 1) {
-                        $vbox.append('<span class="ui-select-item">'+selectData[i].text+'<a class="ui-select-del" data-value="'+selectData[i].value+'">×</a></span>');
-                    }
-                }
-
-                if (settings.multiple == 1) {
-                    var $temp = $('<input class="ui-select-i" readonly />');
-                    $temp.val(text.join(settings.seprator));
-                    $vbox.append($temp);
-                }
+                table.find('[data-key="' + key + '"]').addClass('active');
+                selectedValue.push(key);
+                selectedText.push(item);
             }
 
-            //是否勾选全选按钮
-            var tempData = [];
-            $.each(this.data, function (i, item) {
-                if (item.children) {
-                    tempData = tempData.concat(item.children);
-                } else {
-                    tempData.push(item);
-                }
-            });
-
-            if (tempData.length == selectData.length) {
-                $box.find('.ui-select-checkAll').addClass('active');
+            // 是否勾选全选按钮
+            if (selectedData.length == setting.dataList.length) {
+                table.find('.ui-select-checkAll').addClass('active');
             }
         } else {
-            $vbox.append('<span class="ui-select-text">'+selectData[0].text+'</span>');
-            $box.find('li[data-value="'+selectData[0].value+'"]').addClass('active');
-            value.push(selectData[0].value);
+            var data = selectedData[0];
+            var key = setting.valueField ? data[setting.valueField] : data;
+            var item = setting.textField ? data[setting.textField] : data;
+
+            table.find('[data-key="' + key + '"]').addClass('active');
+            selectedValue.push(key);
+            selectedText.push(item);
         }
 
-        $input.val(value.join(settings.seprator));
-        $box.css('top', ($bar.outerHeight(true) - 1) + 'px');     //设置展开框的top值
+        valueInput.val(selectedValue.join(setting.separator));
+        textInput.val(selectedText.join(setting.separator));
 
-        //设置原select的选中项
-        this.ele.find('option').each(function(index, el) {
-            for (var i = 0, l = selectData.length; i < l; i++) {
-                if ($(this).val() == selectData[i].value) {
-                    $(this).prop('selected', true);
-                }
-            }
-        });
-
-        //触发change和changed事件
-        if (changeFlag !== false) {
-            var e = $.Event('changed.' + namespace);
-            this.ele.trigger(e, [selectData.slice(0), this.oldSelectData.slice(0)]);
-            this.ele.trigger('change');
+        // 触发change事件
+        if (isTriggerChangeEvent !== false) {
+            var e = $.Event('change.' + namespace);
+            this.ele.trigger(e, [selectedData.slice(0)]);
         }
     }
 
@@ -2231,8 +2088,10 @@ $.extend($.fn, {
      * @return {[type]} [description]
      */
     UiSelect.prototype.showList = function () {
-        this.target.find('.ui-select-box').show();
-        this.target.addClass('expand');
+        var ele = this.ele;
+        
+        ele.addClass('expand');
+        ele.find('.ui-select-box').show();
 
         var e = $.Event('expand.' + namespace);
         this.ele.trigger(e);
@@ -2243,81 +2102,88 @@ $.extend($.fn, {
      * @return {[type]} [description]
      */
     UiSelect.prototype.hideList = function () {
-        this.target.find('.ui-select-box').hide();
-        this.target.removeClass('expand');
+        var ele = this.ele;
+
+        ele.removeClass('expand');
+        ele.find('.ui-select-box').hide();
 
         //清空搜索框
-        var $input = this.target.find('.ui-select-input input');
+        var input = ele.find('.ui-select-search input');
 
-        if ($input.val() !== '') {
-            $input.val('');
-
-            if (PluginDep.isBelowIE9) {
-                $input.trigger('propertychange');
-            } else {
-                $input.trigger('input');
-            }
+        if (input.val() !== '') {
+            input.val('');
+            input.trigger('propertychange');
+            input.trigger('input');
         }
 
-        var e = $.Event('shrink.' + namespace);
-        this.ele.trigger(e, this.selectData.slice(0));
+        var e = $.Event('collapse.' + namespace);
+        ele.trigger(e);
     }
 
     /**
-     * [public]
-     * [setValue 设置值，提供主动调用]
+     * [setValue 选中值]
      * @param {[type]} value [description]
      */
     UiSelect.prototype.setValue = function (value) {
-        var settings = this.settings;
-        this.oldSelectData = this.selectData.slice(0);
-        this.selectData.length = 0;
+        var setting = this.setting;
+        var dataList = setting.dataList;
 
-        if (!$.isArray(value)) {
+        this.oldSelectedData = this.selectedData.slice(0);
+        this.selectedData = [];
+
+        if (setting.multi && !$.isArray(value)) {
+            throw new Error('Need an array of value when multi option is true!');
+        }
+
+        if (!setting.multi && $.isArray(value)) {
+            throw new Error('Value can not be an array when multi option is false!');
+        }
+
+        if ($.isArray(value)) {
             value = [value];
         }
 
-        for (var i = 0, l = this.data.length; i < l; i++) {
+        // 查找选中项
+        for (var i = 0, l = dataList.length; i < l; i++) {
+            var key = setting.valueField ? dataList[i][setting.valueField] : dataList[i];
+
             for (var j = 0, jLen = value.length; j < jLen; j++) {
-                if (this.data[i].value == value[j]) {
-                    this.selectData.push({
-                        value: this.data[i].value,
-                        text: this.data[i].text
-                    });
+                if (key === value[j]) {
+                    this.selectedData.push(dataList[i]);
                 }
             }
         }
 
+        // 未找到
+        if (!this.selectedData.length) {
+            return;
+        }
+
+        // 判断新设置的值是否和旧值相同
         var isSame = false;
-        if (this.oldSelectData.length == this.selectData.length) {
-            isSame = true
-            for (var i = 0, l = this.oldSelectData.length; i < l; i++) {
-                if ($.inArray(this.oldSelectData[i], this.selectData) == -1) {
+        if (this.oldSelectedData.length == this.selectedData.length) {
+            isSame = true;
+
+            for (var i = 0, l = this.selectedData.length; i < l; i++) {
+                if (PluginDep.indexOf(this.oldSelectedData, this.selectedData[i], setting.valueField) == -1) {
                     isSame = false;
                 }
             }
         }        
 
-        if (!isSame && this.selectData.length > 0) {
+        if (!isSame) {
             this.setSelect();
-        }        
+        }
     }
 
     /**
-     * [public]
-     * [destroy 销毁DOM并显示原来的select]
+     * [destroy 销毁组件]
      * @return {[type]} [description]
      */
     UiSelect.prototype.destroy = function () {
-        this.ele.removeData(namespace);
-
-        if (this.target) {
-            this.target.remove();
-        }        
-
-        if (this.type == 1) {
-            this.ele.show();
-        }
+        this.container
+            .removeData(namespace)
+            .empty();
     }
 
     /**
@@ -2326,12 +2192,12 @@ $.extend($.fn, {
      * @return {[type]} [description]
      */
     UiSelect.prototype.setDisabled = function (disabled) {
-        this.settings.disabled = typeof disabled == 'undefined' ? true : disabled;
+        this.setting.disabled = typeof disabled == 'undefined' ? true : disabled;
 
-        if (this.settings.disabled) {
-            this.target.addClass('disabled');
+        if (this.setting.disabled) {
+            this.ele.addClass('disabled');
         } else {
-            this.target.removeClass('disabled');
+            this.ele.removeClass('disabled');
         }
     }
 
@@ -2341,7 +2207,7 @@ $.extend($.fn, {
      */
     UiSelect.prototype.selectAll = function (selected) {
         selected = typeof selected == 'undefined' ? true : selected;
-        var checkAll = this.target.find('.ui-select-checkAll');
+        var checkAll = this.ele.find('.ui-select-checkAll');
 
         if (selected && !checkAll.hasClass('active')
             || !selected && checkAll.hasClass('active')) {
@@ -2355,216 +2221,124 @@ $.extend($.fn, {
      */
     UiSelect.prototype.bindEvents = function () {
         var self = this;
-        var settings = this.settings;
-        var $target = this.target.off();
-        var selectData = this.selectData;
+        var setting = this.setting;
+        var ele = this.ele;
+        var box = ele.find('.ui-select-box')[0];
 
-        //展开下拉框
-        $target.on('click', '.ui-select-bar, .ui-select-icon', function () {
-            //禁用状态
-            if (settings.disabled) {
+        // 展开下拉框
+        ele.on('click', '.ui-select-bar', function (e) {
+            // 禁用状态
+            if (setting.disabled) {
                 return false;
             }
 
-            if ($(this).hasClass('noexpand')) {
-                return false;
-            }
-
-            if ($target.hasClass('expand')) {
+            if (ele.hasClass('expand')) {
                 self.hideList();
             } else {
                 self.showList();
             }
 
-            return false;
+            e.preventDefault();
         });
         
-        //列表选中事件
-        $target.on('click', '.ui-select-li', function () {
+        // 列表选中事件
+        ele.on('click', '.ui-select-list tr:not(.ui-select-checkAll)', function (e) {
             var $this = $(this);
-            var value = $this.attr('data-value');
-            var text = $this.find('.ui-select-content').html();
-            
-            try {
-                if ($(text).length > 1) {
-                    text = $(text).eq(0).text();
-                }
-            } catch(e) {
+            var data = $this.data('data');      
 
-            }            
+            // 保存改变之前的数据
+            self.oldSelectedData = self.selectedData.slice(0);
 
-            //保存改变之前的数据
-            self.oldSelectData = selectData.slice(0);
-
-            if (settings.multiple) {
-                if ($this.hasClass('active')) {
-                    for (var i = 0, l = selectData.length; i < l; i++) {
-                        if (selectData[i].value === value) {
-                            selectData.splice(i, 1);
-                            break;
-                        }
-                    }
+            if (setting.multi) {
+                var index = PluginDep.indexOf(self.selectedData, data, setting.valueField);
+                    
+                if (index > -1) {
+                    self.selectedData.splice(index, 1);
                 } else {
-                    selectData.push({
-                        value: value,
-                        text: text
-                    });
+                    self.selectedData.push(data);
                 }
 
                 self.setSelect();
             } else {
-                self.hideList();
-
                 if (!$this.hasClass('active')) {
-                    selectData.length = 0;
-                    selectData.push({
-                        value: value,
-                        text: text
-                    });
-
+                    self.selectedData = [data];
                     self.setSelect();
                 }
+
+                self.hideList();
             }
         });
         
-        //全选
-        $target.on('click', '.ui-select-checkAll', function () {
-            //保存改变之前的数据
-            self.oldSelectData = selectData.slice(0);
-            selectData.length = 0;
+        // 全选
+        ele.on('click', '.ui-select-checkAll', function () {
+            // 保存改变之前的数据
+            self.oldSelectedData = self.selectedData.slice(0);
 
             if (!$(this).hasClass('active')) {
-                $.each(self.data, function (i, item) {
-                    if (item.children) {
-                        $.each(item.children, function (j, item) {
-                            var text = item.text;
-
-                            if ($(text).length > 0) {
-                                text = $(text).eq(0).text();
-                            }
-
-                            selectData.push({
-                                value: item.value,
-                                text: text
-                            });
-                        });
-                    } else {
-                        var text = item.text;
-
-                        if ($(text).length > 0) {
-                            text = $(text).eq(0).text();
-                        }
-
-                        selectData.push({
-                            value: item.value,
-                            text: text
-                        });
-                    }
-                });
+                self.selectedData = setting.dataList;
+            } else {
+                self.selectedData = [];
             }
 
             self.setSelect();
         });
-        
-        //删除选中项
-        $target.on('click', '.ui-select-del', function () {
-            var value = $(this).attr('data-value');
 
-            //保存改变之前的数据
-            self.oldSelectData = selectData.slice(0);
-
-            for (var i = 0, l = selectData.length; i < l; i++) {
-                if (selectData[i].value == value) {
-                    selectData.splice(i, 1);
-                    break;
-                }
-            }
-
-            $(this).parent().remove();
-            self.setSelect();
-        });
-
-        //输入框输入筛选，propertychange不能委托
-        $target.find('.ui-select-input input').on('input propertychange', inputHandler);
+        // 输入框输入筛选，propertychange不能委托
+        ele.find('.ui-select-search input').on('input propertychange', inputHandler);
 
         function inputHandler(e) {
             var val = $(this).val();
-            var data = self.originalData.slice(0);
-            var sData = [];
+            var dataList = setting.dataList;
+            self.showDataList = [];
 
             if (val === '') {
-                self.data = data;
+                self.showDataList = dataList;
             } else {
                 //查找结果
-                for (var i = 0, l = data.length; i < l; i++) {
-                    if (data[i].children) {
-                        for (var j = 0, len = data[i].children.length; j < len; j++) {
-                            if (data[i].children[j].value.indexOf(val) > -1 ||
-                                data[i].children[j].text.indexOf(val) > -1) {
-                                var isExist = false;
+                for (var i = 0, l = dataList.length; i < l; i++) {
+                    var data = dataList[i];
 
-                                for (var k = 0, kLen = sData.length; k < kLen; k++) {
-                                    if (ele.label === data[i].label) {
-                                        isExist = true;
-                                        ele.children.push(data[i].children[j]);
-
-                                        break;
-                                    }
-                                }
-
-                                if (!isExist) {
-                                    sData.push({
-                                        label: data[i].label,
-                                        children: [data[i].children[j]]
-                                    });
-                                }
+                    if (self.searchFields.length) {
+                        for (var field in self.searchFields) {
+                            if (data[field] !== undefined && data[field] !== null && data[field].toString().indexOf(val) > -1) {
+                                self.showDataList.push(data);
                             }
                         }
                     } else {
-                        if (data[i].value.indexOf(val) > -1 || data[i].text.indexOf(val) > -1) {
-                            sData.push(data[i]);
+                        if (data !== undefined && data !== null && data.toString().indexOf(val) > -1) {
+                            self.showDataList.push(data);
                         }
                     }
                 }
-
-                self.data = sData;
             }
 
             self.createList();
         }
 
-        //隐藏下拉框
-        $(document).on('click.' + namespace, function() {
+        // 隐藏下拉框
+        $(document).on('click.' + namespace, function () {
             self.hideList();
         });
 
-        $target.on('click', '.ui-select-box', function () {
-            return false;
+        // 隐藏其他的列表
+        $(document).on('click', '.ui-select', function (e) {
+            if (this != ele[0]) {
+                self.hideList();
+            } else {
+                e.stopPropagation();
+            }
         });
     }
 
     $.fn.uiSelect = function (method) {
-        var args = arguments;
-
         if (methods[method]) {
-            return this.each(function () {
-                if ($(this).data(namespace)) {
-                    methods[method].apply(this, Array.prototype.slice.call(args, 1));
-                }                
-            });
+            return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
         } else if (typeof method === 'object' || !method) {
-            return this.each(function () {
-                methods.init.apply(this, args);
-            });
+            return methods.init.apply(this, arguments);
         } else {
-            $.error('The method ' + method + ' does not exist in $.select');
+            $.error('The method ' + method + ' does not exist in $.uiSelect');
         }
     }
-
-    // UiSelect.js DATA-API
-    $(document).ready(function () {
-        $('[data-uitype="'+pName+'"]').uiSelect();
-    });
 })();
 
 /**
@@ -2577,7 +2351,9 @@ $.extend($.fn, {
     var namespace = 'ui.' + pName;
 
     var methods = {
-        init: function (options) {             
+        init: function (options) {     
+            methods.destroy.call(this);
+
             return this.each(function() {
                 var $this = $(this);
                 var settings = $.extend(true, {}, Scrollbar.DEFAULTS, $this.data(), options); 
@@ -2591,24 +2367,11 @@ $.extend($.fn, {
          * @return {[type]} [description]
          */
         destroy: function () {
-            var obj = this.data(namespace);
-            obj.destroy();
-        },
-
-        /**
-         * [getOptions 获取选项]
-         * @param  {[type]} option [description]
-         * @return {[type]}        [description]
-         */
-        getOptions: function (option) {
-            var obj = this.data(namespace);
-            var options = obj.options;
-
-            if (arguments.length == 0) {
-                return options;
-            } else {
-                return options[option];
-            }
+            return this.each(function () {
+                if ($(this).data(namespace)) {
+                    $(this).data(namespace).destroy();
+                }
+            });
         }
     };
 
@@ -3409,7 +3172,6 @@ $.extend($.fn, {
                 var setting = $.extend(true, {}, Validate.DEFAULTS, $this.data(), option); 
                 
                 $this.data(namespace, new Validate($this, setting));
-                globalId++;
             });
         }
     }
@@ -3417,7 +3179,7 @@ $.extend($.fn, {
     var Validate = function (ele, setting) {
         this.ele = ele;
         this.setting = setting;
-        this.targetId = 'validate-tip-' + globalId;
+        this.targetId = 'validate-tip-' + globalId++;
 
         this.init();
     };

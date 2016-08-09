@@ -227,9 +227,7 @@
         var formData = new FormData();
         var s = {
             url: setting.uploader,
-            processData: false,
-            cache: false,
-            type: 'POST'
+            type: 'POST',
         };
 
         // 添加用户数据到formData中或者url中

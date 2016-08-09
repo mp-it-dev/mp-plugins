@@ -92,7 +92,10 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 	});
 
 	$('#upload').uploadify({
-		uploader: 'http://192.168.4.86:100/test/home/uploadFile'
+		uploader: 'http://192.168.4.86:100/test/home/uploadFile',
+		formData: {
+			name: 'emmett'
+		}
 	});
 
 	$('.selector-organiztion').on('click', function () {
@@ -168,8 +171,8 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 		// maxWidth: 1300
 	});
 
-	$('#uiSelector').uiSelect({
-		data: [{
+	$('#single-ui-select').uiSelect({
+		dataList: [{
 			value: '1',
 			text: '中国',
 			other: '亚洲'
@@ -186,14 +189,16 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 			text: '英国',
 			other: '欧洲'
 		}],
-		fields: [{
-			name: 'text',
-			width: '50%'
-		}, {
-			name: 'other',
-			width: '50%'
-		}],
-		name: 'test_country'
+		name: 'test_single_select',
+		template: '<td>#{text}</td><td>#{other}</td>',
+		textField: 'text',
+		valueField: 'value',
+	});
+
+	$('#multi-ui-select').uiSelect({
+		dataList: ['中国', '美国', '日本', '英国', '法国', '俄罗斯', '印度', '巴西'],
+		name: 'test_multi_select',
+		multi: true
 	});
 
 	var rMenu = $.rightMenu({
