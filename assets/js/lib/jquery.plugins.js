@@ -2299,9 +2299,13 @@ $.extend($.fn, {
                     var data = dataList[i];
 
                     if (self.searchFields.length) {
-                        for (var field in self.searchFields) {
+                        for (var j = 0, jLen = self.searchFields.length; j < jLen; j++) {
+                            var field = self.searchFields[j];
+
                             if (data[field] !== undefined && data[field] !== null && data[field].toString().indexOf(val) > -1) {
                                 self.showDataList.push(data);
+                                // break当前循环，以防止单条数据多次匹配
+                                break;
                             }
                         }
                     } else {

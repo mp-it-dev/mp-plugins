@@ -193,12 +193,13 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 		template: '<td>#{text}</td><td>#{other}</td>',
 		textField: 'text',
 		valueField: 'value',
+		search: true
 	});
 
 	$('#multi-ui-select').uiSelect({
 		dataList: ['中国', '美国', '日本', '英国', '法国', '俄罗斯', '印度', '巴西'],
 		name: 'test_multi_select',
-		searchbox: true,
+		search: true,
 		multi: true
 	});
 
