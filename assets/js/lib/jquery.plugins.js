@@ -1947,7 +1947,7 @@ $.extend($.fn, {
         valueField      : '',               // value字段名
         seprator        : ',',              // 多选值分隔符
         disabled        : false,            // 是否禁用
-        searchbox       : false,            // 是否显示搜索框
+        search          : false,            // 是否搜索
         multi           : false             // 是否多选
     };
 
@@ -1967,7 +1967,7 @@ $.extend($.fn, {
                     '<div class="ui-select-caret"><b></b></div>' +
                 '</div>' +
                 '<div class="ui-select-box">'+
-                    (setting.searchbox ? '<div class="ui-select-search"><input type="text"></div>' : '') +
+                    (setting.search ? '<div class="ui-select-search"><input type="text"></div>' : '') +
                     '<div class="ui-select-list"><table></table></div>' +
                 '</div>' +
                 '<input class="ui-select-value" type="hidden" name="' + setting.name + '" />' +
@@ -1989,7 +1989,7 @@ $.extend($.fn, {
         }
 
         if (!setting.multi) { // 如果是单选则默认选中第一个
-            this.selectedData.push(setting.dataList[0]);
+            this.selectedData = setting.dataList.slice(0, 1);
         } else {    // 多选添加图标
             setting.template = '<td><span class="ui-select-checkbox"></span></td>' + setting.template;
         }
@@ -2275,7 +2275,7 @@ $.extend($.fn, {
             self.oldSelectedData = self.selectedData.slice(0);
 
             if (!$(this).hasClass('active')) {
-                self.selectedData = setting.dataList;
+                self.selectedData = setting.dataList.slice(0);
             } else {
                 self.selectedData = [];
             }
