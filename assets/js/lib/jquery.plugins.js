@@ -333,7 +333,6 @@ $.extend($.fn, {
         tableClass      : '',                       //自定义table类名
         maxHeight       : false,                    //table容器最大高度
         height          : false,                    //table容器高度
-        headerClass     : 'info',                   //表头行类
         menu            : false,                    //菜单栏
 
         /*
@@ -369,10 +368,10 @@ $.extend($.fn, {
          *     align: false,                        //对齐方式
          *     headerAlign: false,                  //表头对齐方式
          *     hide: false,                         //是否显示列
-         *     class: false,                        //自定义类
-         *     sort: {
-         *         sname: 'id',                     //排序字段
-         *         sorder: 'asc',                   //排序方式，asc升序，desc降序
+         *     sort: {                              //排序
+         *         enable: false,                   //启用排序
+         *         isDefault: false,                //是否默认排序
+         *         defaultOrder: 'asc'              //默认排序方式
          *     },
          *     numberFormat: {
          *         toThousands: true,
@@ -414,10 +413,10 @@ $.extend($.fn, {
 
         //表头选项
         resizable           : true,                 //是否可拖动列宽
-        sortNameField       : 'sname',              //排序字段字段名
-        sortOrderField      : 'sorder',             //排序方式字段名
-        sortName            : '',                   //默认排序字段
-        sortOrder           : 'asc',                //默认排序方式
+        snameField          : 'sname',              //排序字段字段名
+        sorderField         : 'sorder',             //排序方式字段名
+        ascField            : 'asc',                //升序标识名
+        descField           : 'desc',               //降序标识名
 
         resultVerify        : false,                //返回结果验证
             
@@ -504,6 +503,7 @@ $.extend($.fn, {
             options = this.options,
             paging = options.paging,
             $container = this.container,
+            colOptions = options.colOptions,
             param;
 
         if (typeof options.data === 'function') {
@@ -512,10 +512,10 @@ $.extend($.fn, {
             param = $.extend(true, {}, options.data);
         }
 
-        //是否有默认排序
-        if (options.sortName) {
-            param[options.sortNameField] = options.sortName;
-            param[options.sortOrderField] = options.sortOrder;
+        // 如果有排序则添加
+        if (this.sname) {
+            param[options.snameField] = this.sname;
+            param[options.sorderField] = this.sorder;
         }
 
         var ajaxOpt;
@@ -575,7 +575,6 @@ $.extend($.fn, {
             var $pager = $('<div class="table-pager"></div>').appendTo($container.find('.table-container'));
 
             $pager.pager(ajaxOpt);
-            options.paging.pager = $pager.data('ui.pager').options;
         } else {
             ajaxOpt = {
                 url             : options.url,
@@ -788,7 +787,7 @@ $.extend($.fn, {
             colOptions = options.colOptions,
             colLen = colOptions.length;
 
-        var html = '<tr class="table-tr ' + (options.headerClass || '') + '">';
+        var html = '<tr class="table-tr">';
 
         //复选框
         if (options.checkbox) {
@@ -805,22 +804,29 @@ $.extend($.fn, {
         }
 
         for (var i = 0; i < colLen; i++) {
-            var col = colOptions[i];
+            var col = colOptions[i],
+                sort = col.sort,
+                attr = 'data-field="' + col.field + '" data-field-index="' + i + '" onselectstart="return false;"',
+                sortClass = '';
 
             if (col.hide) {
                 continue;
             }
 
-            var attr = 'data-field="'+col.field+'" data-field-index="' + i + '" onselectstart="return false;"', 
-                stl = [],
-                sort = col.sort;
+            if (sort && sort.enable) {
+                sort.defaultOrder = sort.defaultOrder || 'asc';
+                attr += ' data-sorder="' + (sort.isDefault ? sort.defaultOrder : '') + '"';
+                sortClass = ' table-sort';
 
-            if (sort) {
-                sort.sorder = sort.sorder || 'asc';
-                attr += ' data-sname="' + sort.sname + '"' + ' data-sorder="' + sort.sorder + '"';
+                // 保存默认排序
+                if (sort.isDefault) {
+                    this.sname = col.field;
+                    this.sorder = sort.defaultOrder;
+                    sortClass += ' table-sort-active';
+                }
             }
 
-            var $th = $('<th class="table-th' + (col.sort ? ' table-sort' : '') + '" ' + attr +'"></th>');
+            var $th = $('<th class="table-th' + sortClass + '" ' + attr +'></th>');
 
             if (col.headerAlign || options.headerAlign) {
                 $th.css('text-align', col.headerAlign || options.headerAlign);
@@ -976,10 +982,10 @@ $.extend($.fn, {
             data = $.extend(true, {}, options.data(), data);
         }
 
-        //是否有排序
-        if (options.sortName) {
-            data[options.sortNameField] = options.sortName;
-            data[options.sortOrderField] = options.sortOrder;
+        // 如果有排序则添加
+        if (this.sname) {
+            data[options.snameField] = this.sname;
+            data[options.sorderField] = this.sorder;
         }
 
         this.container.find('.table-th-checkbox input').prop('checked', false);
@@ -1223,22 +1229,30 @@ $.extend($.fn, {
                 return;
             }
 
-            $container.find('.table-th').removeClass('table-sort-active');
-
-            var $th = $(this).addClass('table-sort-active');
-            var sname = $th.attr('data-sname');
+            var $th = $(this);
+            var sname = $th.attr('data-field');
             var sorder = $th.attr('data-sorder');
 
-            if (sorder == 'asc') {
-                $th.attr('data-sorder', 'desc');
+            // 重置其他列排序
+            $container.find('.table-th').each(function () {
+                if (this != $th[0]) {
+                    $(this).removeClass('table-sort-active').attr('data-sorder', '');
+                }
+            });
+
+            if (sorder == '') {
+                $th.addClass('table-sort-active').attr('data-sorder', 'asc');
+                self.sname = sname;
+                self.sorder = 'asc';
+            } else if (sorder == 'asc') {
+                $th.addClass('table-sort-active').attr('data-sorder', 'desc');
+                self.sname = sname;
+                self.sorder = 'desc';
             } else {
-                $th.attr('data-sorder', 'asc');
+                $th.attr('data-sorder', '');
+                self.sname = null;
+                self.sorder = null;
             }
-
-            var options = self.options;
-
-            options.sortName = sname;
-            options.sortOrder = sorder;
 
             self.reload();
         });

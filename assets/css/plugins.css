@@ -103,8 +103,7 @@
     z-index: 1;
     width: 1px;
     height: 100%;
-    cursor: col-resize;
-    background-color: #ddd;
+    cursor: e-resize;
 }
 .table-container .table-border .table-th-resize {
     right: -1px;
@@ -113,47 +112,40 @@
     border-top: 0;
 }
 .table-sort:hover {
-    cursor: pointer;
+    background: #e6e6e6;
 }
 .table-sort .table-sort-icon {
-    position: absolute;
-    top: 50%;
-    right: 0;
+    display: none;
+    position: relative;
+    margin-left: 5px;
     border: 4px solid transparent;
     border-top-width: 6px;
     border-bottom-width: 6px;
-    display: none;
 }
 .table-sort:hover .table-sort-icon,
 .table-sort-active .table-sort-icon {
-    display: block;
-}
-.table-sort[data-sorder="asc"] .table-sort-icon {
-    border-bottom-color: #000;
-    margin-top: -8px;
+    display: inline-block;
 }
 .table-sort-active[data-sorder="asc"] .table-sort-icon {
-    border-bottom-color: red;
-}
-.table-sort[data-sorder="desc"] .table-sort-icon {
-    border-top-color: #000;
-    margin-top: -4px;
+    border-bottom-color: #6190CD;
+    top: -2px;
 }
 .table-sort-active[data-sorder="desc"] .table-sort-icon {
-    border-top-color: red;
+    border-top-color: #6190CD;
+    top: 5px;
 }
 .table-drag {
-    cursor: col-resize !important;
+    cursor: e-resize !important;
 }
 .table-drag-line {
+    display: none;
     position: absolute;
     left: 0;
     top: 0;
-    width: 2px;
+    z-index: 3;
+    width: 1px;
     height: 100%;
     background-color: #777;
-    z-index: 3;
-    display: none;
 }
 .table-loading {
     position: absolute;

@@ -33,7 +33,6 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 	
 	var table = $("#table").table({
 		height: 400,
-		tableClass: 'table-border',
 		menu: {
 			cellFilter: '#tableCellFilter',
 			colShow: '#tableColShow'
@@ -62,8 +61,8 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 				}
 			},
 			sort: {
-				sname: 'title',
-				sorder: 'asc'
+				enable: true,
+				isDefault: true
 			},
 			handler: function (value, data) {
 				return '<a href="'+data.alt+'" target="_blank">'+data.title+'</a>';
@@ -71,7 +70,10 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 		}, {
 			name: '原始名称',
 			field: 'original_title',
-			width: 300
+			width: 300,
+			sort: {
+				enable: true
+			}
 		}, {
 			name: '年代',
 			field: 'year',

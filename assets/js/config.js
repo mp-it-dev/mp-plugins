@@ -3,7 +3,7 @@ require.config({
     paths: {
         'jquery': 'lib/jquery-1.11.3',
         'bootstrap': 'lib/bootstrap.min',
-        'uploadify': FormData && FileList ? 'lib/jquery.uploadify.origin': 'lib/jquery.uploadify',
+        'uploadify': typeof FormData != 'undefined' ? 'lib/jquery.uploadify.origin': 'lib/jquery.uploadify',
         'tlayer': 'lib/jquery.tlayer',
         'plugins': 'lib/jquery.plugins',
         'util': 'lib/util',
