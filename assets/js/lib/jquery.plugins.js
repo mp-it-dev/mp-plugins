@@ -288,7 +288,7 @@ $.extend($.fn, {
             var container = this.eq(0).data(namespace).container;
             var selectedRow = [];
 
-            container.find('.table-td-checkbox input:checked').each(function () {
+            container.find('.table-checkbox:checked').each(function () {
                 var data = $(this).parents('.table-tr').data('rowData');
                 selectedRow.push(data);
             });
@@ -353,14 +353,13 @@ $.extend($.fn, {
         colParam        : false,                    //列自定义参数，对象形式，支持函数返回
         colOptions      : [],                       //列设置
         groupHeaders    : false,                    //多表头设置
-        align           : false,                    //全局设置对齐方式
-        headerAlign     : false,                    //表头对齐方式
 
         /*
          * colOptions格式：[{
          *     name: 'ID',                          //列显示名称
          *     field: 'id',                         //列字段
-         *     width: 100,                          //列宽
+         *     width: false,                        //列宽，默认自适应
+         *     minWidth: false,                     //最小列宽
          *     edit: {                              //是否可编辑，默认为false
          *         replace: '<input />',            //编辑元素
          *         callback: function () {},        //编辑回调函数
@@ -643,6 +642,7 @@ $.extend($.fn, {
     Table.prototype.initTable = function () {
         var self = this,
             options = this.options,
+            colOptions = options.colOptions,
             $container = this.container;
 
         setTimeout(function () {
@@ -699,10 +699,12 @@ $.extend($.fn, {
             //计算表格宽度
             var $thead_ths = $container.find('.table-head .holder th');
             var $tbody_ths = $container.find('.table-body .holder th');
-            var w = 0, totalW = 0;
+            var w = 0, totalW = 0, fieldIndex, minWidth;
 
             for (var i = 0, l = $thead_ths.length; i < l; i++) {
-                w = Math.max(parseInt($thead_ths[i].style.width) || $thead_ths.eq(i).width(), 40);
+                fieldIndex = $thead_ths.eq(i).data('field-index');
+                minWidth = typeof fieldIndex != 'undefined' ? colOptions[fieldIndex].minWidth || 0 : 0;
+                w = Math.max(parseInt($thead_ths[i].style.width) || $thead_ths.eq(i).width(), 40, minWidth);
 
                 if ($thead_ths.eq(i).is(':visible')) {
                     totalW += w;
@@ -753,23 +755,23 @@ $.extend($.fn, {
 
         //行号
         if (options.rownum) {
-            html += '<th style="width: 50px;"></th>';
+            html += '<th style="width: 40px;"></th>';
         }
 
         for (var i = 0; i < colLen; i++) {
             var col = colOptions[i];
-            var dis = '';
+            var style = '';
 
             if (!col.hide) {
                 if (col.width) {
                     if (!isNaN(col.width)) {
-                        dis += 'width: ' + col.width + 'px;';
+                        style += ' style="width: ' + col.width + 'px;"';
                     } else {
-                        dis += 'width: ' + col.width + ';';
+                        style += ' style="width: ' + col.width + ';"';
                     }
                 }
 
-                html += '<th style="' + dis + '"></th>';
+                html += '<th' + style + ' data-field-index="' + i + '"></th>';
             }            
         }
 
@@ -789,17 +791,17 @@ $.extend($.fn, {
 
         var html = '<tr class="table-tr">';
 
-        //复选框
-        if (options.checkbox) {
-            html += '<th class="table-th table-th-checkbox" onselectstart="return false;">'+
-                        '<input type="checkbox" />'+
+        //行号
+        if (options.rownum) {
+            html += '<th class="table-th" style="text-align: center;">'+
+                        '<div class="table-th-text"></div>'+
                     '</th>';
         }
 
-        //行号
-        if (options.rownum) {
-            html += '<th class="table-th table-th-rownum">'+
-                        '<div class="table-th-text">序号</div>'+
+        //复选框
+        if (options.checkbox) {
+            html += '<th class="table-th" style="text-align: center;" onselectstart="return false;">'+
+                        '<input class="table-checkbox" type="checkbox" />'+
                     '</th>';
         }
 
@@ -828,8 +830,8 @@ $.extend($.fn, {
 
             var $th = $('<th class="table-th' + sortClass + '" ' + attr +'></th>');
 
-            if (col.headerAlign || options.headerAlign) {
-                $th.css('text-align', col.headerAlign || options.headerAlign);
+            if (col.headerAlign) {
+                $th.css('text-align', col.headerAlign);
             }            
 
             if (options.resizable) {
@@ -876,15 +878,15 @@ $.extend($.fn, {
             var $tr = $('<tr class="table-tr"'+rowData+'></tr>').appendTo($tbody);
             $tr.data('rowData', dataList[i]);
 
-            if (options.checkbox) {
-                $tr.append('<td class="table-td table-td-checkbox" onselectstart="return false;">'+
-                            '<input type="checkbox" />'+
+            if (options.rownum) {
+                $tr.append('<td class="table-td" style="text-align: center;">'+
+                            '<div class="table-td-text">'+(i + 1)+'</div>'+
                         '</td>');
             }
 
-            if (options.rownum) {
-                $tr.append('<td class="table-td table-td-rownum">'+
-                            '<div class="table-td-text">'+(i + 1)+'</div>'+
+            if (options.checkbox) {
+                $tr.append('<td class="table-td" style="text-align: center;" onselectstart="return false;">'+
+                            '<input class="table-checkbox" type="checkbox" />'+
                         '</td>');
             }
 
@@ -939,8 +941,8 @@ $.extend($.fn, {
                     $td.data('editData', col.edit);
                 }
 
-                if (col.align || options.align) {
-                    $td.css('text-align', col.align || options.align);
+                if (col.align) {
+                    $td.css('text-align', col.align);
                 }
 
                 //如果返回的是html元素或jquery元素则使用append
@@ -988,7 +990,7 @@ $.extend($.fn, {
             data[options.sorderField] = this.sorder;
         }
 
-        this.container.find('.table-th-checkbox input').prop('checked', false);
+        this.container.find('.table-checkbox').prop('checked', false);
 
         if (options.paging.enable) {
             var pager = this.container.find('.table-pager');
@@ -1112,10 +1114,6 @@ $.extend($.fn, {
                     $colHeader.hide();
                 }
 
-                if (options.headerAlign) {
-                    $colHeader.css('text-align', options.headerAlign);
-                }
-
                 $tr.append($colHeader);         // move the current header in the next row
 
                 // set the coumter of headers which will be moved in the next row
@@ -1148,6 +1146,10 @@ $.extend($.fn, {
             .off()
             .removeData(namespace)
             .empty();
+
+        if (this.colShow) {
+            this.colShow.remove();
+        }
     }
 
     /**
@@ -1200,26 +1202,16 @@ $.extend($.fn, {
         });
 
         //复选框点击事件，单选
-        $container.on('change', '.table-td-checkbox input[type="checkbox"]', function () {
-            var totalLen = $container.find('.table-td-checkbox input[type="checkbox"]').length;
-            var currLen = $container.find('.table-td-checkbox input[type="checkbox"]:checked').length;
+        $container.on('change', '.table-td .table-checkbox', function () {
+            var totalLen = $container.find('.table-td .table-checkbox').length;
+            var currLen = $container.find('.table-td .table-checkbox:checked').length;
 
-            $container.find('.table-th-checkbox input[type="checkbox"]').prop('checked', currLen == totalLen);
-        });
-
-        $container.on('click', '.table-td-checkbox input[type="checkbox"], .table-th-checkbox input[type="checkbox"]', function (e) {
-            e.stopPropagation();
+            $container.find('.table-th .table-checkbox').prop('checked', currLen == totalLen);
         });
 
         //复选框点击事件，全选
-        $container.on('change', '.table-th-checkbox input[type="checkbox"]', function () {
-            $container.find('.table-td-checkbox input[type="checkbox"]').prop('checked', $(this).prop('checked'));
-        });
-        
-        $container.on('click', '.table-th-checkbox, .table-td-checkbox', function () {
-            var $checkbox = $(this).find('input[type="checkbox"]');
-
-            $checkbox.prop('checked', !$checkbox.prop('checked')).change();
+        $container.on('change', '.table-th .table-checkbox', function () {
+            $container.find('.table-td .table-checkbox').prop('checked', $(this).prop('checked'));
         });
 
         //排序

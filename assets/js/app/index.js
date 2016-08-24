@@ -77,7 +77,7 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 		}, {
 			name: '年代',
 			field: 'year',
-			width: 200
+			width: 100
 		}, {
 			name: '类型',
 			field: 'genres',
@@ -85,11 +85,11 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 		}, {
 			name: '收藏数',
 			field: 'collect_count',
-			width: 200
+			width: 100
 		}]
 	});	
 
-	$('#search').click(function () {
+	$('#search, #tableRefresh').click(function () {
 		table.table('reload');
 	});
 
