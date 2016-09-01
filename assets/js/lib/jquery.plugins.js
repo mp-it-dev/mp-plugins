@@ -1372,8 +1372,8 @@ $.extend($.fn, {
             self.menu.menu();
             // 显示菜单
             self.menu.menu('show', {
-                left: e.clientX,
-                top: e.clientY,
+                left: e.pageX,
+                top: e.pageY,
                 args: $(this).parent()
             });
         });
@@ -1398,7 +1398,7 @@ $.extend($.fn, {
             menu.on('click', '.table-filter button', function (e) {
                 var val = menu.find('.table-filter input').val();
                 var th = menu.menu('getArgs');
-                
+
                 // 移除筛选值
                 $container.find('.table-th-menu').each(function () {
                     $(this).parent().removeData('value');
@@ -3727,16 +3727,17 @@ $.extend($.fn, {
     Menu.prototype.show = function (option) {
         var setting = this.setting;
         var ele = this.ele;
+        var pos = PluginDep.getPosition($('body'));
         this.args = option.args;
 
         // 先显示才能获取实际宽高
         ele.show();
 
-        if (option.left + ele.outerWidth() > $(win).width()) {
+        if (option.left + ele.outerWidth() > $(win).width() + pos.scrollLeft) {
             option.left = option.left - ele.outerWidth();
         }
 
-        if (option.top + ele.outerHeight() > $(win).height() ) {
+        if (option.top + ele.outerHeight() > $(win).height() + pos.scrollTop) {
             option.top = option.top - ele.outerHeight();
         }
 
