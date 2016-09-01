@@ -818,31 +818,35 @@ $.extend($.fn, {
             var col = colOptions[i],
                 menu = col.menu,
                 attr = 'data-field="' + col.field + '" data-field-index="' + i + '" onselectstart="return false;"',
-                sortClass = '';
+                colClass = '';
 
             if (col.hide) {
                 continue;
             }
 
-            if (menu && menu.sort) {
-                attr += ' data-sorder="' + (menu.sort.defaultOrder ? menu.sort.defaultOrder : '') + '"';
-                sortClass = ' table-sort';
+            if (menu) {
+                colClass = ' table-menu';
 
-                // 保存默认排序
-                if (!this.sname && menu.sort.defaultOrder) {
-                    this.sname = col.field;
-                    this.sorder = menu.sort.defaultOrder;
-                    sortClass += ' table-sort-active';
-                }
+                if (menu.sort) {
+                    attr += ' data-sorder="' + (menu.sort.defaultOrder ? menu.sort.defaultOrder : '') + '"';
+                    colClass += ' table-sort';
+
+                    // 保存默认排序
+                    if (!this.sname && menu.sort.defaultOrder) {
+                        this.sname = col.field;
+                        this.sorder = menu.sort.defaultOrder;
+                        colClass += ' table-sort-active';
+                    }
+                }                
             }
 
-            var $th = $('<th class="table-th' + sortClass + '" ' + attr +'></th>');
+            var $th = $('<th class="table-th' + colClass + '" ' + attr +'></th>');
 
             if (col.align) {
                 $th.css('text-align', col.align);
             }
 
-            $th.append('<div class="table-th-text">' + col.name + (sortClass ? '<span class="table-sort-icon"></span>' : '') + '</div>');
+            $th.append('<div class="table-th-text">' + col.name + (menu && menu.sort ? '<span class="table-sort-icon"></span>' : '') + '</div>');
             $th.append('<div class="table-th-resize"></div>');
 
             if (menu) {
@@ -1339,7 +1343,7 @@ $.extend($.fn, {
                     '<div class="ui-menu-item-icon">' +
                         '<i class="glyphicon glyphicon-th"></i>' +
                     '</div>' +
-                    '<div class="ui-menu-item-text">列</div>' +
+                    '<div class="ui-menu-item-text">列显示/隐藏</div>' +
                     '<ul class="ui-menu table-columns">' +
                         columns +
                     '</ul>' +
@@ -1368,8 +1372,8 @@ $.extend($.fn, {
             self.menu.menu();
             // 显示菜单
             self.menu.menu('show', {
-                left: e.clientX,
-                top: e.clientY,
+                left: e.pageX,
+                top: e.pageY,
                 args: $(this).parent()
             });
         });
@@ -1395,6 +1399,11 @@ $.extend($.fn, {
                 var val = menu.find('.table-filter input').val();
                 var th = menu.menu('getArgs');
 
+                // 移除筛选值
+                $container.find('.table-th-menu').each(function () {
+                    $(this).parent().removeData('value');
+                });
+
                 // 保存筛选值
                 th.data('value', val);
                 self.filter(+th.data('field-index'), val);
@@ -1405,6 +1414,11 @@ $.extend($.fn, {
                 if (e.which == 13) {
                     var val = this.value;
                     var th = menu.menu('getArgs');
+
+                    // 移除筛选值
+                    $container.find('.table-th-menu').each(function () {
+                        $(this).parent().removeData('value');
+                    });
 
                     // 保存筛选值
                     th.data('value', val);
@@ -3713,16 +3727,17 @@ $.extend($.fn, {
     Menu.prototype.show = function (option) {
         var setting = this.setting;
         var ele = this.ele;
+        var pos = PluginDep.getPosition($('body'));
         this.args = option.args;
 
         // 先显示才能获取实际宽高
         ele.show();
 
-        if (option.left + ele.outerWidth() > $(win).width()) {
+        if (option.left + ele.outerWidth() > $(win).width() + pos.scrollLeft) {
             option.left = option.left - ele.outerWidth();
         }
 
-        if (option.top + ele.outerHeight() > $(win).height() ) {
+        if (option.top + ele.outerHeight() > $(win).height() + pos.scrollTop) {
             option.top = option.top - ele.outerHeight();
         }
 

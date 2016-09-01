@@ -37,7 +37,7 @@
     background-clip: padding-box;
     cursor: default;
 }
-.table-container .table-sort:hover {
+.table-container .table-menu:hover {
     background: #efefef;
 }
 .table-container .table > thead > tr > th {
@@ -101,7 +101,7 @@
     position: absolute;
     right: 2px;
     top: 0;
-    width: 20px;
+    width: 12px;
     height: 100%;
     cursor: pointer;
 }
@@ -110,9 +110,14 @@
 }
 .table-container .table-th-menu .glyphicon {
     position: absolute;
-    left: 50%;
+    left: 0;
     top: 50%;
-    margin: -7px 0 0 -7px;
+    margin: -6px 0 0 0;
+    font-size: 12px;
+    color: #ccc;
+}
+.table-container .table-th-menu:hover .glyphicon {
+    color: #000;
 }
 .table-container .table-body .table-tr:first-child td {
     border-top: 0;
@@ -859,7 +864,7 @@
 
 /*右键菜单 start*/
 .ui-menu {
-    position: fixed;
+    position: absolute;
     z-index: 9999;
     min-width: 120px;
     margin: 0;
