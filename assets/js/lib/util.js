@@ -398,6 +398,22 @@
             parts[0] = parts[0].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + (separator || ','));
 
             return parts.join('.');
+        },
+
+        // 获取DOM视口信息，包括宽高、相对于body的left、top，以及body的scrollLeft、scrollTop
+        getPosition: function (ele) {
+            var eleRect = ele.getBoundingClientRect();
+
+            // IE8中没有width和height
+            if (eleRect.width === undefined) {
+                eleRect.width =  eleRect.right - eleRect.left;
+                eleRect.height =  eleRect.bottom - eleRect.top;
+            }
+
+            eleRect.scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft;
+            eleRect.scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+
+            return eleRect;
         }
     }
 

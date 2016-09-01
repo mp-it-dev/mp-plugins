@@ -238,12 +238,15 @@ $('#example-autoComolete').autoComplete({
         data: false,                //请求入参，不包括搜索关键字，搜索关键字会自动带入
         dataType: false,            //返回数据类型，支持jsonp
         dataField: 'data',          //返回数据的字段中那个字段表示数据列表，null表示返回数据即数据列表
-        searchField: 'keyword'      //搜索关键字名称
+        searchField: 'keyword',     //搜索关键字名称
+        delay: 200,                 //延迟加载时间
+        minKeywordLength: 0         //最小关键字长度，小于该长度时不发送请求
     },
     dataList: [],                   //数据列表，支持本地数据列表
     localSearchField: null,         //本地搜索字段
-    template: '&lt;td&gt;#{}&lt;/td&gt;', 	//列表模板
-    listWidth: false,               //列表宽度
+    template: '&lt;td&gt;#{}&lt;/td&gt;',       //列表模板
+    width: false,                   //列表宽度
+    maxHeight: 300,                 //列表最大高度
     maxNum: null,                   //最大显示条数
     autoHide: false,                //列表是否自动在3秒后隐藏
     callback: false,                //选中数据之后的回掉，参数为选中的数据
@@ -526,50 +529,57 @@ $('#example-uploadify').uploadify();
 							</code>
 							<code class="language-javascript">						
 $("#example-table").table({
-	url: "https://api.douban.com/v2/movie/top250?start=1",
-	crossDomain: true,
-	data: function () {
-		return {
-			keyword: $('#keyword').val()
-		};
-	},
-	indexField: "start",
-	sizeField: "count",
-	dataField: "subjects",
+	tableClass: 'table-condensed',
 	height: 400,
-	pageSize: 20,
+	url: 'http://192.168.4.86:100/Test/User/GetList',
+	dataType: 'jsonp',
+	jsonp: 'callback',
+	paging: {
+		enable: true,
+		pageSize: 20,
+		pageSizeArray: [20, 40, 60]
+	},
 	colOptions: [{
-		name: 'ID',
-		field: 'id',
+		name: '工号',
+		field: 'Badge',
+		width: 80,
 		edit: {
 			replace: function (rowData) {
-				return '&lt;input value="'+rowData.id+'" /&gt;';
+				return '&lt;input value="'+rowData.title+'" /&gt;';
 			}
 		},
-		sort: {
-			sname: 'id',
-			sorder: 'asc'
-		},
-		handler: function (value, data) {
-			return '&lt;a href="'+data.alt+'" target="_blank"&gt;'+data.id+'&lt;/a&gt;';
+		menu: {
+			sort: {
+				defaultOrder: 'asc'
+			}
 		}
 	}, {
-		name: '名称',
-		field: 'title'
+		name: '姓名',
+		field: 'Name',
+		width: 100,
+		menu: {
+			sort: true,
+			filter: {
+				async: true
+			}
+		}
 	}, {
-		name: '原始名称',
-		field: 'original_title'
+		name: '姓名拼音',
+		field: 'SpellName',
+		width: 150
 	}, {
-		name: '年代',
-		field: 'year'
+		name: '邮箱',
+		field: 'Email',
+		minWidth: 200
 	}, {
-		name: '类型',
-		field: 'genres'
+		name: '顶级部门名称',
+		field: 'ZeroDepName',
+		width: 200
 	}, {
-		name: '收藏数',
-		field: 'collect_count'
-	}],
-	tableClass: "table-hover"
+		name: '一级部门名称',
+		field: 'OneDepName',
+		width: 200
+	}]
 });
 							</code>
 						</pre>
@@ -584,7 +594,17 @@ $("#example-table").table({
     tableClass      : '',                       //自定义table类名
     maxHeight       : false,                    //table容器最大高度
     height          : false,                    //table容器高度
-    headerClass     : 'info',                   //表头行类
+
+    /*
+     * {
+     *     cellFilter: {
+     *         button: 'selector'
+     *     },
+     *     colShow: {
+     *         button: 'selector'
+     *     }
+     * }         
+     */
 
     //单元格选项
     checkbox        : false,                    //是否显示checkbox
@@ -593,25 +613,27 @@ $("#example-table").table({
     colParam        : false,                    //列自定义参数，对象形式，支持函数返回
     colOptions      : [],                       //列设置
     groupHeaders    : false,                    //多表头设置
-    align           : false,                    //全局设置对齐方式
-    headerAlign     : false,                    //表头对齐方式
 
     /*
      * colOptions格式：[{
      *     name: 'ID',                          //列显示名称
      *     field: 'id',                         //列字段
-     *     width: 100,                          //列宽
+     *     width: false,                        //列宽，默认自适应
+     *     minWidth: false,                     //最小列宽
      *     edit: {                              //是否可编辑，默认为false
-     *         replace: '&lt;input /&gt;',		//编辑元素
+     *         replace: '<input />',            //编辑元素
      *         callback: function () {},        //编辑回调函数
      *     },
      *     align: false,                        //对齐方式
-     *     headerAlign: false,                  //表头对齐方式
-     *     css: false,                          //设置css样式
-     *     class: false,                        //自定义类
-     *     sort: {
-     *         sname: 'id',                     //排序字段
-     *         sorder: 'asc',                   //排序方式，asc升序，desc降序
+     *     hide: false,                         //是否显示列
+     *     menu: {                              //列操作菜单       
+     *         sort: {                          //排序
+     *             defaultOrder: 'asc'          //默认排序方式
+     *         },
+     *         filter: {                        //筛选
+     *             async: true                  //是否远程筛选
+     *         },
+     *         colShow: true                    //显示隐藏列
      *     },
      *     numberFormat: {
      *         toThousands: true,
@@ -634,7 +656,6 @@ $("#example-table").table({
     dataType            : 'json',               //返回数据类型
     jsonp               : 'callback',           //跨域回调函数名称
     dataField           : 'data',               //json数组字段名,
-    autoLoad            : true,                 //是否自动加载数据
 
     //分页选项
     paging              : {
@@ -645,18 +666,20 @@ $("#example-table").table({
         totalField      : 'total',              //总条数字段名
         pageIndex       : 1,                    //从第几页开始
         pageSize        : 20,                   //每页显示多少条数据
-        pageSizeArray   : false,                //每页显示多少条数据的选择数组
-        pageLength      : 5,                    //显示的页码数
         pageInfo        : true,                 //是否显示页码信息
+        pageLength      : 5,                    //显示的页码数
+        pageSizeArray   : false,                //每页显示多少条数据的选择数组
         skipPage        : true                  //是否启用跳页
     },
 
     //表头选项
     resizable           : true,                 //是否可拖动列宽
-    sortNameField       : 'sname',              //排序字段字段名
-    sortOrderField      : 'sorder',             //排序方式字段名
-    sortName            : '',                   //默认排序字段
-    sortOrder           : 'asc',                //默认排序方式
+    snameField          : 'sname',              //排序字段字段名
+    sorderField         : 'sorder',             //排序方式字段名
+    ascField            : 'asc',                //升序标识名
+    descField           : 'desc',               //降序标识名
+    filterField         : 'filter',             //筛选字段名称
+    keywordField        : 'keyword',            //关键字字段名称
 
     resultVerify        : false,                //返回结果验证
         

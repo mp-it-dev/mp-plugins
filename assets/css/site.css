@@ -1,5 +1,4 @@
 @charset "utf-8";
-
 .navbar-gray .navbar-brand {
     font-family: '隶书';
     font-size: 20px;
@@ -173,4 +172,14 @@ pre code.language-javascript:after {
 .order-list ol {
     padding-left: 2em;
     list-style-type: circle;
+}
+
+.imglist li {
+    float: left;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+.imglist img {
+    width: 100px;
+    height: 100px;
 }
