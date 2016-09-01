@@ -1343,7 +1343,7 @@ $.extend($.fn, {
                     '<div class="ui-menu-item-icon">' +
                         '<i class="glyphicon glyphicon-th"></i>' +
                     '</div>' +
-                    '<div class="ui-menu-item-text">列</div>' +
+                    '<div class="ui-menu-item-text">列显示/隐藏</div>' +
                     '<ul class="ui-menu table-columns">' +
                         columns +
                     '</ul>' +
