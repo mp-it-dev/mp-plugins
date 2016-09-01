@@ -535,7 +535,8 @@ $("#example-table").table({
 	}, {
 		name: '姓名拼音',
 		field: 'SpellName',
-		width: 150
+		width: 150,
+		menu: true
 	}, {
 		name: '邮箱',
 		field: 'Email',
@@ -564,17 +565,6 @@ $("#example-table").table({
     maxHeight       : false,                    //table容器最大高度
     height          : false,                    //table容器高度
 
-    /*
-     * {
-     *     cellFilter: {
-     *         button: 'selector'
-     *     },
-     *     colShow: {
-     *         button: 'selector'
-     *     }
-     * }         
-     */
-
     //单元格选项
     checkbox        : false,                    //是否显示checkbox
     rownum          : false,                    //是否显示行号
@@ -595,14 +585,13 @@ $("#example-table").table({
      *     },
      *     align: false,                        //对齐方式
      *     hide: false,                         //是否显示列
-     *     menu: {                              //列操作菜单       
+     *     menu: {                              //列操作菜单，只要该值不为false，则列显示/隐藏功能启用       
      *         sort: {                          //排序
      *             defaultOrder: 'asc'          //默认排序方式
      *         },
      *         filter: {                        //筛选
      *             async: true                  //是否远程筛选
-     *         },
-     *         colShow: true                    //显示隐藏列
+     *         }
      *     },
      *     numberFormat: {
      *         toThousands: true,

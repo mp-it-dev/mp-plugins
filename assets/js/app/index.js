@@ -69,7 +69,8 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 		}, {
 			name: '姓名拼音',
 			field: 'SpellName',
-			width: 150
+			width: 150,
+			menu: true
 		}, {
 			name: '邮箱',
 			field: 'Email',
