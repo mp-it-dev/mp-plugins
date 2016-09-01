@@ -54,6 +54,9 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 			menu: {
 				sort: {
 					defaultOrder: 'asc'
+				},
+				filter: {
+					async: true
 				}
 			}
 		}, {

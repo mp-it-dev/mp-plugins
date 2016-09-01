@@ -1398,6 +1398,11 @@ $.extend($.fn, {
             menu.on('click', '.table-filter button', function (e) {
                 var val = menu.find('.table-filter input').val();
                 var th = menu.menu('getArgs');
+                
+                // 移除筛选值
+                $container.find('.table-th-menu').each(function () {
+                    $(this).parent().removeData('value');
+                });
 
                 // 保存筛选值
                 th.data('value', val);
@@ -1409,6 +1414,11 @@ $.extend($.fn, {
                 if (e.which == 13) {
                     var val = this.value;
                     var th = menu.menu('getArgs');
+
+                    // 移除筛选值
+                    $container.find('.table-th-menu').each(function () {
+                        $(this).parent().removeData('value');
+                    });
 
                     // 保存筛选值
                     th.data('value', val);
