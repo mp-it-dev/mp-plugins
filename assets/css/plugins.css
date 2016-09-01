@@ -149,6 +149,12 @@
 .table-sort-active[data-sorder="desc"] .table-sort-icon:after {
     margin-top: -8px;
 }
+.table-sort-active[data-sorder="asc"] .table-sort-icon:before {
+    border-bottom-color: #428bca;
+}
+.table-sort-active[data-sorder="desc"] .table-sort-icon:after {
+    border-top-color: #428bca;
+}
 .table-sort-active[data-sorder="asc"] .table-sort-icon:after,
 .table-sort-active[data-sorder="desc"] .table-sort-icon:before {
     display: none;
