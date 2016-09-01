@@ -35,6 +35,10 @@
     position: relative;
     background-color: transparent;
     background-clip: padding-box;
+    cursor: default;
+}
+.table-container .table-sort:hover {
+    background: #efefef;
 }
 .table-container .table > thead > tr > th {
     -webkit-user-select: none;
@@ -81,79 +85,86 @@
     -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
     box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
 }
-.table-container .table-th-checkbox,
-.table-container .table-td-checkbox {
-    text-align: center;
-    cursor: pointer;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-.table-container .table-td-rownum {
-    text-align: center;
-}
-.table-container .table-td-filter {
-    background-color: #ddd;
-}
 .table-container .table-th-resize {
     position: absolute;
-    right: 0px;
+    right: 0;
     top: 0;
     z-index: 1;
-    width: 1px;
+    width: 2px;
     height: 100%;
-    cursor: col-resize;
-    background-color: #ddd;
+    cursor: e-resize;
 }
 .table-container .table-border .table-th-resize {
     right: -1px;
 }
+.table-container .table-th-menu {
+    position: absolute;
+    right: 2px;
+    top: 0;
+    width: 20px;
+    height: 100%;
+    cursor: pointer;
+}
+.table-container .table-th-menu:hover {
+    background-color: #ddd;
+}
+.table-container .table-th-menu .glyphicon {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin: -7px 0 0 -7px;
+}
 .table-container .table-body .table-tr:first-child td {
     border-top: 0;
 }
-.table-sort:hover {
-    cursor: pointer;
+.table-checkbox {
+    width: 14px;
+    height: 14px;
 }
-.table-sort .table-sort-icon {
+.table-sort-icon {
+    display: inline-block;
+    position: relative;
+    height: 100%;
+    margin-left: 5px;
+}
+.table-sort-icon:before,
+.table-sort-icon:after {
+    content: "";
     position: absolute;
     top: 50%;
-    right: 0;
-    border: 4px solid transparent;
-    border-top-width: 6px;
+    border: solid transparent;
+    border-width: 0 4px;
+}
+.table-sort-icon:before {
+    margin-top: -11px;
     border-bottom-width: 6px;
-    display: none;
+    border-bottom-color: #ccc;
 }
-.table-sort:hover .table-sort-icon,
-.table-sort-active .table-sort-icon {
-    display: block;
+.table-sort-icon:after {
+    margin-top: -4px;
+    border-top-width: 6px;
+    border-top-color: #ccc;
 }
-.table-sort[data-sorder="asc"] .table-sort-icon {
-    border-bottom-color: #000;
+.table-sort-active[data-sorder="asc"] .table-sort-icon:before,
+.table-sort-active[data-sorder="desc"] .table-sort-icon:after {
     margin-top: -8px;
 }
-.table-sort-active[data-sorder="asc"] .table-sort-icon {
-    border-bottom-color: red;
-}
-.table-sort[data-sorder="desc"] .table-sort-icon {
-    border-top-color: #000;
-    margin-top: -4px;
-}
-.table-sort-active[data-sorder="desc"] .table-sort-icon {
-    border-top-color: red;
+.table-sort-active[data-sorder="asc"] .table-sort-icon:after,
+.table-sort-active[data-sorder="desc"] .table-sort-icon:before {
+    display: none;
 }
 .table-drag {
-    cursor: col-resize !important;
+    cursor: e-resize !important;
 }
 .table-drag-line {
+    display: none;
     position: absolute;
     left: 0;
     top: 0;
-    width: 2px;
+    z-index: 3;
+    width: 1px;
     height: 100%;
     background-color: #777;
-    z-index: 3;
-    display: none;
 }
 .table-loading {
     position: absolute;
@@ -173,12 +184,30 @@
     border: 2px solid #fbd850;
     display: none;
 }
+.table-columns {
+    background-color: #fff;
+}
+.table-columns li:hover {
+    background-color: #e3e8f7;
+}
 .table-columns li label {
     display: block;
-    padding: 3px 20px;
-    clear: both;
+    padding: 5px 20px;
+    margin: 0;
     font-weight: normal;
-    line-height: 1.428571429;
+    line-height: 1.5;
+    white-space: nowrap;
+}
+.table-columns li label input {
+    position: relative;
+    top: 2px;
+}
+.table-filter {
+    padding: 10px;
+    background-color: #fff;
+}
+.table-filter input.form-control {
+    width: 150px;
 }
 /*table end*/
 
@@ -205,7 +234,7 @@
     line-height: 2;
     text-align: center;
     border: 1px solid #d4d4d4;
-    border-right: none;
+    border-right-width: 0;
     background-color: #fff;
     color: #428bca;
     border-radius: 0;
@@ -213,10 +242,10 @@
     text-decoration: none;
 }
 .paging-btn-first {
-    border-radius: 5px 0 0px 5px;
+    border-radius: 3px 0 0px 3px;
 }
 .paging-btn-last {
-    border-radius: 0 5px 5px 0px;
+    border-radius: 0 3px 3px 0px;
     border-right: 1px solid #d4d4d4;
 }
 .paging-btn:hover {
@@ -247,6 +276,7 @@
     float: right;
 }
 .pagination .pageinfo {
+    display: inline-block;
     line-height: 30px;
 }
 .pagination .pageinfo-text {
@@ -822,44 +852,72 @@
 /*resize end*/
 
 /*右键菜单 start*/
-.right-menu {
+.ui-menu {
     position: fixed;
     z-index: 9999;
-    list-style: none;
+    min-width: 120px;
     margin: 0;
     padding: 0;
     border: 1px solid #ddd;
-    border-top: 0;
-    background-color: #fff;
     border-radius: 3px;
     display: none;
+    list-style: none;
 }
-.right-menu li {
+.ui-menu-item {
+    position: relative;
+    padding: 6px 10px;
     border-top: 1px solid #ddd;
-    min-width: 100px;
-    padding: 0 10px;
     font-size: 12px;
-    line-height: 30px;
-    overflow: hidden;
+    line-height: 1.5;
+    background-color: #fff;
 }
-.right-menu li:hover {
-    background-color: #eee;
-    cursor: pointer;
+.ui-menu-item:first-child {
+    border-top-width: 0;
 }
-.right-menu-icon,
-.right-menu-text {
-    display: inline-block;
-    vertical-align: middle;
+.ui-menu-item.hover {
+    background-color: #e3e8f7;
+    cursor: default;
 }
-.right-menu-icon {
-    width: 20px;
-    height: 20px;
+.ui-menu-item-icon,
+.ui-menu-children-icon {
+    position: absolute;
+    top: 6px;
+    display: block;
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
     text-align: center;
-    line-height: 20px;
-    overflow: hidden;
 }
-.right-menu-text {
-    padding-left: 10px;
+.ui-menu-item-icon {
+    left: 10px;
+}
+.ui-menu-children-icon {
+    width: 8px;
+    right: 10px;
+}
+.ui-menu-children-icon:before {
+    content: "";
+    display: block;
+    position: relative;
+    top: 4px;
+    border: solid transparent;
+    border-width: 5px 0 5px 8px;
+    border-left-color: #333;
+}
+.ui-menu-item-text {
+    display: block;
+    margin: 0 20px;
+    padding: 0 5px;
+    border-left: 1px solid #ddd;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.ui-menu-item .ui-menu {
+    display: none;
+    position: absolute;
+    left: 100%;
+    top: 0;
 }
 /*右键菜单 end*/
 

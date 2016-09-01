@@ -32,62 +32,60 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 	});
 	
 	var table = $("#table").table({
+		tableClass: 'table-condensed',
 		height: 400,
-		tableClass: 'table-border',
-		menu: {
-			cellFilter: '#tableCellFilter',
-			colShow: '#tableColShow'
-		},
-		url: "https://api.douban.com/v2/movie/top250",
+		url: 'http://192.168.4.86:100/Test/User/GetList',
 		dataType: 'jsonp',
 		jsonp: 'callback',
-		data: function () {
-			return {
-				keyword: $('#keyword').val()
-			};
-		},
-		dataField: "subjects",
 		paging: {
 			enable: true,
-			indexField: "start",
-			sizeField: "count",
-			pageSize: 20
+			pageSize: 20,
+			pageSizeArray: [20, 40, 60]
 		},
 		colOptions: [{
-			name: '名称',
-			field: 'title',
+			name: '工号',
+			field: 'Badge',
+			width: 80,
 			edit: {
-				replace: function (rowData) {
-					return '<input value="'+rowData.title+'" />';
+				replace: function (data) {
+					return '<input value="' + data.Badge + '" />';
 				}
 			},
-			sort: {
-				sname: 'title',
-				sorder: 'asc'
-			},
-			handler: function (value, data) {
-				return '<a href="'+data.alt+'" target="_blank">'+data.title+'</a>';
+			menu: {
+				sort: {
+					defaultOrder: 'asc'
+				}
 			}
 		}, {
-			name: '原始名称',
-			field: 'original_title',
-			width: 300
+			name: '姓名',
+			field: 'Name',
+			width: 100,
+			menu: {
+				sort: true,
+				filter: {
+					async: true
+				}
+			}
 		}, {
-			name: '年代',
-			field: 'year',
+			name: '姓名拼音',
+			field: 'SpellName',
+			width: 150
+		}, {
+			name: '邮箱',
+			field: 'Email',
+			minWidth: 200
+		}, {
+			name: '顶级部门名称',
+			field: 'ZeroDepName',
 			width: 200
 		}, {
-			name: '类型',
-			field: 'genres',
-			width: 200
-		}, {
-			name: '收藏数',
-			field: 'collect_count',
+			name: '一级部门名称',
+			field: 'OneDepName',
 			width: 200
 		}]
 	});	
 
-	$('#search').click(function () {
+	$('#search, #tableRefresh').click(function () {
 		table.table('reload');
 	});
 
@@ -201,32 +199,5 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 		name: 'test_multi_select',
 		search: true,
 		multi: true
-	});
-
-	var rMenu = $.rightMenu({
-		menu: [{
-			icon: '<i class="glyphicon glyphicon-plus" style="color: green;"></i>',
-			text: '新建目录',
-			callback: function (e, obj) {
-				console.log('新建目录');
-			}
-		}, {
-			icon: '<i class="glyphicon glyphicon-remove" style="color: red;"></i>',
-			text: '删除目录',
-			callback: function (e) {
-				console.log('删除目录');
-			}
-		}, {
-			icon: '<i class="glyphicon glyphicon-upload" style="color: blue;"></i>',
-			text: '上传文件',
-			callback: function (e) {
-				console.log('上传文件');
-			}
-		}]
-	});
-
-	$('#table').on('contextmenu', '.table-body .table-tr', function (e) {
-		rMenu.show(e.clientX, e.clientY, this);
-		e.preventDefault();
 	});
 });

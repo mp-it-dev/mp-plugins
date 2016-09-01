@@ -14,12 +14,12 @@
         <div class="row">
             <label class="control-label form-control-static col-md-2 text-right">选组织架构：</label>
             <div class="col-md-10">
-                <button type="button" class="btn btn-primary selector-organiztion" data-type="singlePeople">单人</button>
-                <button type="button" class="btn btn-success selector-organiztion" data-type="multiPeople">多人</button>
-                <button type="button" class="btn btn-info selector-organiztion" data-type="singleDep">单部门</button>
-                <button type="button" class="btn btn-warning selector-organiztion" data-type="multiDep">多部门</button>
-                <button type="button" class="btn btn-danger selector-organiztion" data-type="singleJob">单职位</button>
-                <button type="button" class="btn btn-inverse selector-organiztion" data-type="multiJob">多职位</button>
+                <button type="button" class="btn btn-primary selector-organization" data-type="singlePeople">单人</button>
+                <button type="button" class="btn btn-success selector-organization" data-type="multiPeople">多人</button>
+                <button type="button" class="btn btn-info selector-organization" data-type="singleDep">单部门</button>
+                <button type="button" class="btn btn-warning selector-organization" data-type="multiDep">多部门</button>
+                <button type="button" class="btn btn-danger selector-organization" data-type="singleJob">单职位</button>
+                <button type="button" class="btn btn-inverse selector-organization" data-type="multiJob">多职位</button>
             </div>
         </div>
         <div class="row" style="margin-top: 20px;">
@@ -67,7 +67,7 @@
     require(['jquery', 'selector'], function($, selector) {
         selector.apiUrl = 'http://192.168.4.86:100/Selector/';
 
-        $('.selector-organiztion').on('click', function() {
+        $('.selector-organization').on('click', function() {
             var type = $(this).data('type');
 
             selector[type]({

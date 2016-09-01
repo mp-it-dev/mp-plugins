@@ -389,7 +389,7 @@
                 contentHTML += '<div class="layer-waiting"><img src="' + settings.imgPath + 'loading_16.gif"/>&nbsp;&nbsp;加载中...</div>';
             } else {
                 //内容区域是一段html字符串
-                var html = c.html || "&nbsp;";
+                var html = c.html || '';
 
                 if (c.icon) {
                     html =  '<div class="layer-table">' +

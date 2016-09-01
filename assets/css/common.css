@@ -72,11 +72,13 @@ a:hover {
     white-space: nowrap;
 }
 
-input[type=checkbox], input[type=radio] {
-    margin: 0;
-    position: relative;
-    top: 2px;
-    top: 1px \9;
+.checkbox-inline, .radio-inline {
+    padding-left: 15px;
+}
+
+.checkbox-inline input[type=checkbox],
+.radio-inline input[type=radio] {
+    margin-left: -15px;
 }
 
 /*去除IE输入框后面的x和眼睛*/
@@ -271,11 +273,18 @@ input[type=checkbox], input[type=radio] {
 }
 .navbar-gray .navbar-brand {
     text-shadow: 0 1px 0 #fff;
+    color: #666;
+}
+.navbar-gray .navbar-brand:hover {
+    color: #222;
 }
 .navbar-gray .nav > li > a {
     color: #777;
     text-decoration: none;
     text-shadow: 0 1px 0 #fff;
+}
+.navbar-gray .nav > li > a:hover {
+    color: #222;
 }
 .navbar-gray .nav > .active > a, 
 .navbar-gray .nav > .active > a:hover, 
@@ -286,9 +295,17 @@ input[type=checkbox], input[type=radio] {
     -webkit-box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
     -moz-box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
     box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
+    background-image: none;
 }
-.navbar-gray .navbar-toggle .icon-bar {
-    background-color: #777;
+.navbar-gray .dropdown-menu > li > a:hover {
+    
+}
+.navbar-gray .dropdown-menu > .active > a, 
+.navbar-gray .dropdown-menu > .active > a:focus, 
+.navbar-gray .dropdown-menu > .active > a:hover {
+    color: #555;
+    background-color: #e5e5e5;
+    background-image: none;
 }
 .navbar-gray .navbar-link {
     color: #777;
@@ -296,6 +313,37 @@ input[type=checkbox], input[type=radio] {
 /*导航栏自定义样式 end*/
 
 /*panel样式重写 start*/
+.panel-info {
+    border-color: #2aabd2;
+}
+.panel-info > .panel-heading {
+    color: #fff;
+    background-image: -moz-linear-gradient(top, #5bc0de, #2aabd2);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#5bc0de), to(#2aabd2));
+    background-image: -webkit-linear-gradient(top, #5bc0de, #2aabd2);
+    background-image: -o-linear-gradient(top, #5bc0de, #2aabd2);
+    background-image: linear-gradient(to bottom, #5bc0de, #2aabd2);
+    background-repeat: repeat-x;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff5bc0de', endColorstr='#ff2aabd2', GradientType=0);
+    border-color: #2aabd2;
+}
+.panel-primary {
+    border-color: #0044cc;
+}
+.panel-primary > .panel-heading {
+    color: #fff;
+    background-image: -moz-linear-gradient(top, #0088cc, #0044cc);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0088cc), to(#0044cc));
+    background-image: -webkit-linear-gradient(top, #0088cc, #0044cc);
+    background-image: -o-linear-gradient(top, #0088cc, #0044cc);
+    background-image: linear-gradient(to bottom, #0088cc, #0044cc);
+    background-repeat: repeat-x;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0044cc', GradientType=0);
+    border-color: #0044cc;
+}
+.panel-default > .panel-heading {
+    border-color: #e8e8e8;
+}
 .panel-heading {
     position: relative;
 }
@@ -315,15 +363,6 @@ input[type=checkbox], input[type=radio] {
     background-color: #535a6c;
     color: #fff;
 }
-.panel-info {
-    border-color: #17c3e5;
-}
-.panel-info > .panel-heading {
-    color: #fff;
-    background-color: #17c3e5;
-    border-color: #17c3e5;
-    background-image: none;
-}
 .panel[data-expand] > .panel-heading:before {
     display: block;
     font-family: "foundation-icons";
@@ -331,7 +370,6 @@ input[type=checkbox], input[type=radio] {
     line-height: 1;
     float: left;
     position: relative;
-    top: 3px;
     margin-right: 5px;
 }
 .panel[data-expand="N"] > .panel-heading:before {
@@ -361,8 +399,6 @@ input[type=checkbox], input[type=radio] {
     background-repeat: repeat-x;
     border-color: #0044cc #0044cc #002a80;
     border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0044cc', GradientType=0);
-    filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
 }
 
 .btn-primary:hover, 
@@ -405,15 +441,11 @@ fieldset[disabled] .btn-primary:hover {
     width: 100%;
 }
 .item-name {
-    width: 100px;
-    margin-right: 15px;
-    margin-bottom: 0;
-    text-align: right;
     display: table-cell;
-    vertical-align: middle;
-}
-.item-name.required {
-    position: relative;
+    width: 100px;
+    margin: 0;
+    padding: 7px 10px 0 0;
+    vertical-align: top;
 }
 .item-name.required:before {
     content: "*";
@@ -424,11 +456,17 @@ fieldset[disabled] .btn-primary:hover {
 .item-control {
     display: table-cell;
     vertical-align: middle;
-    padding-left: 5px;
 }
 .item-static {
     display: table-cell;
-    vertical-align: middle;
-    padding-left: 5px;
+    padding-top: 7px;
+}
+.item-bordered {
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #eee;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
 }
 /*表单行item end*/
