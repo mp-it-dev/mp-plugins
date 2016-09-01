@@ -2082,7 +2082,7 @@ $.extend($.fn, {
                     '<div class="ui-select-caret"><b></b></div>' +
                 '</div>' +
                 '<div class="ui-select-box">'+
-                    (setting.search ? '<div class="ui-select-search"><input type="text"></div>' : '') +
+                    (setting.search ? '<div class="ui-select-search"><input class="form-control" type="text"></div>' : '') +
                     '<div class="ui-select-list"><table></table></div>' +
                 '</div>' +
                 '<input class="ui-select-value" type="hidden" name="' + setting.name + '" />' +
