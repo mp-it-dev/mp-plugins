@@ -337,17 +337,6 @@ $.extend($.fn, {
         maxHeight       : false,                    //table容器最大高度
         height          : false,                    //table容器高度
 
-        /*
-         * {
-         *     cellFilter: {
-         *         button: 'selector'
-         *     },
-         *     colShow: {
-         *         button: 'selector'
-         *     }
-         * }         
-         */
-
         //单元格选项
         checkbox        : false,                    //是否显示checkbox
         rownum          : false,                    //是否显示行号
@@ -368,14 +357,13 @@ $.extend($.fn, {
          *     },
          *     align: false,                        //对齐方式
          *     hide: false,                         //是否显示列
-         *     menu: {                              //列操作菜单       
+         *     menu: {                              //列操作菜单，只要该值不为false，则列显示/隐藏功能启用       
          *         sort: {                          //排序
          *             defaultOrder: 'asc'          //默认排序方式
          *         },
          *         filter: {                        //筛选
          *             async: true                  //是否远程筛选
-         *         },
-         *         colShow: true                    //显示隐藏列
+         *         }
          *     },
          *     numberFormat: {
          *         toThousands: true,
@@ -495,6 +483,8 @@ $.extend($.fn, {
         if (this.options.url) {
             this.getPageData();
         } else {
+            // 备份数据
+            this.dataList = options.dataList.slice(0);
             this.createTbody();
         }
     }
@@ -570,6 +560,8 @@ $.extend($.fn, {
                             return;
                         }
                         
+                        // 备份数据
+                        self.dataList = options.dataList.slice(0);
                         self.createTbody();
                     },
                     error           : options.onRequestError,
@@ -614,6 +606,8 @@ $.extend($.fn, {
                         return;
                     }
                     
+                    // 备份数据
+                    self.dataList = options.dataList.slice(0);
                     self.createTbody();
                 },
                 error: options.onRequestError,
@@ -659,9 +653,6 @@ $.extend($.fn, {
             options = this.options,
             colOptions = options.colOptions,
             $container = this.container;
-
-        // 备份数据
-        this.dataList = options.dataList.slice(0);
 
         setTimeout(function () {
             var $thead = $container.find('.table-head'),
