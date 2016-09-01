@@ -37,7 +37,7 @@
     background-clip: padding-box;
     cursor: default;
 }
-.table-container .table-sort:hover {
+.table-container .table-menu:hover {
     background: #efefef;
 }
 .table-container .table > thead > tr > th {
@@ -113,6 +113,10 @@
     left: 50%;
     top: 50%;
     margin: -7px 0 0 -7px;
+    color: #ccc;
+}
+.table-container .table-th-menu:hover .glyphicon {
+    color: #000;
 }
 .table-container .table-body .table-tr:first-child td {
     border-top: 0;
