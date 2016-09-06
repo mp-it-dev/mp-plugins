@@ -275,9 +275,9 @@ $.extend($.fn, {
          * [reload 重新加载]
          * @return {[type]} [description]
          */
-        reload: function (async, data) {
+        reload: function (async, pageIndex, data) {
             return this.each(function () {
-                $(this).data(namespace).reload(async, data);                
+                $(this).data(namespace).reload(async, pageIndex, data);                
             });
         },
 
@@ -493,7 +493,7 @@ $.extend($.fn, {
      * [getPageData 获取远程数据]
      * @return {[type]}           [description]
      */
-    Table.prototype.getPageData = function (data) {
+    Table.prototype.getPageData = function (pageIndex, data) {
         var self = this,
             options = this.options,
             paging = options.paging,
@@ -523,7 +523,7 @@ $.extend($.fn, {
 
         if (paging.enable) {
             if (this.pager) {
-                this.pager.pager('reload', param);
+                this.pager.pager('reload', pageIndex, param);
             } else {
                 ajaxOpt = {
                     url             : options.url,
@@ -1003,14 +1003,14 @@ $.extend($.fn, {
      * [reload 重新请求数据并加载表格]
      * @return {[type]} [description]
      */
-    Table.prototype.reload = function (async, data) {
+    Table.prototype.reload = function (async, pageIndex, data) {
         var options = this.options;
         async = async === undefined ? true : async;
 
         this.container.find('.table-checkbox').prop('checked', false);
 
         if (async) {
-            this.getPageData(data);
+            this.getPageData(pageIndex, data);
         } else {
             this.createTbody();
         }
@@ -1858,12 +1858,14 @@ $.extend($.fn, {
      * @param  {[type]} data [description]
      * @return {[type]}      [description]
      */
-    Pager.prototype.reload = function (data) {        
+    Pager.prototype.reload = function (pageIndex, data) {        
         if (typeof data != 'undefined') {
             this.options.data = data;
         }
 
-        this.requestData(1);
+        pageIndex = pageIndex === undefined ? this.options.pageIndex : pageIndex;
+
+        this.requestData(pageIndex);
     }
 
     //销毁组件
@@ -2005,6 +2007,21 @@ $.extend($.fn, {
             return this.each(function () {
                 $(this).data(namespace).setValue(value);
             });
+        },
+
+        //获取值
+        getValue: function () {
+            return this.eq(0).data(namespace).getValue();
+        },
+
+        //获取值
+        getText: function () {
+            return this.eq(0).data(namespace).getText();
+        },
+
+        //获取选中数据
+        getSelectedData: function () {
+            return this.eq(0).data(namespace).getSelectedData();
         },
 
         //销毁组件
@@ -2254,7 +2271,7 @@ $.extend($.fn, {
             throw new Error('Value can not be an array when multi option is false!');
         }
 
-        if ($.isArray(value)) {
+        if (!$.isArray(value)) {
             value = [value];
         }
 
@@ -2263,7 +2280,7 @@ $.extend($.fn, {
             var key = setting.valueField ? dataList[i][setting.valueField] : dataList[i];
 
             for (var j = 0, jLen = value.length; j < jLen; j++) {
-                if (key === value[j]) {
+                if ('' + key === '' + value[j]) {
                     this.selectedData.push(dataList[i]);
                 }
             }
@@ -2289,6 +2306,30 @@ $.extend($.fn, {
         if (!isSame) {
             this.setSelect();
         }
+    }
+
+    /**
+     * [getValue 获取选中值]
+     * @param {[type]} value [description]
+     */
+    UiSelect.prototype.getValue = function () {
+        return this.ele.find('.ui-select-value').val();
+    }
+
+    /**
+     * [getText 获取选中文本]
+     * @param {[type]} value [description]
+     */
+    UiSelect.prototype.getText = function () {
+        return this.ele.find('.ui-select-text').val();
+    }
+
+    /**
+     * [getSelectedData 获取选中数据]
+     * @param {[type]} value [description]
+     */
+    UiSelect.prototype.getSelectedData = function () {
+        return this.selectedData;
     }
 
     /**
