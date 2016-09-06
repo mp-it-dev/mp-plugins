@@ -680,8 +680,8 @@ $.extend($.fn, {
 
             //还原最后一列列宽
             if ($thead.data('minusWidth')) {
-                //var w = Math.max(parseInt($theadLastTh[0].style.width) || $theadLastTh.width(), 40);
-                //$theadLastTh.width(w + sWidth);
+                var w = Math.max(parseInt($theadLastTh[0].style.width) || $theadLastTh.width(), 40);
+                $theadLastTh.width(w + sWidth);
                 $thead.css('padding-right', 1);
                 $tbody.css('padding-right', 1);
                 $thead.removeData('minusWidth');
@@ -689,8 +689,8 @@ $.extend($.fn, {
 
             //出现竖直滚动条则设置padding-right
             if ($tbodyTable.outerHeight(true) > $tbody.outerHeight(true)) {
-                //var w = Math.max(parseInt($theadLastTh[0].style.width) || $theadLastTh.width(), 40);
-                //$theadLastTh.width(w - sWidth);
+                var w = Math.max(parseInt($theadLastTh[0].style.width) || $theadLastTh.width(), 40);
+                $theadLastTh.width(w - sWidth);
                 $thead.css('padding-right', sWidth + 1);
                 $tbody.css('padding-right', sWidth + 1);
                 $thead.data('minusWidth', true);
@@ -2060,7 +2060,7 @@ $.extend($.fn, {
         template        : '<td>#{}</td>',   // 模板
         textField       : '',               // text字段名
         valueField      : '',               // value字段名
-        seprator        : ',',              // 多选值分隔符
+        separator       : ',',              // 多选值分隔符
         disabled        : false,            // 是否禁用
         search          : false,            // 是否搜索
         multi           : false             // 是否多选
