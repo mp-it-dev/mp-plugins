@@ -37,6 +37,7 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 		url: 'http://192.168.4.86:100/Test/User/GetList',
 		dataType: 'jsonp',
 		jsonp: 'callback',
+		rownum: true,
 		paging: {
 			enable: true,
 			pageSize: 20,
@@ -46,6 +47,7 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 			name: '工号',
 			field: 'Badge',
 			width: 80,
+			fixed: true,
 			edit: {
 				replace: function (data) {
 					return '<input value="' + data.Badge + '" />';
@@ -72,8 +74,7 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 		}, {
 			name: '姓名拼音',
 			field: 'SpellName',
-			width: 150,
-			menu: true
+			width: 150
 		}, {
 			name: '邮箱',
 			field: 'Email',

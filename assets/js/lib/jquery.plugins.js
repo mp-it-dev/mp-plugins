@@ -240,19 +240,19 @@ $.extend($.fn, {
      * @type {Object}
      */
     var methods = {
-        init: function (options) {
+        init: function (option) {
             methods.destroy.call(this);
 
             return this.each(function () {
                 var $this = $(this);
 
-                if (!options.colOptions || options.colOptions.length == 0) {
+                if (!option.colOptions || option.colOptions.length == 0) {
                     return false;
                 }
 
-                var settings = $.extend(true, {}, Table.DEFAULTS, $(this).data(), options);
+                option = $.extend(true, {}, Table.DEFAULTS, option);
 
-                $this.data(namespace, new Table($this, settings));
+                $this.data(namespace, new Table($this, option));
             });
         },
 
@@ -272,12 +272,13 @@ $.extend($.fn, {
         },
 
         /**
-         * [reload 重新加载]
-         * @return {[type]} [description]
+         * [reload 重新加载表格]
+         * @param  {[Boolean]} async     [是否远程加载，默认true]
+         * @param  {[Number]} pageIndex [加载哪一页，默认当前页]
          */
-        reload: function (async, data) {
+        reload: function (async, pageIndex) {
             return this.each(function () {
-                $(this).data(namespace).reload(async, data);                
+                $(this).data(namespace).reload(async, pageIndex);                
             });
         },
 
@@ -286,10 +287,10 @@ $.extend($.fn, {
          * @return {[type]} [description]
          */
         getSelectedRowData: function () {
-            var container = this.eq(0).data(namespace).container;
+            var ele = this.eq(0).data(namespace).ele;
             var selectedRow = [];
 
-            container.find('.table-checkbox:checked').each(function () {
+            ele.find('.table-checkbox:checked').each(function () {
                 var data = $(this).parents('.table-tr').data('rowData');
                 selectedRow.push(data);
             });
@@ -299,20 +300,17 @@ $.extend($.fn, {
 
         /**
          * [setGroupHeaders 合并表头]
-         * @param {[type]} o [description]
          */
-        setGroupHeaders: function (o) {
+        setGroupHeaders: function (option) {
             return this.each(function () {
-                $(this).data(namespace).setGroupHeaders(o);
+                $(this).data(namespace).setGroupHeaders(option);
             });
         },
 
         /**
          * [destroy 销毁表格]
-         * @param  {[type]} argument [description]
-         * @return {[type]}          [description]
          */
-        destroy: function (argument) {
+        destroy: function () {
             return this.each(function () {
                 if ($(this).data(namespace)) {
                     $(this).data(namespace).destroy();
@@ -321,217 +319,197 @@ $.extend($.fn, {
         }
     }
 
-    var Table = function ($container, settings) {
-        this.container = $container;
-        this.options = settings;
-        this.id = $container.attr('id') || tables.length;
+    var Table = function (ele, setting) {
+        this.ele = ele;
+        this.setting = setting;
+        this.id = ele.attr('id') || tables.length;
 
+        this.initDOM();
+        this.initData();
         tables.push(this);
-        this.init();
     }
 
-    //默认配置
+    // 默认配置
     Table.DEFAULTS = {
-        //表格选项
-        tableClass      : '',                       //自定义table类名
-        maxHeight       : false,                    //table容器最大高度
-        height          : false,                    //table容器高度
+        // 样式选项
+        tableClass      : '',                       // 自定义table类名
+        maxHeight       : false,                    // table容器最大高度
+        height          : false,                    // table容器高度
 
-        //单元格选项
-        checkbox        : false,                    //是否显示checkbox
-        rownum          : false,                    //是否显示行号
-        rowParam        : false,                    //行自定义参数，对象形式，支持函数返回
-        colParam        : false,                    //列自定义参数，对象形式，支持函数返回
-        colOptions      : [],                       //列设置
-        groupHeaders    : false,                    //多表头设置
+        // 单元格选项
+        checkbox        : false,                    // 是否显示checkbox
+        rownum          : false,                    // 是否显示行号和列显示隐藏，两个功能
+        rowParam        : false,                    // 行自定义参数，对象形式，支持函数返回
+        colParam        : false,                    // 列自定义参数，对象形式，支持函数返回
+        groupHeaders    : false,                    // 多表头设置
+        colOptions      : [],                       // 列设置
 
         /*
          * colOptions格式：[{
-         *     name: 'ID',                          //列显示名称
-         *     field: 'id',                         //列字段
-         *     width: false,                        //列宽，默认自适应
-         *     minWidth: false,                     //最小列宽
-         *     edit: {                              //是否可编辑，默认为false
-         *         replace: '<input />',            //编辑元素
-         *         callback: function () {},        //编辑回调函数
+         *     name: 'ID',                          // 列显示名称
+         *     field: 'id',                         // 列字段
+         *     width: false,                        // 列宽，默认自适应
+         *     minWidth: false,                     // 最小列宽
+         *     edit: {                              // 是否可编辑，默认为false
+         *         replace: '<input />',            // 编辑元素
+         *         callback: function () {},        // 编辑回调函数
          *     },
-         *     align: false,                        //对齐方式
-         *     hide: false,                         //是否显示列
-         *     menu: {                              //列操作菜单，只要该值不为false，则列显示/隐藏功能启用       
-         *         sort: {                          //排序
-         *             defaultOrder: 'asc'          //默认排序方式
+         *     align: false,                        // 对齐方式
+         *     hide: false,                         // 是否显示列
+         *     fixed: false,                        // 是否固定列不被隐藏
+         *     menu: {                              // 列操作菜单
+         *         sort: {                          // 排序
+         *             defaultOrder: 'asc'          // 默认排序方式
          *         },
-         *         filter: {                        //筛选
-         *             async: true                  //是否远程筛选
+         *         filter: {                        // 筛选
+         *             async: true                  // 是否远程筛选
          *         }
          *     },
          *     numberFormat: {
          *         toThousands: true,
          *         toWarning: true
          *     }
-         *     handler: function (value, data) {    //列处理函数，在该列的所有数据
-         *                                          //都会被此函数处理，一定要返回数据
+         *     handler: function (value, data) {    // 列处理函数，在该列的所有数据
+         *                                          // 都会被此函数处理，一定要返回数据
          *         return value;
          *     },
          * }]
          */
         
-        //本地表格选项
-        dataList            : [],                   //本地数组数据
+        dataList            : [],                   // 本地数组数据
 
-        //远程请求选项
-        url                 : '',                   //远程获取数据url
-        type                : 'GET',                //请求方式
-        data                : false,                //请求数据，json或function
-        dataType            : 'json',               //返回数据类型
-        jsonp               : 'callback',           //跨域回调函数名称
-        dataField           : 'data',               //json数组字段名,
+        // 远程请求选项
+        url                 : '',                   // 远程获取数据url
+        type                : 'GET',                // 请求方式
+        data                : false,                // 请求数据，json或function
+        dataType            : 'json',               // 返回数据类型
+        jsonp               : 'callback',           // 跨域回调函数名称
+        dataField           : 'data',               // json数组字段名,
 
-        //分页选项
+        // 分页选项
         paging              : {
-            enable          : true,                 //是否启用分页
-            localPage       : false,                //是否本地分页
-            indexField      : 'pageIndex',          //页码字段名
-            sizeField       : 'pageSize',           //每页条数字段名
-            totalField      : 'total',              //总条数字段名
-            pageIndex       : 1,                    //从第几页开始
-            pageSize        : 20,                   //每页显示多少条数据
-            pageInfo        : true,                 //是否显示页码信息
-            pageLength      : 5,                    //显示的页码数
-            pageSizeArray   : false,                //每页显示多少条数据的选择数组
-            skipPage        : true                  //是否启用跳页
+            enable          : false,                // 是否启用分页
+            localPage       : false,                // 是否本地分页
+            indexField      : 'pageIndex',          // 页码字段名
+            sizeField       : 'pageSize',           // 每页条数字段名
+            totalField      : 'total',              // 总条数字段名
+            pageIndex       : 1,                    // 从第几页开始
+            pageSize        : 20,                   // 每页显示多少条数据
+            pageInfo        : true,                 // 是否显示页码信息
+            pageLength      : 5,                    // 显示的页码数
+            pageSizeArray   : false,                // 每页显示多少条数据的选择数组
+            skipPage        : true                  // 是否启用跳页
         },
 
-        //表头选项
-        resizable           : true,                 //是否可拖动列宽
-        snameField          : 'sname',              //排序字段字段名
-        sorderField         : 'sorder',             //排序方式字段名
-        ascField            : 'asc',                //升序标识名
-        descField           : 'desc',               //降序标识名
-        filterField         : 'filter',             //筛选字段名称
-        keywordField        : 'keyword',            //关键字字段名称
-
-        resultVerify        : false,                //返回结果验证
+        // 表头操作
+        resizable           : true,                 // 是否可拖动列宽
+        snameField          : 'sname',              // 排序字段字段名
+        sorderField         : 'sorder',             // 排序方式字段名
+        ascField            : 'asc',                // 升序标识名
+        descField           : 'desc',               // 降序标识名
+        filterField         : 'filter',             // 筛选字段名称
+        keywordField        : 'keyword',            // 关键字字段名称
             
         //回调函数
-        onInit              : false,                //表格数据初始化完成
-        onRequestError      : false                 //请求错误回调
+        onInit              : false,                // 表格数据初始化完成
+        error               : false,                // 请求错误回调
+        complete            : false                 // 请求完成回调
     }
 
     /**
-     * [init 表格初始化]
-     * @param  {[type]} options [初始化参数]
-     * @return {[type]}         [description]
+     * [initDOM 构建组件DOM结构]
      */
-    Table.prototype.init = function () {
-        var self = this,
-            options = this.options,
-            $container = this.container;
+    Table.prototype.initDOM = function () {
+        var setting = this.setting;
+        var ele = this.ele;
+        var html =  
+            '<div class="table-container">' + 
+                '<div class="table-drag-line">&nbsp;</div>' +
+                (setting.tableCaption ? '<div class="table-caption"><a class="op_cl"><span></span></a><span>' + setting.tableCaption + '</div>' : '') +
+                '<div class="table-head">'+
+                    '<table class="table ' + setting.tableClass + '">' + 
+                        '<thead>' + this.initHolder() + this.initThead() + '</thead>'+
+                    '</table>' +
+                '</div>'+
+                '<div class="table-body">' +
+                    '<div class="table-loading">努力加载中...</div>'+
+                    '<table class="table table-hover ' + setting.tableClass + '">' + 
+                        '<thead>' + this.initHolder() + '</thead>' +
+                    '</table>' +
+                '</div>' +
+                (setting.paging.enable ? '<div class="table-pager"></div>' : '') +
+            '</div>';
 
-        var html =  '<div class="table-container">' + 
-                        '<div class="table-drag-line">&nbsp;</div>' +
-                        (options.tableCaption ? '<div class="table-caption"><a class="op_cl"><span></span></a><span>'+options.tableCaption+'</div>' : '') +
-                        '<div class="table-head">'+
-                            '<table class="table ' + options.tableClass + '">' + 
-                                '<thead>' + this.initHolder() + this.initThead() + '</thead>'+
-                            '</table>' +
-                        '</div>'+
-                        '<div class="table-body">' +
-                            '<div class="table-loading">努力加载中...</div>'+
-                            '<table class="table table-hover ' + options.tableClass + '">' + 
-                                '<thead>' + this.initHolder() + '</thead>' +
-                            '</table>' +
-                        '</div>'+
-                    '</div>';
+        ele.html(html);
+        this.menu = $('<ul class="ui-menu"></ul>').appendTo('body');
 
-        $container.html(html);
-
-        for (var i = 0, l = $container.find('.table-head .holder th').length; i < l; i++) {
-            $container.find('.table-head .table-tr th').eq(i).attr('data-index', i);
+        // 设置列索引
+        var ths = ele.find('.table-head .holder th');
+        for (var i = 0, l = ths.length; i < l; i++) {
+            ths.eq(i).attr('data-index', i);
         }
 
         //执行多列参数设置
-        if (options.groupHeaders) {
-            self.setGroupHeaders(options.groupHeaders);
-        }
-
-        this.initMenu();
-        this.initData();
-    }
-
-    /**
-     * [initMenu 初始化菜单]
-     * @return {[type]} [description]
-     */
-    Table.prototype.initMenu = function () {
-        var options = this.options,
-            colOptions = options.colOptions;
-
-        for (var i = 0, l = colOptions.length; i < l; i++) {
-            if (colOptions[i].menu) {
-                this.menu = $('<ul class="ui-menu"></ul>').appendTo('body');
-                break;
-            }
+        if (setting.groupHeaders) {
+            this.setGroupHeaders(setting.groupHeaders);
         }
     }
 
     /**
-     * [initData 处理数据并返回到回调]
-     * @return {[type]} [description]
+     * [initData 初始化数据]
      */
     Table.prototype.initData = function () {
-        if (this.options.url) {
-            this.getPageData();
+        if (this.setting.url) {
+            this.requestData(1);
         } else {
             // 备份数据
-            this.dataList = options.dataList.slice(0);
+            this.dataList = this.setting.dataList.slice(0);
             this.createTbody();
         }
     }
 
     /**
-     * [getPageData 获取远程数据]
-     * @return {[type]}           [description]
+     * [requestData 加载远程数据]
      */
-    Table.prototype.getPageData = function (data) {
-        var self = this,
-            options = this.options,
-            paging = options.paging,
-            $container = this.container,
-            colOptions = options.colOptions,
-            param;
+    Table.prototype.requestData = function (pageIndex) {
+        var self = this;
+        var setting = this.setting;
+        var paging = setting.paging;
+        var ele = this.ele;
+        var colOptions = setting.colOptions;
+        var data;
 
-        if (typeof options.data === 'function') {
-            param = $.extend(true, {}, options.data(), data);
+        if (typeof setting.data === 'function') {
+            data = $.extend(true, {}, setting.data());
         } else {
-            param = $.extend(true, {}, options.data, data);
+            data = $.extend(true, {}, setting.data);
         }
 
         // 如果有排序则添加
         if (this.sname && this.sorder) {
-            param[options.snameField] = this.sname;
-            param[options.sorderField] = this.sorder;
+            data[setting.snameField] = this.sname;
+            data[setting.sorderField] = this.sorder;
         }
 
         // 如果有筛选则添加
         if (this.filterName) {
-            param[options.filterField] = this.filterName;
-            param[options.keywordField] = this.keyword;
+            data[setting.filterField] = this.filterName;
+            data[setting.keywordField] = this.keyword;
         }
 
         var ajaxOpt;
 
         if (paging.enable) {
             if (this.pager) {
-                this.pager.pager('reload', param);
+                this.pager.pager('reload', pageIndex, data);
             } else {
                 ajaxOpt = {
-                    url             : options.url,
-                    type            : options.type,
-                    data            : param,
-                    dataType        : options.dataType,
-                    jsonp           : options.jsonp,
-                    dataField       : options.dataField,
+                    url             : setting.url,
+                    type            : setting.type,
+                    data            : data,
+                    dataType        : setting.dataType,
+                    jsonp           : setting.jsonp,
+                    dataField       : setting.dataField,
                     indexField      : paging.indexField,
                     sizeField       : paging.sizeField,
                     totalField      : paging.totalField,
@@ -543,85 +521,70 @@ $.extend($.fn, {
                     skipPage        : paging.skipPage,
                     localPage       : paging.localPage,
                     beforeSend      : function () {       //加载框显示
-                        var height = $container.find('.table-body').height();
+                        var height = ele.find('.table-body').height();
                         
                         if (height) {
-                            $container.find(".table-loading").show();
+                            ele.find(".table-loading").show();
                         }
                     },
                     complete        : function () {         //隐藏加载框
-                        $container.find(".table-loading").hide();
-                    },
-                    success         : function (res) {
-                        options.dataList = (options.dataField ? res[options.dataField] : res) || [];
+                        ele.find(".table-loading").hide();
 
-                        if (options.dataList.length == 0) {
+                        if (typeof setting.complete == 'function') {
+                            setting.apply(this, arguments);
+                        }
+                    },
+                    success         : function (dataList) {                        
+                        // 备份数据
+                        self.dataList = dataList;
+
+                        if (dataList.length == 0) {
                             self.initError('无数据');
                             return;
                         }
-                        
-                        // 备份数据
-                        self.dataList = options.dataList.slice(0);
+
+                        setting.dataList = dataList.slice(0);
                         self.createTbody();
                     },
-                    error           : options.onRequestError,
-                    resultVerify    : function (res) {
-                        if (typeof options.resultVerify == 'function') {
-                            var ret = options.resultVerify(res);
-
-                            if (!ret.state) {
-                                self.initError(ret.msg);
-                            }
-
-                            return ret.state;
-                        }
-                    }
+                    error           : setting.error
                 }
 
-                this.pager = $('<div class="table-pager"></div>').appendTo($container.find('.table-container'));
-                this.pager.pager(ajaxOpt);
+                this.pager = ele.find('.table-pager').pager(ajaxOpt);
             }            
         } else {
             ajaxOpt = {
-                url             : options.url,
-                type            : options.type,
-                data            : param,
-                dataType        : options.dataType,
-                jsonp           : options.jsonp,
+                url             : setting.url,
+                type            : setting.type,
+                data            : data,
+                dataType        : setting.dataType,
+                jsonp           : setting.jsonp,
                 beforeSend      : function () {       //加载框显示
-                    var height = $container.find('.table-body').height();
+                    var height = ele.find('.table-body').height();
 
                     if (height) {
-                        $container.find(".table-loading").show();
+                        ele.find(".table-loading").show();
                     }
                 },
                 complete        : function () {         //隐藏加载框
-                    $container.find(".table-loading").hide();
-                },
-                success         : function (res) {
-                    options.dataList = (options.dataField ? res[options.dataField] : res) || [];
+                    ele.find(".table-loading").hide();
 
-                    if (options.dataList.length == 0) {
+                    if (typeof setting.complete == 'function') {
+                        setting.apply(this, arguments);
+                    }
+                },
+                success         : function (res) {                    
+                    // 备份数据
+                    self.dataList = (setting.dataField ? res[setting.dataField] : res) || [];
+
+                    if (self.dataList.length == 0) {
                         self.initError('无数据')
                         return;
                     }
                     
-                    // 备份数据
-                    self.dataList = options.dataList.slice(0);
+                    setting.dataList = self.dataList.slice(0);
                     self.createTbody();
                 },
-                error: options.onRequestError,
-                resultVerify: function (res) {
-                    if (typeof options.resultVerify == 'function') {
-                        var ret = options.resultVerify(res);
-
-                        if (!res.state) {
-                            self.initError(ret.msg);
-                        }
-
-                        return ret.state;
-                    }
-                }
+                error: setting.error
             }
 
             $.ajax(ajaxOpt);
@@ -633,13 +596,13 @@ $.extend($.fn, {
      * @return {[type]} [description]
      */
     Table.prototype.createTbody = function () {
-        var $container = this.container,
-            $tbody = this.initTbody();
+        var ele = this.ele;
+        var tbody = this.initTbody();
 
-        $container.find('.table-body .table tbody').remove();
-        $container.find('.table-body .table').append($tbody);
-        $container.find('.table-body').scrollTop(0);
-        //$container.find('.table-body').scrollLeft(0);
+        ele.find('.table-body .table tbody').remove();
+        ele.find('.table-body .table').append(tbody);
+        ele.find('.table-body').scrollTop(0);
+        //ele.find('.table-body').scrollLeft(0);
 
         this.initTable();
     }
@@ -649,101 +612,98 @@ $.extend($.fn, {
      * @return {[type]} [description]
      */
     Table.prototype.initTable = function () {
-        var self = this,
-            options = this.options,
-            colOptions = options.colOptions,
-            $container = this.container;
+        var self = this;
+        var setting = this.setting;
+        var colOptions = setting.colOptions;
+        var ele = this.ele;
 
         setTimeout(function () {
-            var $thead = $container.find('.table-head'),
-                $tbody = $container.find('.table-body'),
-                theadHeight = $thead.outerHeight(true),
-                tbodyHeight = $tbody.outerHeight(true),
-                tpageHeight = $container.find('.table-pager').outerHeight(true),
-                sWidth = PluginDep.scrollBarWidth();
+            var thead = ele.find('.table-head');
+            var tbody = ele.find('.table-body');
+            var theadHeight = thead.outerHeight(true);
+            var tbodyHeight = tbody.outerHeight(true);
+            var tpageHeight = ele.find('.table-pager').outerHeight(true);
+            var sWidth = PluginDep.scrollBarWidth();
 
-            //计算最大高度
-            if (options.maxHeight) {
-                var maxHeight = options.maxHeight - $container.getCss('margin-top') - $container.getCss('margin-bottom') - theadHeight - tpageHeight;
-
-                $tbody.css('max-height', maxHeight);
+            // 设置最大高度
+            if (setting.maxHeight) {
+                tbody.css('max-height', setting.maxHeight - theadHeight - tpageHeight);
             }
 
-            //计算高度
-            if (options.height) {
-                var height = options.height - $container.getCss('margin-top') - $container.getCss('margin-bottom') - theadHeight - tpageHeight;
-                $tbody.css('height', height);
+            // 设置高度
+            if (setting.height) {
+                tbody.css('height', setting.height - theadHeight - tpageHeight);
             }
 
-            var $tbodyTable = $tbody.find('.table');
-            var $theadLastTh = $thead.find('.holder th:visible:last');
+            var tbodyTable = tbody.find('.table');
+            var theadLastTh = thead.find('.holder th:visible:last');
 
-            //还原最后一列列宽
-            if ($thead.data('minusWidth')) {
-                //var w = Math.max(parseInt($theadLastTh[0].style.width) || $theadLastTh.width(), 40);
-                //$theadLastTh.width(w + sWidth);
-                $thead.css('padding-right', 1);
-                $tbody.css('padding-right', 1);
-                $thead.removeData('minusWidth');
+            // 还原最后一列列宽
+            if (thead.data('minusWidth')) {
+                var w = Math.max(parseInt(theadLastTh[0].style.width) || theadLastTh.width(), 40);
+
+                theadLastTh.width(w + sWidth);
+                thead.css('padding-right', 1);
+                tbody.css('padding-right', 1);
+                thead.removeData('minusWidth');
             }
 
-            //出现竖直滚动条则设置padding-right
-            if ($tbodyTable.outerHeight(true) > $tbody.outerHeight(true)) {
-                //var w = Math.max(parseInt($theadLastTh[0].style.width) || $theadLastTh.width(), 40);
-                //$theadLastTh.width(w - sWidth);
-                $thead.css('padding-right', sWidth + 1);
-                $tbody.css('padding-right', sWidth + 1);
-                $thead.data('minusWidth', true);
+            // 出现竖直滚动条则设置padding-right
+            if (tbodyTable.outerHeight() > tbody.outerHeight()) {
+                var w = Math.max(parseInt(theadLastTh[0].style.width) || $theadLastTh.width(), 40);
+
+                theadLastTh.width(w - sWidth);
+                thead.css('padding-right', sWidth + 1);
+                tbody.css('padding-right', sWidth + 1);
+                thead.data('minusWidth', true);
             } else {
-                $tbody.css('max-height', 'none');
+                tbody.css('max-height', 'none');
             }
 
-            //解决IE8下高度会在最大高度基础上加上滚动条高度的bug
-            if (PluginDep.isBelowIE9 && options.maxHeight && $tbodyTable.outerWidth(true) > $tbody.outerWidth(true)) {
-                $tbody.css('max-height', $tbody.getCss('max-height') - sWidth);
+            // 解决IE8下高度会在最大高度基础上加上滚动条高度的bug
+            if (PluginDep.isBelowIE9 && tbody.getCss('max-height') && tbodyTable.outerWidth() > tbody.outerWidth()) {
+                tbody.css('max-height', tbody.getCss('max-height') - sWidth);
             }
 
-            //$container.find('.table').css('table-layout', 'fixed');
-
-            //计算表格宽度
-            var $thead_ths = $container.find('.table-head .holder th');
-            var $tbody_ths = $container.find('.table-body .holder th');
+            // 计算表格宽度
+            var theadThs = ele.find('.table-head .holder th');
+            var tbodyThs = ele.find('.table-body .holder th');
             var w = 0, totalW = 0, fieldIndex, minWidth;
 
-            for (var i = 0, l = $thead_ths.length; i < l; i++) {
-                fieldIndex = $thead_ths.eq(i).data('field-index');
+            for (var i = 0, l = theadThs.length; i < l; i++) {
+                fieldIndex = theadThs.eq(i).data('field-index');
                 minWidth = typeof fieldIndex != 'undefined' ? colOptions[fieldIndex].minWidth || 0 : 0;
-                w = Math.max(parseInt($thead_ths[i].style.width) || $thead_ths.eq(i).width(), 40, minWidth);
+                w = Math.max(parseInt(theadThs[i].style.width) || theadThs.eq(i).width(), 40, minWidth);
 
-                if ($thead_ths.eq(i).is(':visible')) {
+                if (theadThs.eq(i).is(':visible')) {
                     totalW += w;
                 }
 
-                $tbody_ths.eq(i).width(w);
-                $thead_ths.eq(i).width(w);
+                tbodyThs.eq(i).width(w);
+                theadThs.eq(i).width(w);
             }
 
-            //设置总宽度防止拖动时变形
-            $container.find('.table').css('width', totalW);
+            // 设置总宽度防止拖动时变形
+            ele.find('.table').css('width', totalW);
 
             if (PluginDep.browser.msie) {
-                $container.find('.table-th-resize').each(function () {
+                ele.find('.table-th-resize').each(function () {
                     $(this).height($(this).parent().outerHeight());
                 });
             }
 
-            //设置拖动线高度
-            $container.find('.table-drag-line').height($container.height() - $container.find('.table-pager').outerHeight(true));
+            // 设置拖动线高度
+            ele.find('.table-drag-line').height(ele.height() - tpageHeight);
 
-            //如果绑定过事件的话不需要再次绑定
+            // 如果绑定过事件的话不需要再次绑定
             if (!self.isBindedEvent) {
                 self.bindEvents();
             }
 
-            if (options.onInit) {
-                options.onInit.call($container[0], options);
+            if (setting.onInit) {
+                setting.onInit.call(ele[0], setting);
             }
-        }, 0);
+        }, 10);
     }
 
     /**
@@ -751,37 +711,38 @@ $.extend($.fn, {
      * @return {[type]} [description]
      */
     Table.prototype.initHolder = function () {
-        var options    = this.options,
-            colOptions = options.colOptions,
-            colLen = colOptions.length;
+        var setting = this.setting;
+        var colOptions = setting.colOptions;
 
         var html = '<tr class="holder">';
 
-        //复选框
-        if (options.checkbox) {
+        // 复选框
+        if (setting.checkbox) {
             html += '<th style="width: 40px;"></th>';
         }
 
-        //行号
-        if (options.rownum) {
+        // 行号
+        if (setting.rownum) {
             html += '<th style="width: 40px;"></th>';
         }
 
-        for (var i = 0; i < colLen; i++) {
+        for (var i = 0, l = colOptions.length; i < l; i++) {
             var col = colOptions[i];
             var style = '';
 
-            if (!col.hide) {
-                if (col.width) {
-                    if (!isNaN(col.width)) {
-                        style += ' style="width: ' + col.width + 'px;"';
-                    } else {
-                        style += ' style="width: ' + col.width + ';"';
-                    }
-                }
+            if (col.hide) {
+                continue;
+            }
 
-                html += '<th' + style + ' data-field-index="' + i + '"></th>';
-            }            
+            if (col.width) {
+                if (!isNaN(col.width)) {
+                    style = ' style="width: ' + col.width + 'px;"';
+                } else {
+                    style = ' style="width: ' + col.width + ';"';
+                }
+            }
+
+            html += '<th' + style + ' data-field-index="' + i + '"></th>';     
         }
 
         html += '</tr>';
@@ -794,31 +755,32 @@ $.extend($.fn, {
      * @return {[type]} [description]
      */
     Table.prototype.initThead = function () {
-        var options    = this.options,
-            colOptions = options.colOptions,
-            colLen = colOptions.length;
+        var setting = this.setting;
+        var colOptions = setting.colOptions;
 
         var html = '<tr class="table-tr">';
 
-        //行号
-        if (options.rownum) {
+        // 行号
+        if (setting.rownum) {
             html += '<th class="table-th" style="text-align: center;">'+
-                        '<div class="table-th-text"></div>'+
+                        '<div class="table-col-display" title="显示隐藏列">' +
+                            '<i class="glyphicon glyphicon-th"></i>' +
+                        '</div>'+
                     '</th>';
         }
 
-        //复选框
-        if (options.checkbox) {
-            html += '<th class="table-th" style="text-align: center;" onselectstart="return false;">'+
+        // 复选框
+        if (setting.checkbox) {
+            html += '<th class="table-th" style="text-align: center;">'+
                         '<input class="table-checkbox" type="checkbox" />'+
                     '</th>';
         }
 
-        for (var i = 0; i < colLen; i++) {
-            var col = colOptions[i],
-                menu = col.menu,
-                attr = 'data-field="' + col.field + '" data-field-index="' + i + '" onselectstart="return false;"',
-                colClass = '';
+        for (var i = 0, l = colOptions.length; i < l; i++) {
+            var col = colOptions[i];
+            var menu = col.menu;
+            var attr = ' data-field="' + col.field + '" data-field-index="' + i + '"';
+            var colClass = '';
 
             if (col.hide) {
                 continue;
@@ -840,20 +802,20 @@ $.extend($.fn, {
                 }                
             }
 
-            var $th = $('<th class="table-th' + colClass + '" ' + attr +'></th>');
+            var th = $('<th class="table-th' + colClass + '" ' + attr +'></th>');
 
             if (col.align) {
-                $th.css('text-align', col.align);
+                th.css('text-align', col.align);
             }
 
-            $th.append('<div class="table-th-text">' + col.name + (menu && menu.sort ? '<span class="table-sort-icon"></span>' : '') + '</div>');
-            $th.append('<div class="table-th-resize"></div>');
+            th.append('<div class="table-th-text">' + col.name + (menu && menu.sort ? '<span class="table-sort-icon"></span>' : '') + '</div>');
+            th.append('<div class="table-th-resize"></div>');
 
             if (menu) {
-                $th.append('<div class="table-th-menu"><span class="glyphicon glyphicon-menu-hamburger"></span></div>');
+                th.append('<div class="table-th-menu"><span class="glyphicon glyphicon-menu-hamburger"></span></div>');
             }
 
-            html += $th[0].outerHTML;
+            html += th[0].outerHTML;
         }
 
         html += '</tr>';
@@ -866,43 +828,48 @@ $.extend($.fn, {
      * @return {[type]} [description]
      */
     Table.prototype.initTbody = function () {
-        var options     = this.options,
-            dataList    = options.dataList,
-            colOptions  = options.colOptions,
-            colLen      = colOptions.length;
+        var setting = this.setting;
+        var dataList = setting.dataList;
+        var colOptions  = setting.colOptions;
 
-        var $tbody = $('<tbody></tbody>');
+        var tbody = $('<tbody></tbody>');
+        var j = 0;
+        var colLen = colOptions.length;
 
-        var i, j, dataLen = dataList.length;
-
-        for (i = 0; i < dataLen; i++) {
+        // 遍历行
+        for (var i = 0, dataLen = dataList.length; i < dataLen; i++) {
             var data = dataList[i];
-            var rowParam = options.rowParam || {};
-            var rowData = ' data-rowid="'+i+'"';
+            var rowParam = setting.rowParam || {};
+            var rowData = ' data-rowid="' + i + '"';
 
             if (typeof rowParam === 'function') {
                 rowParam = rowParam(data, i);
             }
 
             for (var key in rowParam) {
-                rowData += ' data-'+key+'="'+rowParam[key]+'"';
+                rowData += ' data-' + key + '="' + rowParam[key] + '"';
             }
 
-            var $tr = $('<tr class="table-tr"'+rowData+'></tr>').appendTo($tbody);
-            $tr.data('rowData', dataList[i]);
+            var tr = $('<tr class="table-tr"' + rowData + '></tr>').appendTo(tbody);
+            tr.data('rowData', dataList[i]);
 
-            if (options.rownum) {
-                $tr.append('<td class="table-td" style="text-align: center;">'+
-                            '<div class="table-td-text">'+(i + 1)+'</div>'+
-                        '</td>');
+            if (setting.rownum) {
+                tr.append(
+                    '<td class="table-td" style="text-align: center;">' +
+                        '<div class="table-td-text">' + (i + 1) + '</div>' +
+                    '</td>'
+                );
             }
 
-            if (options.checkbox) {
-                $tr.append('<td class="table-td" style="text-align: center;" onselectstart="return false;">'+
-                            '<input class="table-checkbox" type="checkbox" />'+
-                        '</td>');
+            if (setting.checkbox) {
+                tr.append(
+                    '<td class="table-td" style="text-align: center;">' +
+                        '<input class="table-checkbox" type="checkbox" />' +
+                    '</td>'
+                );
             }
 
+            // 遍历列
             for (j = 0; j < colLen; j++) {
                 var col = colOptions[j];
                 var text;
@@ -925,62 +892,52 @@ $.extend($.fn, {
                     text = data[col.field];
                 }
 
-                //数字格式化
-                if (col.numberFormat) {
-                    if (col.numberFormat.toThousands) {
-                        text = NumberFormat.toThousands(text);
-                    }
-                    if (col.numberFormat.toWarning) {
-                        text = NumberFormat.toWarning(text);
-                    }
-                }
-
-                var colParam = options.colParam || {};
+                var colParam = setting.colParam || {};
                 var colData = '';
 
                 if (typeof colParam === 'function') {
-                    colParam = colParam(data, i, col.field);
+                    colParam = colParam(data, i, col);
                 }
 
                 for (var key in colParam) {
-                    colData += ' data-'+key+'="'+colParam[key]+'"';
+                    colData += ' data-' + key + '="' + colParam[key] + '"';
                 }
 
-                var $td = $('<td class="table-td"'+colData+'></td>').appendTo($tr);
-                var $div = $('<div class="table-td-text"></div>').appendTo($td);
+                var td = $('<td class="table-td"' + colData + '></td>').appendTo(tr);
+                var div = $('<div class="table-td-text"></div>').appendTo(td);
 
-                if (typeof col.edit === 'object') {
-                    $td.addClass('table-td-edit').attr('onuserselectstart', 'return false');
-                    $td.data('editData', col.edit);
+                if (col.edit) {
+                    td.addClass('table-td-edit').data('editData', col.edit);
                 }
 
                 if (col.align) {
-                    $td.css('text-align', col.align);
+                    td.css('text-align', col.align);
                 }
 
-                //如果返回的是html元素或jquery元素则使用append
-                if (typeof text === 'object' && (text instanceof jQuery || PluginDep.isDom(text))) {
-                    $div.append(text);
+                // 如果返回的是DOM或jquery元素则使用append
+                if (text instanceof jQuery || PluginDep.isDom(text)) {
+                    div.append(text);
                 } else {
-                    $div.html((text === undefined || text === null) ? '' : text + '');
+                    div.html((text === undefined || text === null) ? '' : text + '');
                 }
             }
         }
 
-        return $tbody;
+        return tbody;
     }
 
     /**
-     * [initError 返回结果出错时显示错误信息]
+     * [initError 显示错误信息]
      * @return {[type]} [description]
      */
     Table.prototype.initError = function (msg) {
-        var $container = this.container;
-        var colLen = $container.find('.table-body thead th').length;
-        var $tbody = $('<tbody><tr class="table-tr table-errorInfo"><td colspan="' + colLen + '" align="center">' + msg + '</td></tr></tbody>');
+        var ele = this.ele;
+        var thLen = ele.find('.table-body thead th').length;
+        var tbody = $('<tbody><tr class="table-tr table-errorInfo"><td colspan="' + thLen + '" align="center">' + msg + '</td></tr></tbody>');
 
-        $container.find('.table-body table tbody').remove();
-        $container.find('.table-body table').append($tbody);
+        ele.find('.table-body table tbody').remove();
+        ele.find('.table-body table').append(tbody);
+
         this.initTable();
     }
 
@@ -989,7 +946,7 @@ $.extend($.fn, {
      * @return {[type]} [description]
      */
     Table.prototype.destroy = function () {
-        this.container
+        this.ele
             .off()
             .removeData(namespace)
             .empty();
@@ -1003,47 +960,44 @@ $.extend($.fn, {
      * [reload 重新请求数据并加载表格]
      * @return {[type]} [description]
      */
-    Table.prototype.reload = function (async, data) {
-        var options = this.options;
-        async = async === undefined ? true : async;
-
-        this.container.find('.table-checkbox').prop('checked', false);
-
-        if (async) {
-            this.getPageData(data);
-        } else {
-            this.createTbody();
-        }
+    Table.prototype.reload = function (pageIndex) {
+        // 取消选择
+        this.ele.find('.table-checkbox').prop('checked', false);
+        this.requestData(pageIndex);
     }
 
     /**
      * [refresh 以当前数据刷新表格，改变表结构时调用]
-     * @return {[type]} [description]
+     * @param  {Boolean} isRebuild [是否重构表结构]
      */
-    Table.prototype.refresh = function () {
-        var self = this,
-            options = this.options,
-            $container = this.container;
+    Table.prototype.refresh = function (isRebuild) {
+        var setting = this.setting;
+        var ele = this.ele;
+        isRebuild = isRebuild === undefined ? false : isRebuild;
 
-        $container.find('.table-head').html(
-            '<table class="table ' + options.tableClass + '">' + 
-                '<thead>' + this.initHolder() + this.initThead() + '</thead>'+
-            '</table>' 
-        );
-        $container.find('.table-body').html(
-            '<div class="table-loading">努力加载中...</div>'+
-            '<table class="table table-hover ' + options.tableClass + '">' + 
-                '<thead>' + this.initHolder() + '</thead>' +
-            '</table>'
-        );
+        if (isRebuild) {
+            ele.find('.table-head').html(
+                '<table class="table ' + setting.tableClass + '">' + 
+                    '<thead>' + this.initHolder() + this.initThead() + '</thead>'+
+                '</table>' 
+            );
+            ele.find('.table-body').html(
+                '<div class="table-loading">努力加载中...</div>'+
+                '<table class="table table-hover ' + setting.tableClass + '">' + 
+                    '<thead>' + this.initHolder() + '</thead>' +
+                '</table>'
+            );
 
-        for (var i = 0, l = $container.find('.table-head .holder th').length; i < l; i++) {
-            $container.find('.table-head .table-tr th').eq(i).attr('data-index', i);
-        }
+            // 设置列索引
+            var ths = ele.find('.table-head .holder th');
+            for (var i = 0, l = ths.length; i < l; i++) {
+                ths.eq(i).attr('data-index', i);
+            }
 
-        //执行多列参数设置
-        if (options.groupHeaders) {
-            self.setGroupHeaders(options.groupHeaders);
+            // 执行多列参数设置
+            if (setting.groupHeaders) {
+                this.setGroupHeaders(setting.groupHeaders);
+            }
         }
 
         this.createTbody();
@@ -1051,19 +1005,17 @@ $.extend($.fn, {
 
     /**
      * [setGroupHeaders 设置多列表头]
-     * @return {[type]} [description]
      */
     Table.prototype.setGroupHeaders = function (o) {
-        o = $.extend({
+        var setting = this.setting;
+        var ele = this.ele;
+
+        o = $.extend(true, {
             useColSpanStyle: true,
             headers: []
-        }, o || {});
+        }, o);
 
-        var options = this.options,
-            container = this.container,
-            ts = this;
-
-        options.groupHeaders = o;
+        setting.groupHeaders = o;
 
         var i, cmi, skip = 0, $tr, $colHeader, th, $th, thStyle,
             iCol,
@@ -1071,11 +1023,11 @@ $.extend($.fn, {
             numberOfColumns,
             titleText,
             cVisibleColumns,
-            $htable = $('.table-head', container),
+            $htable = $('.table-head', ele),
             $thead = $htable.find("thead"),
             $trLabels = $thead.find("tr.table-tr:last").addClass("table-second-header"),
             $ths = $trLabels.find('th'),
-            colOptions = options.colOptions,
+            colOptions = setting.colOptions,
             colLen = $ths.length,
             $theadInTable, $firstRow;
 
@@ -1149,22 +1101,38 @@ $.extend($.fn, {
     }
 
     /**
-     * [filter 筛选]
-     * @return {[type]} [description]
+     * [filter 列筛选]
+     * 1、不分页时由table进行筛选
+     * 2、分页时有pager进行筛选
+     * @param  {[type]} fieldIndex [列索引]
+     * @param  {[type]} keyword    [关键字]
      */
     Table.prototype.filter = function (fieldIndex, keyword) {
-        var options = this.options;
-        var col = options.colOptions[fieldIndex];
+        var setting = this.setting;
+        var col = setting.colOptions[fieldIndex];
+        var dataList = this.dataList;
+
+        if (!col.menu || !col.menu.filter) {
+            return;
+        }
 
         this.filterName = col.field;
         this.keyword = keyword;
 
-        if (col.menu && col.menu.filter) {
-            if (!col.menu.filter.async) {
-                options.dataList = [];
+        if (setting.paging.enable) {
+            if (col.menu.filter.async) {
+                this.reload(1);
+            } else {
+                this.pager.pager('filter', this.filterName, this.keyword);
+            }
+        } else {
+            if (col.menu.filter.async) {
+                this.reload(1);
+            } else {
+                setting.dataList = [];
 
-                for (var i = 0, l = this.dataList.length; i < l; i++) {
-                    var val = this.dataList[i][this.filterName];
+                for (var i = 0, l = dataList.length; i < l; i++) {
+                    var val = dataList[i][this.filterName];
 
                     // 处理undefined和null
                     if (val === undefined || val === null) {
@@ -1174,15 +1142,17 @@ $.extend($.fn, {
                     val = val.toString();
 
                     if (val.indexOf(keyword) > -1) {
-                        options.dataList.push(this.dataList[i]);
+                        setting.dataList.push(this.dataList[i]);
                     }
                 }
 
-                this.reload(false);               
-            } else {
-                this.reload(true);               
+                this.refresh();
             }
         }
+
+        // 使用之后清除掉，以免在结果中筛选时传递到服务器端
+        this.filterName = null;
+        this.keyword = null;
     }
 
     /**
@@ -1190,172 +1160,177 @@ $.extend($.fn, {
      * @return {[type]} [description]
      */
     Table.prototype.bindEvents = function () {
-        var self = this,
-            $container = this.container,
-            options = this.options,
-            colOptions = options.colOptions,
-            menu = this.menu;
+        var self = this;
+        var ele = this.ele;
+        var setting = this.setting;
+        var colOptions = setting.colOptions;
+        var menu = this.menu;
 
+        // 标识绑定过事件
         this.isBindedEvent = true;
 
-        //固定表头滚动
-        $container.find('.table-body').on('scroll', function (e) {
+        // 固定表头滚动
+        ele.find('.table-body').on('scroll', function (e) {
             var w = $(this).width();
             var h = $(this).height();
             var top = this.scrollTop;
             var left = this.scrollLeft;
 
-            $container.find('.table-head table').css('left', -this.scrollLeft);
-            $container.find('.table-loading').css({
+            ele.find('.table-head table').css('left', -this.scrollLeft);
+            ele.find('.table-loading').css({
                 top: h / 2 + top,
                 left: w / 2 + left
             });
         });
 
-        $container.on('click', '.table-th-resize', function () {
-            return false;
+        // 列宽度拖动阻止冒泡到排序等操作
+        ele.on('click', '.table-th-resize', function (e) {
+            e.stopPropagation();
+            e.preventDefault();
         });
 
-        //列宽度拖动，mousedown->mousemove->mouseup
-        $container.on('mousedown', '.table-th-resize', function (e) {
-            index = +$(this).parent().data('index');
-            $target = $container;
+        // 列宽度拖动，mousedown->mousemove->mouseup
+        ele.on('mousedown', '.table-th-resize', function (e) {
+            target = ele;
             oldX = e.clientX;
-            oldLeft = 0;
-            oldLineLeft = oldX - $container.offset().left;
-
-            for (var i = 0; i < index + 1; i++) {
-                oldLeft += $container.find('.holder th').eq(i).outerWidth(true);
-            }
+            oldLineLeft = oldX - ele.offset().left;
+            index = +$(this).parent().data('index');
 
             $('body').addClass('table-drag');
-            $container.find('.table-drag-line').css('left', oldLineLeft).show();
-
-            return false;
+            ele.find('.table-drag-line').css('left', oldLineLeft).show();
+            
+            e.stopPropagation();
+            e.preventDefault();
         });
 
-        //复选框点击事件，单选
-        $container.on('change', '.table-td .table-checkbox', function () {
-            var totalLen = $container.find('.table-td .table-checkbox').length;
-            var currLen = $container.find('.table-td .table-checkbox:checked').length;
+        // 复选框改变事件，单选
+        ele.on('change', '.table-td .table-checkbox', function () {
+            var totalLen = ele.find('.table-td .table-checkbox').length;
+            var currLen = ele.find('.table-td .table-checkbox:checked').length;
 
-            $container.find('.table-th .table-checkbox').prop('checked', currLen == totalLen);
+            ele.find('.table-th .table-checkbox').prop('checked', currLen == totalLen);
         });
 
-        //复选框点击事件，全选
-        $container.on('change', '.table-th .table-checkbox', function () {
-            $container.find('.table-td .table-checkbox').prop('checked', $(this).prop('checked'));
+        // 复选框改变事件，全选
+        ele.on('change', '.table-th .table-checkbox', function () {
+            ele.find('.table-td .table-checkbox').prop('checked', $(this).prop('checked'));
         });
 
-        //排序
-        $container.on('click', '.table-sort', function () {
-            //如果正在拖动则阻止排序
-            if ($container.find('.table-drag-line').is(':visible')) {
+        // 排序
+        ele.on('click', '.table-sort', function () {
+            // 如果正在拖动则阻止排序
+            if (ele.find('.table-drag-line').is(':visible')) {
                 return;
             }
 
-            var $th = $(this);
-            var sname = $th.attr('data-field');
-            var sorder = $th.attr('data-sorder');
+            var th = $(this);
+            var sname = th.attr('data-field');
+            var sorder = th.attr('data-sorder');
 
             // 重置其他列排序
-            $container.find('.table-th').each(function () {
-                if (this != $th[0]) {
+            ele.find('.table-th').each(function () {
+                if (this != th[0]) {
                     $(this).removeClass('table-sort-active').attr('data-sorder', '');
                 }
             });
 
             if (sorder == '') {
-                $th.addClass('table-sort-active').attr('data-sorder', 'asc');
+                th.addClass('table-sort-active').attr('data-sorder', 'asc');
                 self.sname = sname;
                 self.sorder = 'asc';
             } else if (sorder == 'asc') {
-                $th.addClass('table-sort-active').attr('data-sorder', 'desc');
+                th.addClass('table-sort-active').attr('data-sorder', 'desc');
                 self.sname = sname;
                 self.sorder = 'desc';
             } else {
-                $th.attr('data-sorder', '');
+                th.attr('data-sorder', '');
                 self.sname = null;
                 self.sorder = null;
             }
 
-            self.reload();
+            self.reload(1);
         });
 
-        //编辑单元格
-        $container.on('dblclick', '.table-td-edit', function () {
-            var $this = $(this);
-            var edit = $(this).data('editData');
+        // 编辑单元格
+        ele.on('dblclick', '.table-td-edit', function (e) {
+            var td = $(this);
+            var edit = td.data('editData');
 
-            //调用用户定义的编辑元素
-            var ele = edit.replace.call(this, $this.parent().data('rowData'));
+            // 调用用户定义的编辑元素
+            var rp = edit.replace.call(this, td.parent().data('rowData'));
 
-            $(ele).addClass('table-td-editEle').appendTo(this).focus();
-            $this.find('.table-td-text').hide();
+            $(rp).addClass('table-td-editEle').appendTo(this).focus();
+            td.find('.table-td-text').hide();
 
-            return false;
+            e.preventDefault();
         });
 
-        //确认编辑，回写数据
-        $container.on('change', '.table-td-editEle', function (e) {
-            var $ele = $(this);
-            var $td = $ele.parent();
-            var $tr = $td.parent();
-            var $text = $ele.siblings('.table-td-text');
-            var rowData = $tr.data('rowData');
+        // 确认编辑，回写数据
+        ele.on('change', '.table-td-editEle', function (e) {
+            var el = $(this);
+            var td = el.parent();
+            var tr = td.parent();
+            var tdText = el.siblings('.table-td-text');
+            var rowData = tr.data('rowData');
 
             var ev = $.Event('editen.ui.table');
-            var ret = $container.trigger(ev, [rowData, $ele]);
+            var ret = ele.trigger(ev, [rowData, this]);
 
             if (ret !== false) {
-                $text.show();
-                $ele.remove();
+                text.show();
+                el.remove();
             }
         });
 
-        //确定修改
-        $container.on('blur', '.table-td-editEle', function (e) {
+        // 确定修改
+        ele.on('blur', '.table-td-editEle', function (e) {
             $(this).trigger('change');
         });
 
-        //表头菜单
-        $container.on('click', '.table-th-menu', function (e) {
-            e.stopPropagation();
+        // 列显示隐藏
+        ele.on('click', '.table-col-display', function (e) {
+            var html = '<li class="table-columns">';
 
+            for (var i = 0, l = colOptions.length; i < l; i++) {
+                var col = colOptions[i];
+                html +=
+                    '<div class="table-columns-item' + (col.fixed ? ' disabled' : '') + '" data-index="' + i + '">' +
+                        '<label>' +
+                            '<input type="checkbox"' + (!col.hide ? ' checked' : '') + (col.fixed ? ' disabled' : '') + '> ' + 
+                            colOptions[i].name +
+                        '</label>' +
+                    '</div>';
+            }
+
+            html += '</li>';
+
+            // 实例化菜单
+            self.menu.html(html).menu();
+            // 显示菜单
+            self.menu.menu('show', {
+                left: e.pageX,
+                top: e.pageY
+            });
+
+            e.stopPropagation();
+        });
+
+        // 表头菜单
+        ele.on('click', '.table-th-menu', function (e) {
             var th = $(this).parent();
             var index = +th.data('field-index');
             var oldValue = th.data('value') || '';
             var col = colOptions[index];
-            var columns = '';
+            var html = '';
 
-            for (var i = 0, l = colOptions.length; i < l; i++) {
-                columns +=
-                    '<li data-index="' + i + '">' +
-                        '<label>' +
-                            '<input type="checkbox"' + (!colOptions[i].hide ? ' checked' : '') + '> ' + 
-                            colOptions[i].name +
-                        '</label>' +
-                    '</li>';
-            }
-
-            self.menu.html(
-                '<li class="ui-menu-item">' +
-                    '<div class="ui-menu-item-icon">' +
-                        '<i class="glyphicon glyphicon-th"></i>' +
-                    '</div>' +
-                    '<div class="ui-menu-item-text">列显示/隐藏</div>' +
-                    '<ul class="ui-menu table-columns">' +
-                        columns +
-                    '</ul>' +
-                '</li>' +
-                (col.menu.filter ? 
-                '<li class="ui-menu-item">' +
-                    '<div class="ui-menu-item-icon">' +
-                        '<i class="glyphicon glyphicon-filter"></i>' +
-                    '</div>' +
-                    '<div class="ui-menu-item-text">筛选</div>' +
-                    '<div class="ui-menu">' +
-                        '<div class="table-filter">' +
+            if (col.menu.filter) {
+                html +=
+                    '<li class="ui-menu-item">' +
+                        '<div class="ui-menu-item-icon">' +
+                            '<i class="glyphicon glyphicon-filter"></i>' +
+                        '</div>' +
+                        '<div class="ui-menu-item-text">筛选</div>' +
+                        '<div class="ui-menu table-filter">' +
                             '<div class="input-group input-group-sm">' +
                                 '<input class="form-control" type="text" value="' + oldValue +'">' +
                                 '<span class="input-group-btn">' +
@@ -1363,120 +1338,119 @@ $.extend($.fn, {
                                 '</span>' +
                             '</div>' +
                         '</div>' +
-                    '</div>' +
-                '</li>'
-                : '')
-            );
+                    '</li>';
+            }
 
             // 实例化菜单
-            self.menu.menu();
+            self.menu.html(html).menu();
             // 显示菜单
             self.menu.menu('show', {
                 left: e.pageX,
                 top: e.pageY,
                 args: $(this).parent()
             });
+
+            e.stopPropagation();
         });
     
-        // 菜单事件
-        if (menu) {
-            // 阻止隐藏菜单
-            menu.on('mousedown', '.table-columns, .table-filter', function (e) {
-                e.stopPropagation();
+        // 阻止隐藏菜单
+        menu.on('mousedown', '.table-columns, .table-filter', function (e) {
+            e.stopPropagation();
+        });
+
+        // 显示/隐藏列
+        menu.on('change', '.table-columns input', function (e) {
+            var index = +$(this).parents('.table-columns-item').data('index');
+            var col = colOptions[index];
+
+            col.hide = !$(this).prop('checked');
+            self.refresh(true);
+        });
+
+        // 筛选
+        menu.on('click', '.table-filter button', function (e) {
+            var val = menu.find('.table-filter input').val();
+            var th = menu.menu('getArgs');
+
+            // 移除筛选值
+            ele.find('.table-th-menu').each(function () {
+                $(this).parent().removeData('value');
             });
 
-            // 显示/隐藏列
-            menu.on('change', '.table-columns input', function (e) {
-                var index = +$(this).parents('li').data('index');
-                var col = colOptions[index];
+            // 保存筛选值
+            th.data('value', val);
+            self.filter(+th.data('field-index'), val);
+            menu.menu('hide');
+        });
 
-                col.hide = !$(this).prop('checked');
-                self.refresh();
-            });
-
-            // 筛选
-            menu.on('click', '.table-filter button', function (e) {
-                var val = menu.find('.table-filter input').val();
+        // 筛选
+        menu.on('keyup', '.table-filter input', function (e) {
+            if (e.which == 13) {
+                var val = this.value;
                 var th = menu.menu('getArgs');
 
                 // 移除筛选值
-                $container.find('.table-th-menu').each(function () {
+                ele.find('.table-th-menu').each(function () {
                     $(this).parent().removeData('value');
                 });
 
                 // 保存筛选值
                 th.data('value', val);
                 self.filter(+th.data('field-index'), val);
-            });
-
-            // 筛选
-            menu.on('keyup', '.table-filter input', function (e) {
-                if (e.which == 13) {
-                    var val = this.value;
-                    var th = menu.menu('getArgs');
-
-                    // 移除筛选值
-                    $container.find('.table-th-menu').each(function () {
-                        $(this).parent().removeData('value');
-                    });
-
-                    // 保存筛选值
-                    th.data('value', val);
-                    self.filter(+th.data('field-index'), val);
-                }                
-            });
-        }
+                menu.menu('hide');
+            }                
+        });
     }
 
-    var oldX, oldLeft, oldLineLeft;
-    var $target, index;
+    var target, oldX, oldLineLeft, index;
 
     //公用事件绑定
-    function bindCommonEvents () {
-        $(document).on('mousemove.drag', '.table-drag', function (e) {
-            var $dragLine = $target.find('.table-drag-line');
-            var $thead_ths = $target.find('.table-head .holder th');
-            var newWidth = Math.max($thead_ths.eq(index).width() + e.clientX - oldX, 40);
-            var lineLeft = oldLineLeft - ($thead_ths.eq(index).width() - newWidth);
+    (function () {
+        // 列宽度拖动中
+        $(document).on('mousemove.' + namespace, '.table-drag', function (e) {
+            var dragLine = target.find('.table-drag-line');
+            var theadThs = target.find('.table-head .holder th');
+            var newWidth = Math.max(theadThs.eq(index).width() + e.clientX - oldX, 40);
+            var lineLeft = oldLineLeft - (theadThs.eq(index).width() - newWidth);
 
-            $dragLine.css('left', lineLeft);
-
-            return false;
+            dragLine.css('left', lineLeft);
+            e.preventDefault();
         });
 
-        $(document).on('mouseup.drag', '.table-drag', function (e) {            
-            var $thead_ths = $target.find('.table-head .holder th');
-            var $tbody_ths = $target.find('.table-body .holder th');
-            var newWidth = Math.max($thead_ths.eq(index).width() + e.clientX - oldX, 40);
+        // 列宽度拖动结束
+        $(document).on('mouseup.' + namespace, '.table-drag', function (e) {
+            var theadThs = target.find('.table-head .holder th');
+            var tbodyThs = target.find('.table-body .holder th');
+            var newWidth = Math.max(theadThs.eq(index).width() + e.clientX - oldX, 40);
             var w = 0, totalW = 0;
 
-            $thead_ths.eq(index).width(newWidth);
+            theadThs.eq(index).width(newWidth);
 
-            //计算表格宽度
-            for (var i = 0, l = $thead_ths.length; i < l; i++) {
-                w = parseInt($thead_ths[i].style.width);
+            // 计算表格宽度
+            for (var i = 0, l = theadThs.length; i < l; i++) {
+                w = parseInt(theadThs[i].style.width);
 
-                if ($thead_ths.eq(i).is(':visible')) {
+                if (theadThs.eq(i).is(':visible')) {
                     totalW += w;
                 }
 
-                $tbody_ths.eq(i).width(w);
-                $thead_ths.eq(i).width(w);
+                tbodyThs.eq(i).width(w);
+                theadThs.eq(i).width(w);
             }
 
-            $target.find('.table').width(totalW);
+            target.find('.table').width(totalW);
+            target.find('.table-drag-line').hide();
             $('.table-drag').removeClass('table-drag');
-            $target.find('.table-drag-line').hide();
 
-            return false;
+            // 释放变量
+            target = null;
+            oldX = null;
+            oldLineLeft = null;
+            index = null;
+
+            e.preventDefault();
         });
-
-        $(document).on('click', function () {
-            $('.table-container .table-td-filter').removeClass('table-td-filter');
-        });
-    }
-
-    bindCommonEvents();
+    }());
 
     var NumberFormat = {
         toThousands: function (num, precision) {
@@ -1532,13 +1506,13 @@ $.extend($.fn, {
     var namespace = 'ui.' + pName;
 
     var methods = {
-        init: function (options) {
+        init: function (option) {
             methods.destroy.call(this);
 
             return this.each(function () {
-                var settings = $.extend(true, {}, Pager.DEFAULTS, $(this).data(), options);
+                option = $.extend(true, {}, Pager.DEFAULTS, option);
 
-                $(this).data(namespace, new Pager($(this), settings));
+                $(this).data(namespace, new Pager($(this), option));
             });
         },
 
@@ -1546,10 +1520,10 @@ $.extend($.fn, {
          * [reload 重新加载]
          * @return {[type]} [description]
          */
-        reload: function (data) {
+        reload: function (pageIndex, data) {
             return this.each(function () {
-                $(this).data(namespace).reload(data);
-            });            
+                $(this).data(namespace).reload(pageIndex, data);
+            });
         },
 
         /**
@@ -1562,126 +1536,121 @@ $.extend($.fn, {
                     $(this).data(namespace).destroy();
                 }
             });
+        },
+
+        /**
+         * [filter 在结果中筛选]
+         * @param  {[type]} filterName [description]
+         * @param  {[type]} keyword    [description]
+         * @return {[type]}            [description]
+         */
+        filter: function (filterName, keyword) {
+            return this.each(function () {
+                $(this).data(namespace).filter(filterName, keyword);
+            });
         }
     };
 
     /**
      * [Pager 分页对象]
-     * @param {[type]} settings [description]
      */
-    var Pager = function ($container, settings) {
-        this.container = $container;
-        this.options = settings;
+    var Pager = function (ele, setting) {
+        this.ele = ele;
+        this.setting = setting;
         this.startIndex = 1;
 
-        this.requestData(settings.pageIndex);
+        if (setting.pageSizeArray && setting.pageSizeArray[0]) {
+            setting.pageSize = setting.pageSizeArray[0];
+        }
+
+        this.requestData(setting.pageIndex);
     }
 
-    //默认选项
+    // 选项
     Pager.DEFAULTS = {
-        url             : '',                       //远程数据的url
-        type            : 'GET',                    //远程请求的方式
-        data            : false,                    //远程请求的参数
-        dataType        : 'json',                   //返回数据类型
-        jsonp           : 'callback',               //jsonp回调函数名称
+        url             : '',                       // 远程数据的url
+        type            : 'GET',                    // 远程请求的方式
+        data            : false,                    // 远程请求的参数
+        dataType        : 'json',                   // 返回数据类型
+        jsonp           : 'callback',               // jsonp回调函数名称
 
-        indexField      : 'pageIndex',              //页码字段名
-        sizeField       : 'pageSize',               //每页条数字段名
-        dataField       : 'data',                   //json数组字段名
-        totalField      : 'total',                  //总条数字段名
-        pageIndex       : 1,                        //从第几页开始
-        pageSize        : 20,                       //每页显示多少条数据
-        pageSizeArray   : false,                    //每页显示条数的选择
-        total           : 0,                        //数据总条数
-        totalPage       : 0,                        //总页数
-        pageLength      : 5,                        //显示的页码数
-        pageInfo        : false,                    //是否显示页码信息
-        skipPage        : true,                     //是否启用跳页
-        localPage       : false,                    //是否本地分页
-        localData       : false,                    //保存本地数据
+        indexField      : 'pageIndex',              // 页码字段名
+        sizeField       : 'pageSize',               // 每页条数字段名
+        dataField       : 'data',                   // json数组字段名
+        totalField      : 'total',                  // 总条数字段名
 
-        beforeSend      : function () {},           //请求之前的回调
-        complete        : function () {},           //请求完成的回调
-        success         : function () {},           //分页成功之后的回调
-        error           : function () {},           //请求错误回调
-        resultVerify    : function () {},           //返回结果验证
-        onInit          : false                     //初始化完成的回调
+        // 分页信息
+        pageIndex       : 1,                        // 从第几页开始
+        pageSize        : 20,                       // 每页显示多少条数据
+        pageSizeArray   : false,                    // 每页显示条数的选择
+        total           : 0,                        // 数据总条数
+        totalPage       : 0,                        // 总页数
+        pageLength      : 5,                        // 显示的页码数
+        pageInfo        : false,                    // 是否显示页码信息
+        skipPage        : true,                     // 是否启用跳页
+        localPage       : false,                    // 是否本地分页
+        localData       : false,                    // 保存本地数据
+
+        beforeSend      : function () {},           // 请求之前的回调
+        complete        : function () {},           // 请求完成的回调
+        success         : function () {},           // 分页成功之后的回调
+        error           : function () {},           // 请求错误回调
+        onInit          : false                     // 初始化完成的回调
     }
 
     /**
      * [requestData 请求数据]
      * @param  {[type]} pageIndex  [页码]
-     * @return {[type]}            [description]
      */
     Pager.prototype.requestData = function (pageIndex) {
-        var self = this,
-            $container = this.container,
-            options = this.options,
-            url = options.url,
-            data = options.data,
-            param;
+        var self = this;
+        var ele = this.ele;
+        var setting = this.setting;
+        var data;
 
-        if (typeof data === 'function') {
-            param = data();
+        if (typeof setting.data === 'function') {
+            data = $.extend(true, {}, setting.data(), this.extraData);
         } else {
-            param = $.extend(true, {}, data);
+            data = $.extend(true, {}, setting.data, this.extraData);
         }
 
-        if (!options.localPage) {
-            param[options.indexField] = pageIndex;
-            param[options.sizeField] = options.pageSize;
+        if (!setting.localPage) {
+            data[setting.indexField] = pageIndex;
+            data[setting.sizeField] = setting.pageSize;
         }
         
         var ajaxOption = {
-            url: url,
-            type: options.type,
-            data: param,
-            dataType: options.dataType,
-            jsonp: options.jsonp,
-            beforeSend: options.beforeSend,
-            complete: options.complete,
-            error: options.error,
+            url: setting.url,
+            type: setting.type,
+            data: data,
+            dataType: setting.dataType,
+            jsonp: setting.jsonp,
+            beforeSend: setting.beforeSend,
+            complete: setting.complete,
+            error: setting.error,
             success: function (res) {
-                var ret = options.resultVerify(res);
+                // 保存数据
+                self.dataList = (setting.dataField ? res[setting.dataField] : res) || [];
+                setting.dataList = self.dataList.slice(0);
 
-                if (ret === false) {
-                    return false;
-                }
+                // 计算总页码等信息
+                setting.pageIndex = pageIndex;
+                setting.total = setting.localPage ? setting.dataList.length : res[setting.totalField];
+                setting.totalPage = Math.ceil(setting.total / setting.pageSize);
+                
+                // 生成页码
+                self.initPage();
 
-                var data = (options.dataField ? res[options.dataField] : res) || [];
-
-                //计算总页码等信息
-                options.pageIndex = pageIndex;
-                options.total = options.localPage ? data.length : res[options.totalField];
-                options.totalPage = Math.ceil(options.total / options.pageSize);
-                $container.empty();
-
-                if (options.total > 0) {
-                    self.initPage();
-                }
-
-                if (options.localPage) {
-                    if ($.isArray(res)) {
-                        self.localRes = res.slice(0);
-                    } else {
-                        self.localRes = $.extend(true, {}, res);
-                    }
-
-                    //本地分页需要将res的data重新加算
-                    if (options.dataField) {
-                        res[options.dataField] = data.slice(0, options.pageIndex * options.pageSize);
-                    } else {
-                        res = data.slice(0, options.pageIndex * options.pageSize);
-                    }
-
-                    options.success(res);
+                // 返回数据
+                if (setting.localPage) {
+                    setting.success(setting.dataList.slice(0, setting.pageIndex * setting.pageSize));
                 } else {
-                    options.success(res);
-                }                
+                    setting.success(setting.dataList.slice(0));
+                }
             }
         }
 
-        //中止之前的请求，防止不停点击
+        // 中止之前的请求，防止不停点击
         if (this.ajaxObj) {
             this.ajaxObj.abort();
         }
@@ -1690,92 +1659,45 @@ $.extend($.fn, {
     }
 
     /**
-     * [skipPage 本地页码跳转]
-     * @return {[type]} [description]
-     */
-    Pager.prototype.skipPage = function (pageIndex) {
-        var options = this.options;
-
-        options.pageIndex = pageIndex;
-
-        this.container.empty();
-        this.initPage();
-
-        var res;
-
-        if ($.isArray(this.localRes)) {
-            res = this.localRes.slice(0);
-        } else {
-            res = $.extend(true, {}, this.localRes);
-        }
-
-        //本地分页需要将res的data重新加算
-        if (options.dataField) {
-            res[options.dataField] = res[options.dataField].slice((pageIndex - 1) * options.pageSize, pageIndex * options.pageSize);
-        } else {
-            res = res.slice((pageIndex - 1) * options.pageSize, pageIndex * options.pageSize);
-        }
-
-        options.success(res, true);
-    }
-
-    /**
-     * [calcPage 计算起始页码]
-     * @return {[type]}           [description]
-     */
-    Pager.prototype.calcPage = function () {
-        var options = this.options;
-        var pageIndex = options.pageIndex;
-
-        if (pageIndex <= this.startIndex || pageIndex == options.totalPage) {
-            this.startIndex = Math.max(1, pageIndex - options.pageLength + 1);
-        } else if (pageIndex >= this.endIndex) {
-            this.startIndex = Math.min(pageIndex, options.totalPage - options.pageLength + 1);
-        }
-
-        this.endIndex = Math.min(this.startIndex + options.pageLength - 1, options.totalPage);
-    }
-
-    /**
      * [initPage 生成页码信息]
-     * @return {[type]} [description]
      */
     Pager.prototype.initPage = function () {
         var self = this;
+        var setting = this.setting;
+        var pageSizeArray = setting.pageSizeArray;
+        var ele = this.ele.empty();
 
-        var options = this.options;
-        var pageSizeArray = options.pageSizeArray;
-        var $container = this.container;
+        if (setting.total <= 0) {
+            return;
+        }
 
         this.calcPage();
 
-        var html =  '<div class="pagination'+(options.pageInfo ? ' justify"' : '')+'">'+
+        var html =  '<div class="pagination' + (setting.pageInfo ? ' justify"' : '') + '">' +
                         '<div class="paging">' +
                             this.firstPage() +
                             this.pageList() +
                             this.lastPage() +
                         '</div>';
 
-        if (options.pageInfo) {
+        if (setting.pageInfo) {
             html += '<div class="pageinfo">'+
-                        '<span>'+
-                            '共<span class="pageinfo-text">'+options.totalPage+'</span>页'+
-                            '<span class="pageinfo-text">'+options.total+'</span>条数据'+
-                        '</span>';
+                        '共<span class="pageinfo-text">' + setting.totalPage + '</span>页'+
+                        '<span class="pageinfo-text">' + setting.total + '</span>条数据';
 
             if ($.isArray(pageSizeArray)) {
-                html += '<span class="pageinfo-text">每页显示：</span>'+
-                        '<select class="pageSize">';
+                html += '&nbsp;&nbsp;每页显示'+
+                        '<select class="pageinfo-size">';
                 
                 for (var i = 0, l = pageSizeArray.length; i < l; i++) {
-                    html += '<option value="'+pageSizeArray[i]+'">'+pageSizeArray[i]+'条</option>';
+                    html += '<option value="' + pageSizeArray[i] + '">' + pageSizeArray[i] + '条</option>';
                 }
 
                 html += '</select>';
             }
 
-            if (options.skipPage) {
-                html += '<span>&nbsp;&nbsp;&nbsp;&nbsp;跳转到第<input class="pageinfo-skip" />页</span>';
+            if (setting.skipPage) {
+                html += '&nbsp;&nbsp;跳转到第<input class="pageinfo-skip" />页';
             }
 
             html += '</div>';
@@ -1783,141 +1705,155 @@ $.extend($.fn, {
                         
         html += '</div>';
 
-        html = html.replace('<option value="'+options.pageSize+'">', '<option value="'+options.pageSize+'" selected="selected">');
+        html = html.replace('<option value="' + setting.pageSize + '">', '<option value="' + setting.pageSize + '" selected="selected">');
 
-        $container.append(html);
+        ele.append(html);
 
         setTimeout(function () {
-            if (!self.initFlag) {
+            if (!self.isBindedEvent) {
                 self.bindEvents();
             }
 
-            if (options.onInit) {
-                options.onInit.call($container[0], options);
+            if (setting.onInit) {
+                setting.onInit.call(ele[0], setting);
             }
+        }, 10);
+    }
 
-            self.initFlag = true;
-        }, 0);
-    },
+    /**
+     * [calcPage 计算起始页码]
+     */
+    Pager.prototype.calcPage = function () {
+        var setting = this.setting;
+        var pageIndex = setting.pageIndex;
+
+        if (pageIndex <= this.startIndex || pageIndex == setting.totalPage) {
+            this.startIndex = Math.max(1, pageIndex - setting.pageLength + 1);
+        } else if (pageIndex >= this.endIndex) {
+            this.startIndex = Math.min(pageIndex, setting.totalPage - setting.pageLength + 1);
+        }
+
+        this.endIndex = Math.min(this.startIndex + setting.pageLength - 1, setting.totalPage);
+    }
 
     /**
      * [prevPage 第一页]
-     * @return {[type]} [description]
      */
     Pager.prototype.firstPage = function () {
-        if (this.options.pageIndex > 1) {
-            return "<a class='paging-btn paging-btn-first' title='首页' data-topage='1'>«</a>";
+        if (this.setting.pageIndex > 1) {
+            return '<a class="paging-btn paging-btn-first" title="首页" data-topage="1">«</a>';
         } else {
-            return "<a class='paging-btn paging-btn-first paging-btn-disabled' title='首页'>«</a>";
+            return '<a class="paging-btn paging-btn-first paging-btn-disabled" title="首页">«</a>';
         }
-    },
+    }
 
     /**
      * [nextPage 最后一页]
-     * @return {[type]} [description]
      */
     Pager.prototype.lastPage = function () {
-        var options = this.options,
-            pageIndex = options.pageIndex,
-            totalPage = options.totalPage;
+        var setting = this.setting;
 
-        if (pageIndex < totalPage) {
-            return "<a class='paging-btn paging-btn-last' title='尾页' data-topage='"+totalPage+"'>»</a>";
+        if (setting.pageIndex < setting.totalPage) {
+            return '<a class="paging-btn paging-btn-last" title="尾页" data-topage="' + setting.totalPage + '">»</a>';
         } else {
-            return "<a class='paging-btn paging-btn-last paging-btn-disabled' title='尾页'>»</a>";
+            return '<a class="paging-btn paging-btn-last paging-btn-disabled" title="尾页">»</a>';
         }
     },
 
     /**
      * [pageList 数字页码]
-     * @return {[type]} [description]
      */
     Pager.prototype.pageList = function () {
-        var options = this.options,
-            pageIndex = options.pageIndex;
+        var setting = this.setting;
 
-        var html = "";
+        var html = '';
 
         for (var i = this.startIndex; i <= this.endIndex; i++) {
-            if (i == pageIndex) {
-                html += "<a class='paging-btn paging-btn-curr'>"+i+"</a>";
+            if (i == setting.pageIndex) {
+                html += '<a class="paging-btn paging-btn-curr" data-topage="' + i + '">' + i + '</a>';
             } else {
-                html += "<a class='paging-btn'>"+i+"</a>";
+                html += '<a class="paging-btn" data-topage="' + i + '">' + i + '</a>';
             }
         }
 
-        if (this.endIndex < options.totalPage) {
-            html += "<span class='paging-btn paging-btn-disabled'>...</span>";
+        if (this.endIndex < setting.totalPage) {
+            html += '<span class="paging-btn paging-btn-disabled">...</span>';
         }
 
         return html;
     }
 
     /**
-     * [reload 重新加载第一页]
-     * @param  {[type]} data [description]
-     * @return {[type]}      [description]
+     * [skipPage 本地页码跳转]
      */
-    Pager.prototype.reload = function (data) {        
-        if (typeof data != 'undefined') {
-            this.options.data = data;
-        }
+    Pager.prototype.skipPage = function (pageIndex) {
+        var setting = this.setting;
+        setting.pageIndex = pageIndex;
 
-        this.requestData(1);
+        this.initPage();
+
+        setting.success(setting.dataList.slice((pageIndex - 1) * setting.pageSize, pageIndex * setting.pageSize));
     }
 
-    //销毁组件
+    /**
+     * [reload 重新加载某一页，默认当前页]
+     * @param  {[type]} pageIndex [页码]
+     */
+    Pager.prototype.reload = function (pageIndex, data) {
+        pageIndex = pageIndex === undefined ? this.setting.pageIndex : pageIndex;
+        this.extraData = data;
+        this.requestData(pageIndex);
+    }
+
+    /**
+     * [destroy 销毁组件]
+     */
     Pager.prototype.destroy = function () {
-        this.container
+        this.ele
             .off()
             .removeData(namespace)
             .empty();
     }
 
-    // 本地分页时筛选
-    Pager.prototype.localFilter = function (filterName, keyword) {
-        var options = this.options;
+    /**
+     * [filter 结果中筛选]
+     * @param  {[type]} filterName  [筛选字段名]
+     * @param  {[type]} keyword [筛选值]
+     */
+    Pager.prototype.filter = function (filterName, keyword) {
+        var setting = this.setting;
+        var dataList = this.dataList.slice(0);
 
-        if (options.localPage) {
-            var dataList, filtered;
+        setting.dataList = [];
 
-            if (options.dataField) {
-                filtered = $.exnted(true, {}, this.localRes);
-                filtered[options.dataField] = [];
-                dataList = this.localRes[options.dataField];
-            } else {
-                dataList = this.localRes;
-                filtered = [];
+        for (var i = 0, l = dataList.length; i < l; i++) {
+            var data = dataList[i];
+            var val = data[filterName];
+
+            // 处理undefined和null
+            if (val === undefined || val === null) {
+                val = '';
             }
 
-            for (var i = 0, l = dataList.length; i < l; i++) {
-                var val = dataList[i][filterName];
+            val = val.toString();
 
-                // 处理undefined和null
-                if (val === undefined || val === null) {
-                    val = '';
-                }
-
-                val = val.toString();
-
-                if (val.indexOf(keyword) > -1) {
-                    if (options.dataField) {
-                        filtered[options.dataField].push(this.dataList[i]);
-                    } else {
-                        filtered.push(this.dataList[i]);
-                    }                    
-                }
+            if (val.indexOf(keyword) > -1) {
+                setting.dataList.push(data);             
             }
+        }
 
-            //计算总页码等信息
-            options.pageIndex = 1;
-            options.total = options.dataField ? filtered[options.dataField].length : filtered.length;
-            options.totalPage = Math.ceil(options.total / options.pageSize);
-            this.container.empty();
+        // 计算总页码等信息
+        setting.pageIndex = 1;
+        setting.total = setting.dataList.length;
+        setting.totalPage = Math.ceil(setting.total / setting.pageSize);
 
-            if (options.total > 0) {
-                this.initPage();
-            }
+        this.initPage();
+
+        // 返回数据
+        if (setting.localPage) {
+            setting.success(setting.dataList.slice(0, setting.pageIndex * setting.pageSize));
+        } else {
+            setting.success(setting.dataList.slice(0));
         }
     }
 
@@ -1927,38 +1863,40 @@ $.extend($.fn, {
      */
     Pager.prototype.bindEvents = function () {
         var self = this;
+        var setting = this.setting;
+        var ele = this.ele;
 
-        var options = this.options,
-            $container = this.container;
+        // 标识绑定过事件
+        this.isBindedEvent = true;
 
-        //每页显示条数切换事件
-        $container.on("change", ".pageSize", function (e) {
-            options.pageSize = +$(this).val();
-            self.requestData(1, true);
+        // 每页显示条数切换事件
+        ele.on('change', '.pageinfo-size', function (e) {
+            setting.pageSize = +$(this).val();
+            self.requestData(1);
         });
 
-        //页码翻页事件
-        $container.on("click.pager", ".paging-btn:not(.paging-btn-disabled, .paging-btn-curr)", function () {
-            var pageIndex = +($(this).data("topage") || $(this).text());
+        // 页码翻页事件
+        ele.on('click', '.paging-btn:not(.paging-btn-disabled)', function () {
+            var pageIndex = +$(this).data('topage');
 
-            if (options.localPage) {
+            if (setting.localPage) {
                 self.skipPage(pageIndex);
             } else {
-                self.requestData(pageIndex, true);
+                self.requestData(pageIndex);
             }
         });
 
-        //页码翻页事件
-        $container.on("keydown.pager", ".pageinfo-skip", function (e) {
+        // 页码翻页事件
+        ele.on('keydown', '.pageinfo-skip', function (e) {
             if (e.which == 13) {
                 var pageIndex = +$(this).val();
 
-                if (isNaN(pageIndex) || pageIndex > options.totalPage || pageIndex <= 0) {
+                if (isNaN(pageIndex) || pageIndex > setting.totalPage || pageIndex <= 0) {
                     alert('请输入有效页码');
                     return;
                 }
 
-                if (options.localPage) {
+                if (setting.localPage) {
                     self.skipPage(pageIndex);
                 } else {
                     self.requestData(pageIndex, true);
@@ -1989,14 +1927,13 @@ $.extend($.fn, {
 
     var methods = {
         // 组件初始化
-        init: function (options) {
+        init: function (option) {
             methods.destroy.call(this);
 
             return this.each(function () {
                 var $this = $(this);
-                var setting = $.extend(true, {}, UiSelect.DEFAULTS, $this.data(), options);
-
-                $this.data(namespace, new UiSelect($this, setting));
+                option = $.extend(true, {}, UiSelect.DEFAULTS, option);
+                $this.data(namespace, new UiSelect($this, option));
             });
         },
 
@@ -2005,6 +1942,21 @@ $.extend($.fn, {
             return this.each(function () {
                 $(this).data(namespace).setValue(value);
             });
+        },
+
+        //获取值
+        getValue: function () {
+            return this.eq(0).data(namespace).getValue();
+        },
+
+        //获取值
+        getText: function () {
+            return this.eq(0).data(namespace).getText();
+        },
+
+        //获取选中数据
+        getSelectedData: function () {
+            return this.eq(0).data(namespace).getSelectedData();
         },
 
         //销毁组件
@@ -2060,7 +2012,7 @@ $.extend($.fn, {
         template        : '<td>#{}</td>',   // 模板
         textField       : '',               // text字段名
         valueField      : '',               // value字段名
-        seprator        : ',',              // 多选值分隔符
+        separator       : ',',              // 多选值分隔符
         disabled        : false,            // 是否禁用
         search          : false,            // 是否搜索
         multi           : false             // 是否多选
@@ -2082,7 +2034,7 @@ $.extend($.fn, {
                     '<div class="ui-select-caret"><b></b></div>' +
                 '</div>' +
                 '<div class="ui-select-box">'+
-                    (setting.search ? '<div class="ui-select-search"><input type="text"></div>' : '') +
+                    (setting.search ? '<div class="ui-select-search"><input class="form-control" type="text"></div>' : '') +
                     '<div class="ui-select-list"><table></table></div>' +
                 '</div>' +
                 '<input class="ui-select-value" type="hidden" name="' + setting.name + '" />' +
@@ -2254,7 +2206,7 @@ $.extend($.fn, {
             throw new Error('Value can not be an array when multi option is false!');
         }
 
-        if ($.isArray(value)) {
+        if (!$.isArray(value)) {
             value = [value];
         }
 
@@ -2263,7 +2215,7 @@ $.extend($.fn, {
             var key = setting.valueField ? dataList[i][setting.valueField] : dataList[i];
 
             for (var j = 0, jLen = value.length; j < jLen; j++) {
-                if (key === value[j]) {
+                if ('' + key === '' + value[j]) {
                     this.selectedData.push(dataList[i]);
                 }
             }
@@ -2289,6 +2241,30 @@ $.extend($.fn, {
         if (!isSame) {
             this.setSelect();
         }
+    }
+
+    /**
+     * [getValue 获取选中值]
+     * @param {[type]} value [description]
+     */
+    UiSelect.prototype.getValue = function () {
+        return this.ele.find('.ui-select-value').val();
+    }
+
+    /**
+     * [getText 获取选中文本]
+     * @param {[type]} value [description]
+     */
+    UiSelect.prototype.getText = function () {
+        return this.ele.find('.ui-select-text').val();
+    }
+
+    /**
+     * [getSelectedData 获取选中数据]
+     * @param {[type]} value [description]
+     */
+    UiSelect.prototype.getSelectedData = function () {
+        return this.selectedData;
     }
 
     /**
@@ -2470,14 +2446,13 @@ $.extend($.fn, {
     var namespace = 'ui.' + pName;
 
     var methods = {
-        init: function (options) {     
+        init: function (option) {     
             methods.destroy.call(this);
 
             return this.each(function() {
                 var $this = $(this);
-                var settings = $.extend(true, {}, Scrollbar.DEFAULTS, $this.data(), options); 
-                
-                $this.data(namespace, new Scrollbar($this, settings));
+                option = $.extend(true, {}, Scrollbar.DEFAULTS, $this.data(), option);                
+                $this.data(namespace, new Scrollbar($this, option));
             });
         },
 
@@ -2804,11 +2779,11 @@ $.extend($.fn, {
     /**
      * [Gallery 下拉框插件对象]
      */
-    var Gallery = function (options) {
-        if ($.isArray(options)) {
-            this.settings = $.extend(true, {}, Gallery.DEFAULTS, {data: options});
-        } else if (typeof options === 'object') {
-            this.settings = $.extend(true, {}, Gallery.DEFAULTS, options);
+    var Gallery = function (option) {
+        if ($.isArray(option)) {
+            this.settings = $.extend(true, {}, Gallery.DEFAULTS, { data: option });
+        } else if (typeof option === 'object') {
+            this.settings = $.extend(true, {}, Gallery.DEFAULTS, option);
         } else {
             $.error('参数不正确！');
         }
@@ -3245,8 +3220,8 @@ $.extend($.fn, {
 
     bindCommonEvents();
 
-    $.gallery = function (options) {
-        return new Gallery(options);
+    $.gallery = function (option) {
+        return new Gallery(option);
     }
 
     // Gallery DATA-API
@@ -3262,12 +3237,12 @@ $.extend($.fn, {
             });
         });
 
-        var options = $.extend(true, {}, Gallery.DEFAULTS, {
+        var option = $.extend(true, {}, Gallery.DEFAULTS, {
             data: data,
             index: index
         }, $ul.data());
 
-        $ul.data(namespace, $.gallery(options));
+        $ul.data(namespace, $.gallery(option));
 
         return false;
     });
@@ -3691,9 +3666,12 @@ $.extend($.fn, {
         },
         show: function (option) {
             return this.each(function () {
-                if ($(this).data(namespace)) {
-                    $(this).data(namespace).show(option);
-                }
+                $(this).data(namespace).show(option);
+            });
+        },
+        hide: function () {
+            return this.each(function () {
+                $(this).data(namespace).hide();
             });
         },
         // 获取show方法传递的额外参数
@@ -3760,7 +3738,9 @@ $.extend($.fn, {
 
     // 销毁组件
     Menu.prototype.destroy = function () {
-        this.ele.removeData(namespace);
+        this.ele
+            .off('mouseenter.' + namespace)
+            .removeData(namespace);
     };
 
     // 绑定事件
@@ -3770,7 +3750,7 @@ $.extend($.fn, {
         var self = this;
 
         // 显示子菜单
-        ele.on('mouseenter', '.ui-menu-item', function (e) {            
+        ele.on('mouseenter.' + namespace, '.ui-menu-item', function (e) {            
             // 隐藏同级菜单的子菜单
             $(this).siblings('.ui-menu-item').each(function () {
                 $(this).removeClass('hover');
