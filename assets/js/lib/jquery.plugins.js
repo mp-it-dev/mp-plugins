@@ -443,7 +443,7 @@ $.extend($.fn, {
         this.menu = $('<ul class="ui-menu"></ul>').appendTo('body');
 
         // 设置列索引
-        var ths = ele.find('.table-head .holder th');
+        var ths = ele.find('.table-head .table-th');
         for (var i = 0, l = ths.length; i < l; i++) {
             ths.eq(i).attr('data-index', i);
         }
