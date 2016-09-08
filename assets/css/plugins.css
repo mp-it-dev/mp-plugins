@@ -85,12 +85,21 @@
     -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
     box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
 }
+.table-container .table-col-display {
+    display: inline-block;
+    font-size: 12px;
+    color: #ccc;
+}
+.table-container .table-col-display:hover {
+    color: #000;
+    cursor: pointer;
+}
 .table-container .table-th-resize {
     position: absolute;
-    right: 0;
+    right: -2px;
     top: 0;
     z-index: 1;
-    width: 2px;
+    width: 4px;
     height: 100%;
     cursor: e-resize;
 }
@@ -197,25 +206,34 @@
 }
 .table-columns {
     background-color: #fff;
+    padding: 10px 0;
 }
-.table-columns li:hover {
+.table-columns-item {    
+    padding: 3px 20px;
+}
+.table-columns-item:hover {
     background-color: #e3e8f7;
 }
-.table-columns li label {
+.table-columns-item.disabled {
+    background-color: #fff;
+    cursor: not-allowed;
+}
+.table-columns-item label {
     display: block;
-    padding: 5px 20px;
     margin: 0;
     font-weight: normal;
     line-height: 1.5;
     white-space: nowrap;
 }
-.table-columns li label input {
+.table-columns-item.disabled label {
+    cursor: not-allowed;
+}
+.table-columns-item label input {
     position: relative;
     top: 2px;
 }
-.table-filter {
-    padding: 10px;
-    background-color: #fff;
+.ui-menu.table-filter {
+    border-width: 0;
 }
 .table-filter input.form-control {
     width: 150px;
@@ -297,7 +315,7 @@
 .pagination .pagecount {
     width: 70px;
 }
-.pagination .pageSize {
+.pagination .pageinfo-size {
     height: 22px;
     border: 1px solid #ccc;
     outline: 0;
