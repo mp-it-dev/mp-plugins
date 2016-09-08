@@ -250,17 +250,17 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 					$this.data(namespace, swfuploadify);
 					
 					// Wrap the instance
-					var $wrapper = $('<div class="uploadify" id="' + settings.id + '"><span class="uploadify-wrapper"></span></div>');
-					$('#' + swfuploadify.movieName).wrap($wrapper);
-					// Recreate the reference to wrapper
-					$wrapper = $('#' + settings.id);
-					// Add the data object to the wrapper 
-					$wrapper.data(namespace, swfuploadify);
+					var $ele = $('<div class="uploadify" id="' + settings.id + '"><span class="uploadify-wrapper"></span></div>');
+					$('#' + swfuploadify.movieName).wrap($ele);
+					// Recreate the reference to ele
+					$ele = $('#' + settings.id);
+					// Add the data object to the ele 
+					$ele.data(namespace, swfuploadify);
 					// 修改button的id
 					$(this).attr('id', settings.id + '-button');
 
 					// 包裹button
-					$wrapper.append(
+					$ele.append(
 						'<div class="uploadify-option">' +
 							this.outerHTML +
 						'</div>'
@@ -269,7 +269,7 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 
 					//添加上传描述
 					if (settings.uploadDesc) {
-						$wrapper.find('.uploadify-option').append('<span class="uploadify-desc">' + settings.uploadDesc + '</span>');
+						$ele.find('.uploadify-option').append('<span class="uploadify-desc">' + settings.uploadDesc + '</span>');
 					}
 
 					// Adjust the styles of the movie
@@ -280,7 +280,7 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 					
 					// Create the file queue
 					if (!settings.queueID) {
-						var $queue = $('<div class="uploadify-queue" id="' + settings.id + '-queue"></div>').appendTo($wrapper);
+						var $queue = $('<div class="uploadify-queue" id="' + settings.id + '-queue"></div>').appendTo($ele);
 
 						swfuploadify.settings.queueID      = settings.id + '-queue';
 						swfuploadify.settings.defaultQueue = true;
@@ -306,8 +306,9 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 					};
 
 					// Save references to all the objects
+					swfuploadify.id 	  = settings.id;
+					swfuploadify.ele  	  = $ele;
 					swfuploadify.original = $clone;
-					swfuploadify.wrapper  = $wrapper;
 					swfuploadify.button   = $button;
 					swfuploadify.queue    = $queue;
 

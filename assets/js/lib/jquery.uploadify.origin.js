@@ -72,7 +72,8 @@
     };
 
     var Uploadify = function (ele, setting) {
-        this.originEle = ele.clone();
+        this.id = setting.id;
+        this.original = ele.clone();
         this.setting = setting;
         this.queueData = {
             files: {},

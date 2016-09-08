@@ -273,12 +273,11 @@ $.extend($.fn, {
 
         /**
          * [reload 重新加载表格]
-         * @param  {[Boolean]} async     [是否远程加载，默认true]
          * @param  {[Number]} pageIndex [加载哪一页，默认当前页]
          */
-        reload: function (async, pageIndex) {
+        reload: function (pageIndex) {
             return this.each(function () {
-                $(this).data(namespace).reload(async, pageIndex);                
+                $(this).data(namespace).reload(pageIndex);                
             });
         },
 
