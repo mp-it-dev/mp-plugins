@@ -1686,7 +1686,7 @@ $.extend($.fn, {
                         '<span class="pageinfo-text">' + setting.total + '</span>条数据';
 
             if ($.isArray(pageSizeArray)) {
-                html += '&nbsp;&nbsp;每页显示'+
+                html += '&nbsp;&nbsp;每页显示 '+
                         '<select class="pageinfo-size">';
                 
                 for (var i = 0, l = pageSizeArray.length; i < l; i++) {

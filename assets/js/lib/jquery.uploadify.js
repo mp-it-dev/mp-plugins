@@ -104,16 +104,16 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 (function (factory) {
     // AMD
     if (typeof define === 'function' && define.amd) {
-        define(['jquery'], factory);
+        define(['jquery', 'util'], factory);
     } else {
-        if (!jQuery) {
-            throw new Error('uploadify depends on jquery');
+        if (!jQuery || !util) {
+            throw new Error('uploadify depends on jquery, util');
         }
 
-        factory(jQuery);
+        factory(jQuery, util);
     }
 }
-(function($) {
+(function($, util) {
 	var namespace = 'ui.uploadiyf';
 	var uploadifyId = 0;
 
@@ -676,13 +676,14 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 				settings.onSelect.apply(this, arguments);
 			} else if (settings.defaultTemplate) {
 				var itemTemplate = 
-					'<div id="${fileID}" class="uploadify-queue-item">\
-						<span class="icon"></span>\
-						<span class="file-name" title="${origin_name}">${fileName}</span>\
-						<span class="uploadify-progress">\
-							<span class="uploadify-progress-bar">&nbsp;</span>\
+					'<div id="${fileID}" class="uploadify-queue-item" data-status="queued">\
+						<span class="file-icon">\
+							<span class="icon queued"></span>\
 						</span>\
-						<span class="data">Waiting</span>\
+						<span class="file-name">\
+							<span class="file-name-text" title="${origin_name}">${fileName}</span>\
+						</span>\
+						<span class="file-data">Waiting</span>\
 						<span class="file-operate">\
 							<a class="file-cancel" href="#" onclick="$(\'#${instanceID}\').uploadify(\'cancel\', \'${fileID}\');return false;">取消</a>\
 						</span>\
@@ -887,8 +888,7 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 			} else if (settings.defaultTemplate) {
 				//更新状态
 				$('#' + file.id).attr('data-status', 'error');
-				$('#' + file.id).find('icon').attr('class', 'icon error');
-				$('#' + file.id).find('.uploadify-progress-bar').css('width','1px');
+				$('#' + file.id).find('.file-icon').html('<span class="icon error"></span>');
 			}
 		},
 
@@ -929,12 +929,7 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 			if (settings.onUploadProgress) {
 				settings.onUploadProgress.call(this, file, fileBytesLoaded, fileTotalBytes, queueBytesLoaded, this.queueData.uploadSize);
 			} else if (settings.defaultTemplate) {
-				if (settings.progressData == 'percentage') {
-					$('#' + file.id).find('.data').html(percentage + '%');
-				} else if (settings.progressData == 'speed' && lapsedTime > 500) {
-					$('#' + file.id).find('.data').html(this.queueData.averageSpeed + suffix);
-				}
-				$('#' + file.id).find('.uploadify-progress-bar').css('width', percentage + '%');
+				$('#' + file.id).find('.file-data').html(percentage + '%');
 			}
 		},
 
@@ -980,7 +975,7 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 			} else if (settings.defaultTemplate) {
 				//更新状态
 				$('#' + file.id).attr('data-status', 'uploading');
-				$('#' + file.id).find('icon').attr('class', 'icon uploading');
+				$('#' + file.id).find('.file-icon').html('<span class="icon uploading"></span>');
 			}
 		},
 
@@ -1000,108 +995,24 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 			if (settings.onUploadSuccess) {
 				settings.onUploadSuccess.call(this, file, data, response); 
 			} else if (settings.defaultTemplate) {
-				var html = '<div id="'+file.id+'" class="uploadify-queue-item success">' +
-                    '<span class="icon ' + Util.getFileIcon(file.name) + '"></span>' +
-                    '<span class="file-name" title="'+file.name+'">' + file.name + "</span>" +
-                    '<span class="file-size">' + Util.getFileSize(file.size) + '</span>' +
-                    '<span class="file-operate">' +
-                        '<a class="file-del" href="#">删除</a>'+
-                    '</span>' +
-                '</div>';
+				var html = 
+					'<div id="'+file.id+'" class="uploadify-queue-item" data-status="success">\
+	                    <span class="file-icon">\
+	                    	<span class="icon ' + util.getFileIcon(file.name) + '"></span>\
+	                    </span>\
+	                    <span class="file-name">\
+							<span class="file-name-text" title="' + file.name + '">' + file.name + '</span>\
+						</span>\
+	                    <span class="file-data">' + util.getFileSize(file.size) + '</span>\
+	                    <span class="file-operate">\
+	                        <a class="file-del" href="#">删除</a>\
+	                    </span>\
+	                </div>';
 
 				var $item = $('#' + file.id).replaceWith(html);
-				var self = this;
-
-				$('#' + file.id).on('click', '.file-del', function () {
-				    $('#' + file.id).remove();
-				    if (settings.onCancel) settings.onCancel.call(self, file);
-				    return false;
-				});
 			}
 		}
 
-	}
-
-	var Util = {};
-
-	//获取文件扩展名的icon
-	Util.getFileIcon = function (fileName) {
-        var extName = fileName.substring(fileName.lastIndexOf('.'));
-        var className = '';
-
-        switch (extName.toLowerCase()) {
-            case '.xls':
-                className = 'icon-xls';
-                break;
-            case '.xlsx':
-                className = 'icon-xlsx';
-                break;
-            case '.doc':
-                className = 'icon-doc';
-                break;
-            case '.docx':
-                className = 'icon-docx';
-                break;
-            case '.ppt':
-                className = 'icon-ppt';
-                break;
-            case '.pptx':
-                className = 'icon-pptx';
-                break;
-            case '.pdf':
-                className = 'icon-pdf';
-                break;
-            case '.txt':
-                className = 'icon-txt';
-                break;
-            case '.xml':
-                className = 'icon-xml';
-                break;
-            case '.csv':
-                className = 'icon-csv';
-                break;
-            case '.zip':
-            case '.7z':
-                className = 'icon-zip';
-                break;
-            case ".rar":
-                className = 'icon-rar';
-                break;
-            case '.png':
-                className = 'icon-png';
-                break;
-            case '.jpg':
-            case '.jpeg':
-                className = 'icon-jpg';
-                break;
-            case '.gif':
-                className = 'icon-gif';
-                break;
-            case '.js':
-                className = 'icon-js';
-                break;
-            case '.css':
-                className = 'icon-css';
-                break;
-            default:
-                className = 'icon-more';
-                break;
-        }
-
-        return className;
-    }
-
-	//计算文件大小
-	Util.getFileSize = function (fileSize) {
-	    fileSize = parseInt(fileSize);
-
-	    if (fileSize > 1024 * 1024) {
-	        return (fileSize/(1024*1024)).toFixed(2) + ' MB';
-	    } else if (fileSize > 1024) {
-	        return (fileSize / 1024).toFixed(2) + ' KB';
-	    } else {
-	    	return fileSize + ' B';
-	    }
 	}
 
 	$.fn.uploadify = function (method) {

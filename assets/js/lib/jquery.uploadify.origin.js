@@ -201,14 +201,15 @@
             // 在DOM中创建上传模板
             var itemTemplate = 
                 '<div id="#{id}" class="uploadify-queue-item" data-status="queued">\
-                    <span class="icon queued"></span>\
-                    <span class="file-name" title="#{name}">#{name}</span>\
-                    <span class="uploadify-progress">\
-                        <span class="uploadify-progress-bar">&nbsp;</span>\
+                    <span class="file-icon">\
+                        <span class="icon queued"></span>\
                     </span>\
-                    <span class="data">Waiting</span>\
+                    <span class="file-name">\
+                        <span class="file-name-text" title="#{name}">#{name}</span>\
+                    </span>\
+                    <span class="file-data">Waiting</span>\
                     <span class="file-operate">\
-                        <a class="file-del" href="#">删除</a>\
+                        <a class="file-cancel" href="#">取消</a>\
                     </span>\
                 </div>';
 
@@ -268,7 +269,7 @@
             } else if (setting.defaultTemplate) {
                 //更新状态
                 $('#' + file.id).attr('data-status', ' uploading');
-                $('#' + file.id).find('.icon').attr('class','icon uploading');
+                $('#' + file.id).find('.file-icon').html('<span class="icon uploading"></span>');
             }
         };
 
@@ -295,8 +296,7 @@
             var percent = Math.ceil(loaded / total * 100);
 
             // 设置进度条
-            $('#' + file.id).find('.data').html(percent + '%');
-            $('#' + file.id).find('.uploadify-progress-bar').css('width', percent + '%');
+            $('#' + file.id).find('.file-data').html(percent + '%');
         }
     };
 
@@ -310,14 +310,18 @@
             setting.onUploadSuccess.call(this, file, data, response); 
         } else if (setting.defaultTemplate) {
             var html = 
-                '<div id="'+file.id+'" class="uploadify-queue-item" data-status="success">' +
-                    '<span class="icon ' + util.getFileIcon(file.name) + '"></span>' +
-                    '<span class="file-name" title="'+file.name+'">' + file.name + "</span>" +
-                    '<span class="file-size">' + util.getFileSize(file.size) + '</span>' +
-                    '<span class="file-operate">' +
-                        '<a class="file-del" href="#">删除</a>'+
-                    '</span>' +
-                '</div>';
+                '<div id="'+file.id+'" class="uploadify-queue-item" data-status="success">\
+                    <span class="file-icon">\
+                        <span class="icon ' + util.getFileIcon(file.name) + '"></span>\
+                    </span>\
+                    <span class="file-name">\
+                        <span class="file-name-text" title="' + file.name + '">' + file.name + '</span>\
+                    </span>\
+                    <span class="file-data">' + util.getFileSize(file.size) + '</span>\
+                    <span class="file-operate">\
+                        <a class="file-del" href="#">删除</a>\
+                    </span>\
+                </div>';
 
             $('#' + file.id).replaceWith(html);
         }
@@ -338,8 +342,7 @@
 
                 // 设置错误样式
                 $('#' + file.id).attr('data-status', ' error');
-                $('#' + file.id).find('.icon').attr('class','icon error');
-                $('#' + file.id).find('.uploadify-progress-bar').css('width','1px');
+                $('#' + file.id).find('.file-icon').attr('<span class="icon error"></span>');
             }
         }
     };
@@ -407,7 +410,7 @@
             }            
         });
 
-        ele.on('click', '.file-del', function (e) {
+        ele.on('click', '.file-cancel', function (e) {
             var item = $(this).parents('.uploadify-queue-item');
             var id = item.attr('id');
             
