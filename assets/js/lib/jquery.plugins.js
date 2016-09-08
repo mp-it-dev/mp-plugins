@@ -1243,7 +1243,7 @@ $.extend($.fn, {
                 self.sname = sname;
                 self.sorder = 'desc';
             } else {
-                th.attr('data-sorder', '');
+                th.removeClass('table-sort-active').attr('data-sorder', '');
                 self.sname = null;
                 self.sorder = null;
             }

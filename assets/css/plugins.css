@@ -159,6 +159,9 @@
     border-top-width: 6px;
     border-top-color: #ccc;
 }
+.table-sort-active .table-th-text {
+	color: #428bca;
+}
 .table-sort-active[data-sorder="asc"] .table-sort-icon:before,
 .table-sort-active[data-sorder="desc"] .table-sort-icon:after {
     margin-top: -8px;
