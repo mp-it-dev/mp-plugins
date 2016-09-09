@@ -717,17 +717,18 @@ $.extend($.fn, {
 
         // 复选框
         if (setting.checkbox) {
-            html += '<th style="width: 40px;"></th>';
+            html += '<th style="width: 40px;" data-width="40px"></th>';
         }
 
         // 行号
         if (setting.rownum) {
-            html += '<th style="width: 40px;"></th>';
+            html += '<th style="width: 40px;" data-width="40px"></th>';
         }
 
         for (var i = 0, l = colOptions.length; i < l; i++) {
             var col = colOptions[i];
             var style = '';
+            var attr = '';
 
             if (col.hide) {
                 continue;
@@ -736,12 +737,14 @@ $.extend($.fn, {
             if (col.width) {
                 if (!isNaN(col.width)) {
                     style = ' style="width: ' + col.width + 'px;"';
+                    attr = ' data-width="' + col.width + 'px"';
                 } else {
                     style = ' style="width: ' + col.width + ';"';
+                    attr = ' data-width="' + col.width + '"';
                 }
             }
 
-            html += '<th' + style + ' data-field-index="' + i + '"></th>';     
+            html += '<th' + style + attr + ' data-field-index="' + i + '"></th>';     
         }
 
         html += '</tr>';
@@ -1154,6 +1157,18 @@ $.extend($.fn, {
         this.keyword = null;
     }
 
+    Table.prototype.resize = function () {
+        var ele = this.ele;
+
+        ele.find('.table').css('width', '100%');
+        ele.find('.holder th').each(function () {
+            var width = $(this).data('width') || 'auto';
+            $(this).css('width', width);
+        });
+
+        this.initTable();
+    }
+
     /**
      * [bindEvents 绑定事件]
      * @return {[type]} [description]
@@ -1448,6 +1463,12 @@ $.extend($.fn, {
             index = null;
 
             e.preventDefault();
+        });
+
+        $(window).on('resize', function () {
+            for (var i = 0, l = tables.length; i < l; i++) {
+                tables[i].resize();
+            }
         });
     }());
 
