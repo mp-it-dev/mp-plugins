@@ -289,7 +289,7 @@ $.extend($.fn, {
             var ele = this.eq(0).data(namespace).ele;
             var selectedRow = [];
 
-            ele.find('.table-checkbox:checked').each(function () {
+            ele.find('.table-td .table-checkbox:checked').each(function () {
                 var data = $(this).parents('.table-tr').data('rowData');
                 selectedRow.push(data);
             });
