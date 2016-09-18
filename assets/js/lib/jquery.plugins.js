@@ -3897,14 +3897,16 @@ $.extend($.fn, {
                 tr.data('data', setting.dataList[i]).appendTo(table);
             }
 
-            resultContainer.show();
+            resultContainer.show().scrollTop(0);
 
             if (setting.autoHide) {
                 setTimeout(function () {
                     resultContainer.hide();
                 }, 3000);
             }
-        }        
+        } else {
+        	resultContainer.hide();
+        }
     }
 
     // 绑定事件
