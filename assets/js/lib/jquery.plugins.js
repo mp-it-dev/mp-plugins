@@ -353,6 +353,7 @@ $.extend($.fn, {
          *         replace: '<input />',            // 编辑元素
          *         callback: function () {},        // 编辑回调函数
          *     },
+         *     headerAlign: false,                  // 表头对齐方式，如果为false则取align值
          *     align: false,                        // 对齐方式
          *     hide: false,                         // 是否显示列
          *     fixed: false,                        // 是否固定列不被隐藏
@@ -806,8 +807,8 @@ $.extend($.fn, {
 
             var th = $('<th class="table-th' + colClass + '" ' + attr +'></th>');
 
-            if (col.align) {
-                th.css('text-align', col.align);
+            if (col.align || col.headerAlign) {
+                th.css('text-align', col.align || col.headerAlign);
             }
 
             th.append('<div class="table-th-text">' + col.name + (menu && menu.sort ? '<span class="table-sort-icon"></span>' : '') + '</div>');
