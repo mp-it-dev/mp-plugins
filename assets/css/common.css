@@ -323,7 +323,7 @@ a:hover {
 .panel-heading {
     position: relative;
 }
-.panel-heading h5 {
+.panel-heading .panel-title {
     line-height: 16px;
 }
 .panel-option {
