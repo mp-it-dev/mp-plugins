@@ -1080,6 +1080,11 @@ $.extend($.fn, {
                     $colHeader.hide();
                 }
 
+                // 设置对齐方式
+                if (cghi.headerAlign) {
+                    $colHeader.css('text-align', cghi.headerAlign);
+                }
+
                 $tr.append($colHeader);         // move the current header in the next row
 
                 // set the coumter of headers which will be moved in the next row
