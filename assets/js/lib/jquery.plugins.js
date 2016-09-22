@@ -1020,7 +1020,7 @@ $.extend($.fn, {
 
         setting.groupHeaders = o;
 
-        var i, cmi, skip = 0, $tr, $colHeader, th, $th, thStyle,
+        var i, cmi, skip = 0, $tr, $colHeader, th, $th, thStyle, fieldIndex,
             iCol,
             cghi,
             numberOfColumns,
@@ -1034,11 +1034,11 @@ $.extend($.fn, {
             colLen = $ths.length,
             $theadInTable, $firstRow;
 
-        var inColumnHeader = function (text, headers) {
+        var inColumnHeader = function (idx, headers) {
             var length = headers.length, i;
 
             for (i = 0; i < length; i++) {
-                if (headers[i].startColumnField === text) {
+                if (headers[i].startIndex === idx) {
                     return i;
                 }
             }
@@ -1050,9 +1050,10 @@ $.extend($.fn, {
 
         for (i = 0; i < colLen; i++) {
             $th = $ths.eq(i);
-            cmi = colOptions[+$th.data('field-index')];
+            fieldIndex = +$th.data('field-index');
+            cmi = colOptions[fieldIndex];
 
-            iCol = cmi ? inColumnHeader(cmi.field, o.headers) : -1;
+            iCol = cmi ? inColumnHeader(fieldIndex, o.headers) : -1;
 
             if (iCol >= 0) {
                 cghi = o.headers[iCol];
