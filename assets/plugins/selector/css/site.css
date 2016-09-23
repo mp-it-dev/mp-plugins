@@ -172,3 +172,9 @@ body {
 .search-result .table-body {
 	overflow: auto;
 }
+
+.text-hidden {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}

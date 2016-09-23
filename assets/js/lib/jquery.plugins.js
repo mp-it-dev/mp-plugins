@@ -807,8 +807,8 @@ $.extend($.fn, {
 
             var th = $('<th class="table-th' + colClass + '" ' + attr +'></th>');
 
-            if (col.align || col.headerAlign) {
-                th.css('text-align', col.align || col.headerAlign);
+            if (col.headerAlign || col.align) {
+                th.css('text-align', col.headerAlign || col.align);
             }
 
             th.append('<div class="table-th-text">' + col.name + (menu && menu.sort ? '<span class="table-sort-icon"></span>' : '') + '</div>');

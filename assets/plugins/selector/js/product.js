@@ -57,7 +57,8 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                         cb({
                             Id: treeNode.id,
                             ActualId: treeNode.ActualId,
-                            Name: treeNode.name
+                            Name: treeNode.name,
+                            Node: treeNode
                         });
                     }
                 }
@@ -127,7 +128,8 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                     selectedData.push({
                         Id: nodes[i].id,
                         ActualId: nodes[i].ActualId,
-                        Name: nodes[i].name
+                        Name: nodes[i].name,
+                        Node: nodes[i]
                     });
                 }
             } else {
@@ -138,7 +140,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                         Id: 'cp_' + data.cpBm,
                         ActualId: data.cpBm,
                         Name: data.cpName,
-                        OriginData: data
+                        Node: data
                     });
                 });
             }            
@@ -161,7 +163,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                     Id: 'cp_' + data.cpBm,
                     ActualId: data.cpBm,
                     Name: data.cpName,
-                    OriginData: data
+                    Node: data
                 }
 
                 cb(selectedData);
