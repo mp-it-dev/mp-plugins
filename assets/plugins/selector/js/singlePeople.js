@@ -110,7 +110,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     function searchPeople(isSearch) {
     	var depId = isSearch ? '' : treeObj.getSelectedNodes()[0].id;
     	var jobId = isSearch? '' : $('#jobList li.selected').data('jobid');
-        var keyword = $('#search-keyword').val();
+        var keyword = isSearch? $('#search-keyword').val() : '';
         var result = $('#peopleList').empty();
 
         $('#loading').show();

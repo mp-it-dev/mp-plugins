@@ -33,8 +33,6 @@
 }
 .table-container .table-th {
     position: relative;
-    background-color: transparent;
-    background-clip: padding-box;
     cursor: default;
 }
 .table-container .table-menu:hover {
