@@ -33,7 +33,7 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 	});
 	
 	var table = $("#table").table({
-		tableClass: 'table-condensed',
+		tableClass: 'table-bordered',
 		height: 400,
 		url: 'http://192.168.4.86:100/Test/User/GetList',
 		dataType: 'jsonp',
