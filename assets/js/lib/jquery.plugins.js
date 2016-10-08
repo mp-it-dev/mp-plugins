@@ -537,12 +537,6 @@ $.extend($.fn, {
                     success         : function (dataList) {                        
                         // 备份数据
                         self.dataList = dataList;
-
-                        if (dataList.length == 0) {
-                            self.initError('无数据');
-                            return;
-                        }
-
                         setting.dataList = dataList.slice(0);
                         self.createTbody();
                     },
@@ -574,13 +568,7 @@ $.extend($.fn, {
                 },
                 success         : function (res) {                    
                     // 备份数据
-                    self.dataList = (setting.dataField ? res[setting.dataField] : res) || [];
-
-                    if (self.dataList.length == 0) {
-                        self.initError('无数据')
-                        return;
-                    }
-                    
+                    self.dataList = (setting.dataField ? res[setting.dataField] : res) || [];                    
                     setting.dataList = self.dataList.slice(0);
                     self.createTbody();
                 },
@@ -596,13 +584,18 @@ $.extend($.fn, {
      * @return {[type]} [description]
      */
     Table.prototype.createTbody = function () {
+        if (this.dataList.length == 0) {
+            this.initError('无数据');
+            return;
+        }
+
         var ele = this.ele;
         var tbody = this.initTbody();
 
         ele.find('.table-body .table tbody').remove();
         ele.find('.table-body .table').append(tbody);
         ele.find('.table-body').scrollTop(0);
-        //ele.find('.table-body').scrollLeft(0);
+        // ele.find('.table-body').scrollLeft(0);
 
         this.initTable();
     }
@@ -1916,7 +1909,7 @@ $.extend($.fn, {
         // 页码翻页事件
         ele.on('keydown', '.pageinfo-skip', function (e) {
             if (e.which == 13) {
-                var pageIndex = +$(this).val();
+                var pageIndex = parseInt($(this).val());
 
                 if (isNaN(pageIndex) || pageIndex > setting.totalPage || pageIndex <= 0) {
                     alert('请输入有效页码');
