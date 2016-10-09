@@ -152,7 +152,10 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 				html: '这是一个content弹出框'
 			},
 			beforeClose: function () {
-				console.log(arguments);
+				console.log('beforeClose');
+			},
+			onClose: function () {
+				console.log('onClose');
 			}
 		});
 	});
