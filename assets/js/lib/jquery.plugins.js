@@ -324,7 +324,7 @@ $.extend($.fn, {
         this.id = ele.attr('id') || tables.length;
 
         this.initDOM();
-        this.initData();
+        this.initData();        
         tables.push(this);
     }
 
@@ -342,6 +342,7 @@ $.extend($.fn, {
         colParam        : false,                    // 列自定义参数，对象形式，支持函数返回
         groupHeaders    : false,                    // 多表头设置
         colOptions      : [],                       // 列设置
+        autoLoad        : true,                     // 是否自动加载数据
 
         /*
          * colOptions格式：[{
@@ -459,13 +460,20 @@ $.extend($.fn, {
      * [initData 初始化数据]
      */
     Table.prototype.initData = function () {
-        if (this.setting.url) {
-            this.requestData(1);
+        var setting = this.setting;
+
+        if (setting.autoLoad) {
+            if (setting.url) {
+                this.requestData(1);
+            } else {
+                // 备份数据
+                this.dataList = setting.dataList.slice(0);
+                this.createTbody();
+            }
         } else {
-            // 备份数据
-            this.dataList = this.setting.dataList.slice(0);
+            this.dataList = [];
             this.createTbody();
-        }
+        }        
     }
 
     /**
@@ -584,15 +592,17 @@ $.extend($.fn, {
      * @return {[type]} [description]
      */
     Table.prototype.createTbody = function () {
+        var ele = this.ele;
+        
+        ele.find('.table-body .table tbody').remove();
+
         if (this.dataList.length == 0) {
-            this.initError('无数据');
+            this.initTable();
             return;
         }
 
-        var ele = this.ele;
         var tbody = this.initTbody();
 
-        ele.find('.table-body .table tbody').remove();
         ele.find('.table-body .table').append(tbody);
         ele.find('.table-body').scrollTop(0);
         // ele.find('.table-body').scrollLeft(0);
@@ -807,7 +817,7 @@ $.extend($.fn, {
             th.append('<div class="table-th-text">' + col.name + (menu && menu.sort ? '<span class="table-sort-icon"></span>' : '') + '</div>');
             th.append('<div class="table-th-resize"></div>');
 
-            if (menu) {
+            if (hasMenu(menu)) {
                 th.append('<div class="table-th-menu"><span class="glyphicon glyphicon-menu-hamburger"></span></div>');
             }
 
@@ -817,6 +827,21 @@ $.extend($.fn, {
         html += '</tr>';
 
         return html;
+
+        function hasMenu(menu) {
+            var ret = false;
+
+            if (typeof menu === 'object') {
+                for (var i in menu) {
+                    if (i != 'sort') {
+                        reg = true;
+                        break;
+                    }
+                }
+            }
+
+            return ret;
+        }
     }
 
     /**
@@ -929,7 +954,7 @@ $.extend($.fn, {
     Table.prototype.initError = function (msg) {
         var ele = this.ele;
         var thLen = ele.find('.table-body thead th').length;
-        var tbody = $('<tbody><tr class="table-tr table-errorInfo"><td colspan="' + thLen + '" align="center">' + msg + '</td></tr></tbody>');
+        var tbody = $('<tbody><tr class="table-tr table-errorInfo"><td colspan="' + thLen + '" style="align: center;">' + msg + '</td></tr></tbody>');
 
         ele.find('.table-body table tbody').remove();
         ele.find('.table-body table').append(tbody);
@@ -1157,6 +1182,10 @@ $.extend($.fn, {
         this.keyword = null;
     }
 
+    /**
+     * [resize 窗口变化时重新计算表格宽度等信息]
+     * @return {[type]} [description]
+     */
     Table.prototype.resize = function () {
         var ele = this.ele;
 
@@ -1248,18 +1277,14 @@ $.extend($.fn, {
                 }
             });
 
-            if (sorder == '') {
-                th.addClass('table-sort-active').attr('data-sorder', 'asc');
-                self.sname = sname;
-                self.sorder = 'asc';
-            } else if (sorder == 'asc') {
+            if (sorder == 'asc') {
                 th.addClass('table-sort-active').attr('data-sorder', 'desc');
                 self.sname = sname;
                 self.sorder = 'desc';
             } else {
-                th.removeClass('table-sort-active').attr('data-sorder', '');
-                self.sname = null;
-                self.sorder = null;
+                th.addClass('table-sort-active').attr('data-sorder', 'asc');
+                self.sname = sname;
+                self.sorder = 'asc';
             }
 
             self.reload(1);
@@ -1910,6 +1935,8 @@ $.extend($.fn, {
         ele.on('keydown', '.pageinfo-skip', function (e) {
             if (e.which == 13) {
                 var pageIndex = parseInt($(this).val());
+
+                e.preventDefault();
 
                 if (isNaN(pageIndex) || pageIndex > setting.totalPage || pageIndex <= 0) {
                     alert('请输入有效页码');

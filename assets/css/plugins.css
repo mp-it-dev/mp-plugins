@@ -35,15 +35,15 @@
     position: relative;
     cursor: default;
 }
-.table-container .table-menu:hover {
-    background: #efefef;
-}
 .table-container .table > thead > tr > th {
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
     border-top: 1px solid #ddd;
+}
+.table-container .table > thead > tr > th.table-menu:hover {
+    background: #efefef;
 }
 .table-container .table-th-text {
     white-space: nowrap;
@@ -857,12 +857,14 @@
     position: absolute;
     z-index: 9999;
     min-width: 120px;
+    max-height: 300px;
     margin: 0;
     padding: 0;
     border: 1px solid #ddd;
     border-radius: 3px;
     display: none;
     list-style: none;
+    overflow: auto;
 }
 .ui-menu-item {
     position: relative;
@@ -940,6 +942,7 @@
 }
 .ui-autoComplete-result table td {
     padding: 4px 10px;
+    word-break: break-all;
 }
 .ui-autoComplete-result table tr + tr {
     border-top: 1px dashed #ddd;
