@@ -282,6 +282,16 @@ $.extend($.fn, {
         },
 
         /**
+         * [refresh 以当前数据刷新表格，改变表结构时调用]
+         * @param  {Boolean} isRebuild [是否重构表结构]
+         */
+        refresh: function (isRebuild) {
+            return this.each(function () {
+                $(this).data(namespace).refresh(isRebuild);                
+            });
+        },
+
+        /**
          * [getSelectedRowData 回去当前表格中选中的行数据]
          * @return {[type]} [description]
          */

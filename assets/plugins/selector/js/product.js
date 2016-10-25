@@ -1,16 +1,19 @@
 require(['jquery', 'util', 'ztree'], function($, util) {
 	var apiUrl = decodeURIComponent(util.queryString('apiurl'));
-    var level = util.queryString('level') || 'cp';
+    var type = util.queryString('type') || 'Cp';
     var multi = util.queryString('multi') || 'false';
+    var zhuji = util.queryString('zhuji') || 'false';
     var cb = parent[util.queryString('callback')];
-
-    level = level == 'undefined' ? 'cp' : level;
-    multi = multi == 'undefined' ? 'false' : multi;
 
     var setting = {
         data: {
             simpleData: {
-                enable: true
+                enable: true,
+                idKey: 'ID',
+                pIdKey: 'ParentID'
+            },
+            key: {
+                name: 'Name'
             }
         },
         callback: {
@@ -21,27 +24,33 @@ require(['jquery', 'util', 'ztree'], function($, util) {
 
             	treeNode.icon = './img/loading.gif';
         		treeObj.updateNode(treeNode);
+                var url = apiUrl;
+
+                if (treeNode.Type == 'Cpx') {
+                    url += 'Product/GetCpxlList?cpxid=' + treeNode.ID;
+                } else if (treeNode.Type == 'Cpxl') {
+                    url += 'Product/GetCpList?cpxlid=' + treeNode.ID + '&zhuji=' + zhuji;
+                }
 
             	$.ajax({
-			    	url: apiUrl + 'Product/GetProList?pid=' + treeNode.id,
+			    	url: url,
 			    	dataType: 'jsonp',
-			    	success: function(data) {
-                        if (data && data.length) {
-                            for (var i = 0, l = data.length; i < l; i++) {
-                                var type = data[i].id.split('_')[0];
-                                                    
-                                if (type == level) {
-                                    data[i].isParent = false;
+			    	success: function(dataList) {
+                        if (dataList && dataList.length) {
+                            for (var i = 0, l = dataList.length; i < l; i++) {
+                                var data = dataList[i];
+                                
+                                if (data.Type == type) {
+                                    data.isParent = false;
+                                    data.icon = './img/pro.png';
                                 } else {
-                                    data[i].nocheck = true;
+                                    data.isParent = true;
+                                    data.nocheck = true;
+                                    data.icon = './img/file.png';
                                 }
-
-                                if (!data[i].isParent) {
-                                    data[i].icon = './img/pro.png';
-                                }                                
                             }
 
-                            treeObj.addNodes(treeNode, data);
+                            treeObj.addNodes(treeNode, dataList);
                         } else {
                             treeNode.isParent = false;
                         }
@@ -55,9 +64,9 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                 if (multi == 'false' && !treeNode.isParent) {
                     if (typeof cb == 'function') {                        
                         cb({
-                            Id: treeNode.id,
-                            ActualId: treeNode.ActualId,
-                            Name: treeNode.name,
+                            Type: treeNode.Type,
+                            ID: treeNode.ID,
+                            Name: treeNode.Name,
                             Node: treeNode
                         });
                     }
@@ -75,37 +84,28 @@ require(['jquery', 'util', 'ztree'], function($, util) {
             chkboxType: { 'Y': '', 'N': '' }
         };
         $('.product .part-opt').show();
-        $('#ztree, #searchResult').height($('#ztree').height() - 30);
-        $('#table-head thead tr').prepend('<th width="30"><input type="checkbox" class="selectAll"></th>');
-        $('#table-body thead tr').prepend('<th width="30"></th>');
-    }
-
-    if (level == 'cp') {
-        $('.product .opt-row').show();
-        $('#ztree, #searchResult').height($('#ztree').height() - 30);
-        $('#table-body').height($('#searchResult').height() - 30);
+        $('#ztree').height($('#ztree').height() - 30);
     }
 
     $.ajax({
         url: apiUrl + 'Product/GetCpxList',
         dataType: 'jsonp',
-        success: function (data) {
-            if (data && data.length) {
-                for (var i = 0, l = data.length; i < l; i++) {
-                    var type = data[i].id.split('_')[0];
+        success: function (dataList) {
+            if (dataList && dataList.length) {
+                for (var i = 0, l = dataList.length; i < l; i++) {
+                    var data = dataList[i];
 
-                    if (type == level) {
-                        data[i].isParent = false;
+                    if (data.Type == type) {
+                        data.isParent = false;
+                        data.icon = './img/pro.png';
                     } else {
-                        data[i].nocheck = true;
+                        data.isParent = true;
+                        data.nocheck = true;
+                        data.icon = './img/file.png';
                     }
-
-                    if (!data[i].isParent) {
-                        data[i].icon = './img/pro.png';
-                    }                     
                 }
 
-                treeObj = $.fn.zTree.init($("#ztree"), setting, data);
+                treeObj = $.fn.zTree.init($("#ztree"), setting, dataList);
             }            
         }
     });
@@ -113,35 +113,18 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     ///////////////
     // 事件绑定
     //////////////
-    var tableHead = $('#table-head');
-    var tableBody = $('#table-body');
-
     // 产品树选中结果
     $('#submitSelected').on('click', function() {
         if (typeof cb == 'function') {
             var selectedData = [];
+            var nodes = treeObj.getCheckedNodes();
 
-            if ($('#ztree').is(':visible')) {
-                var nodes = treeObj.getCheckedNodes();
-
-                for (var i = 0, l = nodes.length; i < l; i++) {
-                    selectedData.push({
-                        Id: nodes[i].id,
-                        ActualId: nodes[i].ActualId,
-                        Name: nodes[i].name,
-                        Node: nodes[i]
-                    });
-                }
-            } else {
-                $('#table-body input:checked').each(function() {
-                    var data = $(this).parents('tr').data('data');
-
-                    selectedData.push({
-                        Id: 'cp_' + data.cpBm,
-                        ActualId: data.cpBm,
-                        Name: data.cpName,
-                        Node: data
-                    });
+            for (var i = 0, l = nodes.length; i < l; i++) {
+                selectedData.push({
+                    Type: nodes[i].Type,
+                    ID: nodes[i].ID,
+                    Name: nodes[i].Name,
+                    Node: nodes[i]
                 });
             }            
 
@@ -153,96 +136,4 @@ require(['jquery', 'util', 'ztree'], function($, util) {
             cb(selectedData);
         }
     });
-    
-    // 单击行操作。对于单选则选择该行结果，对于多选则勾选/取消勾选
-    tableBody.on('click', 'tbody tr:not(.no-result)', function() {
-        if (multi == 'false') {
-            if (typeof cb == 'function') {
-                var data = $(this).data('data');
-                var selectedData =  {
-                    Id: 'cp_' + data.cpBm,
-                    ActualId: data.cpBm,
-                    Name: data.cpName,
-                    Node: data
-                }
-
-                cb(selectedData);
-            }
-        } else {
-            $('input[type="checkbox"]', this).prop('checked', !$('input[type="checkbox"]', this).prop('checked')).change();
-        }        
-    });
-
-    // 阻止冒泡
-    tableBody.on('click', 'tbody input[type="checkbox"]', function(e) {
-        e.stopPropagation();
-    });
-
-    // 全选
-    tableHead.on('change', 'thead .selectAll', function () {
-        $('#table-body tbody input[type="checkbox"]').prop('checked', $(this).prop('checked'));
-    });
-
-    // 是否勾选全选按钮
-    tableBody.on('change', 'tbody input[type="checkbox"]', function () {
-        var totalLen = tableBody.find('tbody input[type="checkbox"]').length;
-        var currLen = tableBody.find('tbody input[type="checkbox"]:checked').length;
-
-        tableHead.find('thead .selectAll').prop('checked', currLen == totalLen);
-    });
-
-    // 搜索
-    $('#search-btn').on('click', function() {
-        search();
-    });
-
-    $('#search-keyword').on('keydown', function(e) {
-        if (e.which == 13) {
-            search();            
-        }
-    });
-
-    // 返回产品树
-    $('#backToTree').on('click', function() {
-        $('#searchResult').hide();
-        $('#ztree').show();
-    });
-
-    //////////////
-    ///函数声明
-    //////////////
-    function search() {
-        var keyword = $('#search-keyword').val();
-
-        $('#loading').show();
-
-        $.ajax({
-            url: apiUrl + 'Product/SearchProduct?keyword=' + keyword,
-            dataType: 'jsonp',
-            success: function(data) {
-                $('#loading').hide();                
-                $('#ztree').hide();
-                $('#searchResult').show();
-                $('#table-body tbody').empty();
-
-                if (data && data.length) {
-                    for (var i = 0, l = data.length; i < l; i++) {
-                        var tr = '<tr>' +
-                                    (multi == 'true' ? '<td><input type="checkbox"></td>' : '') +
-                                    '<td>' + data[i].cpxName + '</td>' +
-                                    '<td>' + data[i].cpxlName + '</td>' +
-                                    '<td>' + data[i].zhengjiName + '</td>' +
-                                    '<td>' + data[i].xsxhName + '</td>' +
-                                    '<td>' + data[i].cpBm + '</td>' +
-                                    '<td>' + data[i].cpName + '</td>' +
-                                '</tr>';
-
-                        tr = $(tr).appendTo('#table-body tbody').data('data', data[i]);
-                    }
-                } else {
-                    $('#table-body tbody').html('<tr class="no-result"><td class="text-center" colspan="' + (multi == 'true' ? 7 : 6) + '">没有搜索到结果</td></tr>');
-                }
-            }
-        });
-    }
 });

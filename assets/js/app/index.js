@@ -1,6 +1,6 @@
 require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], function ($, util, selector) {
 	selector.baseUrl = './assets/plugins/selector/';
-	// selector.apiUrl = 'http://192.168.4.86:100/Selector/';
+	selector.apiUrl = 'http://192.168.4.86:100/Selector/';
 
 	$('#cc').scrollbar();
 	$('#searchProductTree').autoComplete({
@@ -114,17 +114,14 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 	});
 
 	$('.selector-product').on('click', function () {
-		var level = $(this).data('level');
-        var multi = $(this).data('multi');
+		var option = $(this).data();
 
-        selector.product({
-            level: level,
-            multi: multi,
-            callback: function(data) {
-                console.log(data);
-                $.tlayer('close');
-            }
-        });
+		option.callback = function(data) {
+            console.log(data);
+            $.tlayer('close');
+        };
+
+        selector.product(option);
 	});
 
 	$('#msg').click(function () {
