@@ -42,8 +42,8 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                                 
                                 if (data.Type == type) {
                                     data.isParent = false;
-                                    data.icon = './img/pro.png';
                                     data.isLeaf = true;
+                                    data.icon = './img/pro.png';
                                 } else {
                                     data.isParent = true;
                                     data.nocheck = true;
@@ -98,6 +98,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
 
                     if (data.Type == type) {
                         data.isParent = false;
+                        data.isLeaf = true;
                         data.icon = './img/pro.png';
                     } else {
                         data.isParent = true;
