@@ -43,6 +43,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                                 if (data.Type == type) {
                                     data.isParent = false;
                                     data.icon = './img/pro.png';
+                                    data.isLeaf = true;
                                 } else {
                                     data.isParent = true;
                                     data.nocheck = true;
@@ -61,7 +62,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
 			    });
             },
             onClick: function(event, treeId, treeNode) {
-                if (multi == 'false' && !treeNode.isParent) {
+                if (multi == 'false' && treeNode.isLeaf) {
                     if (typeof cb == 'function') {                        
                         cb({
                             Type: treeNode.Type,
