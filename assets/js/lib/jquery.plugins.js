@@ -549,7 +549,7 @@ $.extend($.fn, {
                         ele.find(".table-loading").hide();
 
                         if (typeof setting.complete == 'function') {
-                            setting.apply(this, arguments);
+                            setting.complete.apply(this, arguments);
                         }
                     },
                     success         : function (dataList) {                        
@@ -581,7 +581,7 @@ $.extend($.fn, {
                     ele.find(".table-loading").hide();
 
                     if (typeof setting.complete == 'function') {
-                        setting.apply(this, arguments);
+                        setting.complete.apply(this, arguments);
                     }
                 },
                 success         : function (res) {                    
@@ -3867,25 +3867,26 @@ $.extend($.fn, {
     }
 
     AutoComplete.DEFAULTS = {
-        async: {                        //远程请求获取数据参数，和ajax请求参数基本一致
-            url: '',                    //远程请求url
-            type: 'GET',                //请求方式
-            data: false,                //请求入参，不包括搜索关键字，搜索关键字会自动带入
-            dataType: false,            //返回数据类型，支持jsonp
-            dataField: 'data',          //返回数据的字段中那个字段表示数据列表，null表示返回数据即数据列表
-            searchField: 'keyword',     //搜索关键字名称
-            delay: 200,                 //延迟加载时间
-            minKeywordLength: 0         //最小关键字长度，小于该长度时不发送请求
+        async: {                        // 远程请求获取数据参数，和ajax请求参数基本一致
+            url: '',                    // 远程请求url
+            type: 'GET',                // 请求方式
+            data: false,                // 请求入参，不包括搜索关键字，搜索关键字会自动带入
+            dataType: false,            // 返回数据类型，支持jsonp
+            dataField: 'data',          // 返回数据的字段中那个字段表示数据列表，null表示返回数据即数据列表
+            searchField: 'keyword',     // 搜索关键字名称
+            delay: 200,                 // 延迟加载时间
+            minKeywordLength: 0         // 最小关键字长度，小于该长度时不发送请求
         },
-        dataList: [],                   //数据列表，支持本地数据列表
-        localSearchField: null,         //本地搜索字段
-        template: '<td>#{}</td>',       //列表模板
-        width: false,                   //列表宽度
-        maxHeight: 300,                 //列表最大高度
-        maxNum: null,                   //最大显示条数
-        autoHide: false,                //列表是否自动在3秒后隐藏
-        callback: false,                //选中数据之后的回掉，参数为选中的数据
-        onInit: false                   //组件初始化回调
+        dataList: [],                   // 数据列表，支持本地数据列表
+        localSearchField: null,         // 本地搜索字段
+        template: '<td>#{}</td>',       // 列表模板
+        width: false,                   // 列表宽度
+        maxHeight: 300,                 // 列表最大高度
+        maxNum: null,                   // 最大显示条数
+        autoHide: false,                // 列表是否自动在3秒后隐藏
+        callback: false,                // 选中数据之后的回掉，参数为选中的数据
+        onTrigger: false,               // 触发时自动补全时回调
+        onInit: false                   // 组件初始化回调
     };
 
     // 初始化
@@ -3971,6 +3972,10 @@ $.extend($.fn, {
                     $(this).hide();
                 }
             });
+
+            if (setting.onTrigger) {
+                setting.onTrigger.call(this, val);
+            }
 
             if (async.url) {
                 // 连续触发时取消上一次请求
