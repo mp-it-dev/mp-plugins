@@ -423,6 +423,7 @@ $.extend($.fn, {
             
         //回调函数
         onInit              : false,                // 表格数据初始化完成
+        beforeSend          : false,                // 请求发送前回调
         error               : false,                // 请求错误回调
         complete            : false                 // 请求完成回调
     }
@@ -482,7 +483,7 @@ $.extend($.fn, {
             }
         } else {
             this.dataList = [];
-            this.createTbody();
+            this.createTbody(false);
         }        
     }
 
@@ -516,6 +517,16 @@ $.extend($.fn, {
         }
 
         var ajaxOpt;
+        var beforeSendFn = setting.beforeSend || function () {
+            // 如果tbody有高度，则加载框显示
+            if (ele.find('.table-body').height()) {
+                ele.find('.table-loading').show();
+            }
+        };
+        var completeFn = setting.complete || function () {
+            // 隐藏加载框
+            ele.find('.table-loading').hide();
+        }
 
         if (paging.enable) {
             if (this.pager) {
@@ -538,20 +549,8 @@ $.extend($.fn, {
                     pageInfo        : paging.pageInfo,
                     skipPage        : paging.skipPage,
                     localPage       : paging.localPage,
-                    beforeSend      : function () {       //加载框显示
-                        var height = ele.find('.table-body').height();
-                        
-                        if (height) {
-                            ele.find(".table-loading").show();
-                        }
-                    },
-                    complete        : function () {         //隐藏加载框
-                        ele.find(".table-loading").hide();
-
-                        if (typeof setting.complete == 'function') {
-                            setting.complete.apply(this, arguments);
-                        }
-                    },
+                    beforeSend      : beforeSendFn,
+                    complete        : completeFn,
                     success         : function (dataList) {                        
                         // 备份数据
                         self.dataList = dataList;
@@ -570,20 +569,8 @@ $.extend($.fn, {
                 data            : data,
                 dataType        : setting.dataType,
                 jsonp           : setting.jsonp,
-                beforeSend      : function () {       //加载框显示
-                    var height = ele.find('.table-body').height();
-
-                    if (height) {
-                        ele.find(".table-loading").show();
-                    }
-                },
-                complete        : function () {         //隐藏加载框
-                    ele.find(".table-loading").hide();
-
-                    if (typeof setting.complete == 'function') {
-                        setting.complete.apply(this, arguments);
-                    }
-                },
+                beforeSend      : beforeSendFn,
+                complete        : completeFn,
                 success         : function (res) {                    
                     // 备份数据
                     self.dataList = (setting.dataField ? res[setting.dataField] : res) || [];                    
@@ -601,19 +588,21 @@ $.extend($.fn, {
      * [createTbody 生成表格体]
      * @return {[type]} [description]
      */
-    Table.prototype.createTbody = function () {
+    Table.prototype.createTbody = function (showEmptyMsg) {
         var ele = this.ele;
+        showEmptyMsg = showEmptyMsg !== undefined ? showEmptyMsg : true;
         
         ele.find('.table-body .table tbody').remove();
 
         if (this.dataList.length == 0) {
+            if (showEmptyMsg) {
+                this.initError('无数据');
+            }
             this.initTable();
             return;
         }
 
-        var tbody = this.initTbody();
-
-        ele.find('.table-body .table').append(tbody);
+        ele.find('.table-body .table').append(this.initTbody());
         ele.find('.table-body').scrollTop(0);
         // ele.find('.table-body').scrollLeft(0);
 
