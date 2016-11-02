@@ -1635,10 +1635,10 @@ $.extend($.fn, {
         localPage       : false,                    // 是否本地分页
         localData       : false,                    // 保存本地数据
 
-        beforeSend      : function () {},           // 请求之前的回调
-        complete        : function () {},           // 请求完成的回调
-        success         : function () {},           // 分页成功之后的回调
-        error           : function () {},           // 请求错误回调
+        beforeSend      : false,                    // 请求之前的回调
+        complete        : false,                    // 请求完成的回调
+        success         : false,                    // 分页成功之后的回调
+        error           : false,                    // 请求错误回调
         onInit          : false                     // 初始化完成的回调
     }
 
