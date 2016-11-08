@@ -5,209 +5,16 @@
 (function (factory) {
     // AMD
     if (typeof define === 'function' && define.amd) {
-        define(['jquery'], factory);
+        define(['jquery', 'util'], factory);
     } else {
-        if (!jQuery) {
-            throw new Error('jquery plugin depends on jquery');
+        if (!jQuery || !util) {
+            throw new Error('jquery.plugin depends on jquery, util');
         }
 
-        factory(jQuery);
+        factory(jQuery, util);
     }
 }
-(function ($) {
-
-/**
- * [pluginDep 插件依赖的公用函数]
- */
-var PluginDep = {};
-
-// 在数组中查找项的位置
-PluginDep.indexOf = function (arr, value, key) {
-    var index = -1;
-
-    if (arr.length > 0) {
-        for (var i = 0, l = arr.length; i < l; i++) {
-            if (typeof arr[i] == 'object' && typeof key != 'undefined') {
-                if (arr[i][key] == value[key]) {
-                    index = i;
-                }
-            } else {
-                if (arr[i] == value) {
-                    index = i;
-                }
-            }
-        }
-    }
-
-    return index;
-};
-
-/**
- * [browser 浏览器信息]
- */
-PluginDep.browser = (function () {
-    var ua = navigator.userAgent.toLowerCase();
-    var browser = {};
-    
-    var match = /(chrome)[ \/]([\w.]+)/.exec(ua) ||
-        /(webkit)[ \/]([\w.]+)/.exec(ua) ||
-        /(opera)(?:.*version|)[ \/]([\w.]+)/.exec(ua) ||
-        /(msie) ([\w.]+)/.exec(ua) ||
-        ua.indexOf("compatible") < 0 && /(mozilla)(?:.*? rv:([\w.]+)|)/.exec(ua) ||
-        [];
-
-    var matched = {
-        browser: match[1] || '',
-        version: match[2] || '0'
-    };
-
-    if (matched.browser) {
-        browser[matched.browser] = true;
-        browser.version = +matched.version.split('.')[0];
-    }
-
-    //由于IE11没有msie标识，所以换一种方式判断IE
-    if (window.ActiveXObject || 'ActiveXObject' in window) { 
-        browser.msie = true;
-        delete browser['mozilla'];
-    }
-
-    // Chrome is Webkit, but Webkit is also Safari.
-    if (browser.chrome) {
-        browser.webkit = true;
-    } else if (browser.webkit) {
-        browser.safari = true;
-    }
-
-    return browser;
-})();
-
-/**
- * 是否是IE9以下
- */
-PluginDep.isBelowIE9 = (function () {
-    return PluginDep.browser.msie && PluginDep.browser.version < 9;
-})();
-
-/**
- * [parseTpl 解析简单的模板变量]
- */
-PluginDep.parseTpl = function (template, itemData) {
-    return template.replace(/\#\{([\w]*)\}/g, function (s0, s1) {
-        return s1 == '' ? itemData : itemData[s1] || '';
-    });
-}
-
-/**
- * [isOverflow 判断是否出现滚动条]
- * @param  {[type]}  $ele [description]
- */
-PluginDep.isOverflow = function ($ele) {
-    var obj = {};
-
-    if ($ele[0].scrollWidth > $ele.outerWidth(true)) {
-        obj.x = true;
-    }
-
-    if ($ele[0].scrollHeight > $ele.outerHeight(true)) {
-        obj.y = true;
-    }
-
-    return $.isEmptyObject(obj) ? false : obj;
-}
-
-/**
- * [isDOM 判断是否是DOM元素，包括document]
- * @param  {[type]}  obj [节点对象]
- * @return {Boolean}     [description]
- */
-PluginDep.isDom = function (obj) {
-    if (typeof HTMLElement === 'object') {
-        return obj instanceof HTMLElement;
-    } else {
-        return obj != null && typeof obj === 'object' && (obj.nodeType === 1 || obj.nodeType === 9);
-    }
-}
-
-/**
- * [scrollBarWidth 浏览器滚动条宽度]
- * @return {[type]} [description]
- */
-PluginDep.scrollBarWidth = function (context) {
-    context = context || document;
-
-    var $body = $('body', context);
-    var scrollDiv = document.createElement('div');
-    $(scrollDiv).css({
-        position: 'absolute',
-        top: '-9999px',
-        width: '50px',
-        height: '50px',
-        overflow: 'scroll'
-    });
-    $body.append(scrollDiv);
-    var scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth;
-    $body[0].removeChild(scrollDiv);
-
-    return scrollbarWidth;
-}
-
-/**
- * [hideBodyScrollbar 隐藏body滚动条]
- * @return {[type]} [description]
- */
-PluginDep.hideBodyScrollbar = function (context) {
-    context = context || document;
-
-    var $body = $('body', context);
-    var fullWindowWidth = window.innerWidth;
-    var scrollbarWidth = PluginDep.scrollBarWidth(context);
-
-    if (!fullWindowWidth) { // workaround for missing window.innerWidth in IE8
-      var documentElementRect = document.documentElement.getBoundingClientRect();
-      fullWindowWidth = documentElementRect.right - Math.abs(documentElementRect.left);
-    }
-
-    //获取原始padding
-    $body.originalBodyPad = parseInt(($body.css('padding-right') || 0), 10);
-
-    if (document.body.clientWidth < fullWindowWidth) {
-        $body.css('padding-right', $body.originalBodyPad + scrollbarWidth);
-    }
-
-    $body.addClass('hide-scrollbar');
-}
-
-/**
- * [resetBodyScrollbar 还原body滚动条]
- * @return {[type]} [description]
- */
-PluginDep.resetBodyScrollbar = function (context) {
-    var $body = $('body', context || document);
-    if ($body.hasClass('hide-scrollbar')) {
-        $('body', context || document).removeClass('hide-scrollbar').css('padding-right', $('body').originalBodyPad || '');
-    }
-}
-
-/**
- * [getPosition 计算元素的长宽及位置信息]
- * @param  {[type]} ele [description]
- * @return {[type]}     [description]
- */
-PluginDep.getPosition = function (ele) {
-    var elRect = ele[0].getBoundingClientRect();
-
-    // IE8中没有width和height
-    if (elRect.width === undefined) {
-      elRect = $.extend({}, elRect, { width: elRect.right - elRect.left, height: elRect.bottom - elRect.top });
-    }
-
-    return $.extend({}, elRect, { 
-        scrollTop: document.documentElement.scrollTop || document.body.scrollTop,
-        scrollLeft: document.documentElement.scrollLeft || document.body.scrollLeft 
-    });
-};
-
+(function ($, util) {
 /**
  * [获取css样式数值]
  * @param  {[type]} $ [description]
@@ -264,7 +71,7 @@ $.extend($.fn, {
         getRowData: function (id) {
             var table = this.eq(0).data(namespace);
 
-            if (id instanceof $ || PluginDep.isDom(id)) {
+            if (id instanceof $ || util.isDOM(id)) {
                 return $(id, table.container).data('rowData');
             }
 
@@ -353,6 +160,7 @@ $.extend($.fn, {
         groupHeaders    : false,                    // 多表头设置
         colOptions      : [],                       // 列设置
         autoLoad        : true,                     // 是否自动加载数据
+        autoEncode      : true,                     // 是否自动将html标记转为实体
 
         /*
          * colOptions格式：[{
@@ -625,7 +433,7 @@ $.extend($.fn, {
             var theadHeight = thead.outerHeight(true);
             var tbodyHeight = tbody.outerHeight(true);
             var tpageHeight = ele.find('.table-pager').outerHeight(true);
-            var sWidth = PluginDep.scrollBarWidth();
+            var sWidth = util.scrollBarWidth();
 
             // 设置最大高度
             if (setting.maxHeight) {
@@ -663,7 +471,7 @@ $.extend($.fn, {
             }
 
             // 解决IE8下高度会在最大高度基础上加上滚动条高度的bug
-            if (PluginDep.isBelowIE9 && tbody.getCss('max-height') && tbodyTable.outerWidth() > tbody.outerWidth()) {
+            if (util.browser.msie && util.browser.version < 9 && tbody.getCss('max-height') && tbodyTable.outerWidth() > tbody.outerWidth()) {
                 tbody.css('max-height', tbody.getCss('max-height') - sWidth);
             }
 
@@ -688,7 +496,7 @@ $.extend($.fn, {
             // 设置总宽度防止拖动时变形
             ele.find('.table').css('width', totalW);
 
-            if (PluginDep.browser.msie) {
+            if (util.browser.msie) {
                 ele.find('.table-th-resize').each(function () {
                     $(this).height($(this).parent().outerHeight());
                 });
@@ -898,18 +706,20 @@ $.extend($.fn, {
                     continue;
                 }
 
+                var val;
+
+                if (col.field && data) {
+                    val = data[col.field];
+                }
+
+                if (setting.autoEncode) {
+                    val = util.htmlEncode(val);
+                }
+
                 if (typeof col.handler === 'function') {
-                    var val;
-
-                    if (col.field && data) {
-                        val = data[col.field];
-                    }
-
                     text = col.handler(val, data, col);
-                } else if (col.handler) {
-                    text = col.handler;
                 } else {
-                    text = data[col.field];
+                    text = val;
                 }
 
                 var colParam = setting.colParam || {};
@@ -935,7 +745,7 @@ $.extend($.fn, {
                 }
 
                 // 如果返回的是DOM或jquery元素则使用append
-                if (text instanceof jQuery || PluginDep.isDom(text)) {
+                if (text instanceof jQuery || util.isDOM(text)) {
                     div.append(text);
                 } else {
                     div.html((text === undefined || text === null) ? '' : text + '');
@@ -2128,7 +1938,7 @@ $.extend($.fn, {
             for (var i = 0, l = dataList.length; i < l; i++) {
                 var data = dataList[i];
                 var key = setting.valueField ? data[setting.valueField] : data;
-                var html = PluginDep.parseTpl('<tr data-key="' + key + '">' + template + '</tr>', data);
+                var html = util.parseTpl('<tr data-key="' + key + '">' + template + '</tr>', data);
 
                 $(html).appendTo(table).data('data', data);
             }
@@ -2278,7 +2088,7 @@ $.extend($.fn, {
             isSame = true;
 
             for (var i = 0, l = this.selectedData.length; i < l; i++) {
-                if (PluginDep.indexOf(this.oldSelectedData, this.selectedData[i], setting.valueField) == -1) {
+                if (util.indexOf(this.oldSelectedData, this.selectedData[i], setting.valueField) == -1) {
                     isSame = false;
                 }
             }
@@ -2387,7 +2197,7 @@ $.extend($.fn, {
             self.oldSelectedData = self.selectedData.slice(0);
 
             if (setting.multi) {
-                var index = PluginDep.indexOf(self.selectedData, data, setting.valueField);
+                var index = util.indexOf(self.selectedData, data, setting.valueField);
                     
                 if (index > -1) {
                     self.selectedData.splice(index, 1);
@@ -2519,7 +2329,7 @@ $.extend($.fn, {
         this.container = $container;
         this.options = options;
 
-        this.needScrollbar = PluginDep.isOverflow($container);
+        this.needScrollbar = util.isOverflow($container);
 
         //如果没有滚动条则不需要后续操作
         if (!this.needScrollbar) {
@@ -2925,7 +2735,7 @@ $.extend($.fn, {
         this.cacheImg();
 
         //IE9以下不支持旋转
-        if (PluginDep.isBelowIE9) {
+        if (util.browser.msie && util.browser.version < 9) {
             this.ele.find('.gallery-rotate').remove();
         }
 
@@ -3051,7 +2861,7 @@ $.extend($.fn, {
      * @return {[type]} [description]
      */
     Gallery.prototype.show = function () {
-        PluginDep.hideBodyScrollbar(top.document);
+        hideBodyScrollbar(top.document);
         this.ele.show();
         this.ele[0].offsetWidth;        //force reflow，否则动画无效
         this.ele.addClass('in');
@@ -3068,7 +2878,7 @@ $.extend($.fn, {
         $(top.document).off('keydown.' + namespace);
         setTimeout(function () {
             $ele.remove();
-            PluginDep.resetBodyScrollbar(top.document);
+            resetBodyScrollbar(top.document);
         }, 150);
     }
 
@@ -3240,7 +3050,7 @@ $.extend($.fn, {
     var dragging = false;
 
     //公用事件绑定
-    function bindCommonEvents () {
+    (function bindCommonEvents () {
         $(top.document).on('mousemove.' + namespace, function (e) {
             if (!dragging) {
                 return true;
@@ -3262,9 +3072,44 @@ $.extend($.fn, {
         $(top.document).on('mouseup.' + namespace, function (e) {
             dragging = false;
         });
+    }());
+
+    /**
+     * [hideBodyScrollbar 隐藏body滚动条]
+     * @return {[type]} [description]
+     */
+    function hideBodyScrollbar(context) {
+        context = context || document;
+
+        var $body = $('body', context);
+        var fullWindowWidth = window.innerWidth;
+        var scrollbarWidth = util.scrollBarWidth(context);
+
+        if (!fullWindowWidth) { // workaround for missing window.innerWidth in IE8
+          var documentElementRect = document.documentElement.getBoundingClientRect();
+          fullWindowWidth = documentElementRect.right - Math.abs(documentElementRect.left);
+        }
+
+        //获取原始padding
+        $body.originalBodyPad = parseInt(($body.css('padding-right') || 0), 10);
+
+        if (document.body.clientWidth < fullWindowWidth) {
+            $body.css('padding-right', $body.originalBodyPad + scrollbarWidth);
+        }
+
+        $body.addClass('hide-scrollbar');
     }
 
-    bindCommonEvents();
+    /**
+     * [resetBodyScrollbar 还原body滚动条]
+     * @return {[type]} [description]
+     */
+    function resetBodyScrollbar(context) {
+        var $body = $('body', context || document);
+        if ($body.hasClass('hide-scrollbar')) {
+            $('body', context || document).removeClass('hide-scrollbar').css('padding-right', $('body').originalBodyPad || '');
+        }
+    }
 
     $.gallery = function (option) {
         return new Gallery(option);
@@ -3411,8 +3256,8 @@ $.extend($.fn, {
 
         tip.find('.validate-tip-text').html(msg);
 
-        var pos = PluginDep.getPosition(ele);
-        var viewportPos = PluginDep.getPosition($('body'));
+        var pos = util.getPosition(ele[0]);
+        var viewportPos = util.getPosition($('body')[0]);
         var placement = setting.originPlacement;
         var actualWidth = tip[0].offsetWidth;
         var actualHeight = tip[0].offsetHeight;
@@ -3751,7 +3596,7 @@ $.extend($.fn, {
     Menu.prototype.show = function (option) {
         var setting = this.setting;
         var ele = this.ele;
-        var pos = PluginDep.getPosition($('body'));
+        var pos = util.getPosition($('body')[0]);
         this.args = option.args;
 
         // 先显示才能获取实际宽高
@@ -3919,7 +3764,7 @@ $.extend($.fn, {
 
         if (len > 0) {
             for (var i = 0; i < len; i++) {
-                var tr = $('<tr>' + PluginDep.parseTpl(setting.template, setting.dataList[i]) + '</tr>');
+                var tr = $('<tr>' + util.parseTpl(setting.template, setting.dataList[i]) + '</tr>');
 
                 tr.data('data', setting.dataList[i]).appendTo(table);
             }
@@ -3951,7 +3796,7 @@ $.extend($.fn, {
             var val = input.val();
 
             // 非IE8不处理keyup事件
-            if (e.type == 'keyup' && !(PluginDep.browser.msie && PluginDep.browser.version < 9)) {
+            if (e.type == 'keyup' && !(util.browser.msie && util.browser.version < 9)) {
                 return true;
             }
 
