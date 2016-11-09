@@ -133,7 +133,7 @@
         // 格式化c#后台返回的/Date(1473133893427)/类型的时间
         formatMSDate: function (str, format) {
             var match = /\/Date\((\d+)\)\//.exec(str);
-            format = format || 'YYYY-MM-DD hh:mm:ss';
+            format = format || 'YYYY/MM/DD hh:mm:ss';
 
             return match ? util.formatDate(new Date(+match[1]), format) : '';
         },
