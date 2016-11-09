@@ -81,7 +81,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     	$('#jobList li').removeClass('selected');
     	$(this).addClass('selected');
 
-    	searchPeople();
+    	searchPeople(false);
     });
 
     // 点击行勾选/取消勾选复选框
@@ -93,13 +93,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     // 加入选择或取消选择
     $(document).on('change', '#peopleList input[type="checkbox"]', function() {
         var selectedData = $('#selectedList').data('selectedData') || [];
-        var tr = $(this).parents('tr');
-
-        var data = { 
-            Badge: $('td:eq(1)', tr).text(),
-            Name: $('td:eq(2)', tr).text(),
-            Email: $('td:eq(3)', tr).text()
-        }
+        var data = $(this).parents('tr').data('data');
 
         if ($(this).prop('checked')) {
             if (util.indexOf(selectedData, data, 'Badge') == -1) {
@@ -140,12 +134,12 @@ require(['jquery', 'util', 'ztree'], function($, util) {
 
     $('#search-keyword').on('keydown', function(e) {
         if (e.which == 13) {
-            searchPeople();
+            searchPeople(true);
         }
     });
 
     $('#search-btn').on('click', function(e) {
-        searchPeople();
+        searchPeople(true);
     });
 
     $('#deleteSelected').on('click', function() {
@@ -179,13 +173,13 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     ///函数声明
     //////////////
     
-    function searchPeople() {
-    	var depId = treeObj.getSelectedNodes()[0].id;
-    	var jobId = $('#jobList li.selected').data('jobid');
-        var keyword = $('#search-keyword').val();
+    function searchPeople(isSearch) {
+    	var depId = isSearch ? '' : treeObj.getSelectedNodes()[0].id;
+        var jobId = isSearch? '' : $('#jobList li.selected').data('jobid');
+        var keyword = isSearch? $('#search-keyword').val() : '';
+        var result = $('#peopleList').empty();
 
         $('#loading').show();
-        $('#peopleList').empty();
         $('.js-select-all[data-target="#peopleList"]').prop('checked', false);
 
         $.ajax({
@@ -200,36 +194,43 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         		$('#loading').hide();
 
         		if (data && data.length > 0) {
-        			var html = '';
+                    var tr;
 
-        			for (var i = 0; i < data.length; i++) {
-        			    html += '<tr>';
-                        html +=     '<td width="40"><input type="checkbox"></td>';
-        			    html += 	'<td width="80">' + data[i].Badge + '</td>';
-        			    html += 	'<td width="80">' + data[i].Name + '</td>';
-        			    html += 	'<td>' + data[i].Email + '</td>';
-        			    html += '</tr>';
-        			}
+                    for (var i = 0; i < data.length; i++) {
+                        tr = $(
+                            '<tr>' +
+                                '<td width="40"><input type="checkbox"></td>' +
+                                '<td width="80">' + data[i].Badge + '</td>' +
+                                '<td width="80">' + data[i].Name + '</td>' +
+                                '<td><div class="text-hidden" title="' + data[i].DepName + '">' + data[i].DepName + '</div></td>' +
+                                '<td><div class="text-hidden" title="' + data[i].JobName + '">' + data[i].JobName + '</div></td>' +
+                            '</tr>'
+                        ).data('data', data[i]);                        
 
-        			$('#peopleList').html(html);
-        		}        		
+                        result.append(tr);
+                    }
+                }        		
         	}
         });
     }
 
     function showSelectedData() {
         var selectedData = $('#selectedList').data('selectedData');
-        var html = '';
+        var result = $('#selectedList').empty();
+        var tr;
 
         for (var i = 0; i < selectedData.length; i++) {
-            html += '<tr data-index="' + i + '">';
-            html +=     '<td width="40"><input type="checkbox"></td>';
-            html +=     '<td width="80">' + selectedData[i].Badge + '</td>';
-            html +=     '<td width="80">' + selectedData[i].Name + '</td>';
-            html +=     '<td>' + selectedData[i].Email + '</td>';
-            html += '</tr>';
-        }
+            tr = $(
+                '<tr>' +
+                    '<td width="40"><input type="checkbox"></td>' +
+                    '<td width="80">' + selectedData[i].Badge + '</td>' +
+                    '<td width="80">' + selectedData[i].Name + '</td>' +
+                    '<td><div class="text-hidden" title="' + selectedData[i].DepName + '">' + selectedData[i].DepName + '</div></td>' +
+                    '<td><div class="text-hidden" title="' + selectedData[i].JobName + '">' + selectedData[i].JobName + '</div></td>' +
+                '</tr>'
+            ).data('index', i);                        
 
-        $('#selectedList').html(html);
+            result.append(tr);
+        }
     }
 });

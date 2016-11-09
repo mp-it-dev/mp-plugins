@@ -81,50 +81,45 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     	$('#jobList li').removeClass('selected');
     	$(this).addClass('selected');
 
-    	searchPeople();
+    	searchPeople(false);
     });
 
     $(document).on('click', '#peopleList tr', function() {    	
     	var cb = parent[util.queryString('callback')];
 
     	if (typeof cb == 'function') {
-	    	var data = { 
-	    		Badge: $(this).children().eq(0).text(),
-	    		Name: $(this).children().eq(1).text(),
-	    		Email: $(this).children().eq(2).text()
-	    	}
-
+	    	var data = $(this).data('data');
     		cb(data);
     	}
     });
 
     $('#search-keyword').on('keydown', function(e) {
         if (e.which == 13) {
-            searchPeople();
+            searchPeople(true);
         }
     });
 
     $('#search-btn').on('click', function(e) {
-        searchPeople();
+        searchPeople(true);
     });
 
     //////////////
     ///函数声明
     //////////////
     
-    function searchPeople() {
-    	var depId = treeObj.getSelectedNodes()[0].id;
-    	var jobId = $('#jobList li.selected').data('jobid');
-        var keyword = $('#search-keyword').val();
+    function searchPeople(isSearch) {
+    	var depId = isSearch ? '' : treeObj.getSelectedNodes()[0].id;
+    	var jobId = isSearch? '' : $('#jobList li.selected').data('jobid');
+        var keyword = isSearch? $('#search-keyword').val() : '';
+        var result = $('#peopleList').empty();
 
         $('#loading').show();
-        $('#peopleList').empty()
 
         $.ajax({
         	url: apiUrl + 'Organization/GetPeopleResult',
         	data: {
-        		depId: depId,
-        		jobId: jobId,
+                depId: depId,
+                jobId: jobId,
         		keyword: keyword
         	},
         	dataType: 'jsonp',
@@ -132,17 +127,20 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         		$('#loading').hide();
 
         		if (data && data.length > 0) {
-        			var html = '';
+        			var tr;
 
         			for (var i = 0; i < data.length; i++) {
-        			    html += '<tr>';
-        			    html += 	'<td width="80">' + data[i].Badge + '</td>';
-        			    html += 	'<td width="80">' + data[i].Name + '</td>';
-        			    html += 	'<td>' + data[i].Email + '</td>';
-        			    html += '</tr>';
-        			}
+                        tr = $(
+                            '<tr>' +
+                                '<td width="80">' + data[i].Badge + '</td>' +
+                                '<td width="80">' + data[i].Name + '</td>' +
+                                '<td><div class="text-hidden" title="' + data[i].DepName + '">' + data[i].DepName + '</div></td>' +
+                                '<td><div class="text-hidden" title="' + data[i].JobName + '">' + data[i].JobName + '</div></td>' +
+                            '</tr>'
+                        ).data('data', data[i]);        			    
 
-        			$('#peopleList').html(html);
+                        result.append(tr);
+        			}
         		}        		
         	}
         });

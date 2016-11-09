@@ -33,12 +33,7 @@
 }
 .table-container .table-th {
     position: relative;
-    background-color: transparent;
-    background-clip: padding-box;
     cursor: default;
-}
-.table-container .table-menu:hover {
-    background: #efefef;
 }
 .table-container .table > thead > tr > th {
     -webkit-user-select: none;
@@ -46,6 +41,9 @@
     -ms-user-select: none;
     user-select: none;
     border-top: 1px solid #ddd;
+}
+.table-container .table > thead > tr > th.table-menu:hover {
+    background: #efefef;
 }
 .table-container .table-th-text {
     white-space: nowrap;
@@ -158,6 +156,9 @@
     margin-top: -4px;
     border-top-width: 6px;
     border-top-color: #ccc;
+}
+.table-sort-active .table-th-text {
+	color: #428bca;
 }
 .table-sort-active[data-sorder="asc"] .table-sort-icon:before,
 .table-sort-active[data-sorder="desc"] .table-sort-icon:after {
@@ -460,7 +461,7 @@
 .uploadify {
     position: relative;
     display: inline-block;
-    *display: inline;
+    width: 100%;
 }
 .uploadify-desc {
     display: inline-block;
@@ -469,15 +470,19 @@
 }
 .uploadify-queue-item,
 .finish-queue-item  {
-    overflow: hidden;
+    display: table;
+    width: 100%;
     margin-top: 10px;
+    table-layout: fixed;
 }
 .uploadify-queue-item > *,
 .finish-queue-item > *  {
-    display: inline-block;
-    float: left;
-    line-height: 25px;
+    display: table-cell;
+    padding-right: 10px;
     vertical-align: middle;
+}
+.uploadify-queue .file-icon {
+    width: 30px;
 }
 .uploadify-queue .icon.queued,
 .uploadify-queue .icon.error  {
@@ -486,43 +491,23 @@
 .uploadify-queue .icon.uploading {
     background: transparent url(../img/icon_uploading.gif) center center no-repeat;
 }
-.uploadify-queue .file-name {
-    width: 250px;
-    margin-right: 10px;
+.uploadify-queue .file-name-text {
+    display: block;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
-.finish-queue-item .file-name {
-    width: 362px;
-}
-.uploadify-progress {
-    width: 100px;
-    height: 10px;
-    margin-top: 7px;
-    margin-right: 10px;
-    border: solid 1px #ccc;
-    vertical-align: middle;
-    background-color: #fafafa;
-}
-.uploadify-progress-bar {
-    display: block;
-    width: 0;
-    height: 100%;
-    background-color: #a5dd3d;
-    font-size: 0;
-}
-.uploadify-queue .data,
-.uploadify-queue .file-size {
-    height: 100%;
-    text-align: center;
+.uploadify-queue .file-data {
+    width: 80px;
 }
 .uploadify-queue .file-operate {
+    width: 100px;
+}
+.uploadify-queue .file-operate > * {
     color: #0068B7;
     cursor: pointer;
-    margin-left: 10px;
 }
-.uploadify-queue .file-operate:hover {
+.uploadify-queue .file-operate > *:hover {
     color: #f00;
     text-decoration: underline;
 }
@@ -872,12 +857,14 @@
     position: absolute;
     z-index: 9999;
     min-width: 120px;
+    max-height: 300px;
     margin: 0;
     padding: 0;
     border: 1px solid #ddd;
     border-radius: 3px;
     display: none;
     list-style: none;
+    overflow: auto;
 }
 .ui-menu-item {
     position: relative;
@@ -955,6 +942,7 @@
 }
 .ui-autoComplete-result table td {
     padding: 4px 10px;
+    word-break: break-all;
 }
 .ui-autoComplete-result table tr + tr {
     border-top: 1px dashed #ddd;
@@ -982,7 +970,7 @@
     top: 0;
     left: 0;
     display: none;
-    z-index: 1070;
+    z-index: 9999;
     padding: 3px 8px;
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
     font-size: 12px;

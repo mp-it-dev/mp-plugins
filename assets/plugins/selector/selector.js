@@ -83,7 +83,7 @@
 					width: 530,
 					height: 480,
 					padding: 0,
-					src: this.baseUrl + 'multiDep.html?callback=multiDepCallback&apiurl=' + encodeURIComponent(this.apiUrl) + '&t=' + t
+					src: this.baseUrl + 'multiDep.html?callback=multiDepCallback&apiurl=' + encodeURIComponent(option.apiUrl || this.apiUrl) + '&t=' + t
 				}
 			});
 		},
@@ -100,7 +100,7 @@
 					width: 530,
 					height: 480,
 					padding: 0,
-					src: this.baseUrl + 'singleDepJob.html?callback=singleDepJobCallback&apiurl=' + encodeURIComponent(this.apiUrl) + '&t=' + t
+					src: this.baseUrl + 'singleDepJob.html?callback=singleDepJobCallback&apiurl=' + encodeURIComponent(option.apiUrl || this.apiUrl) + '&t=' + t
 				}
 			});
 		},
@@ -117,29 +117,29 @@
 					width: 530,
 					height: 480,
 					padding: 0,
-					src: this.baseUrl + 'multiDepJob.html?callback=multiDepJobCallback&apiurl=' + encodeURIComponent(this.apiUrl) + '&t=' + t
+					src: this.baseUrl + 'multiDepJob.html?callback=multiDepJobCallback&apiurl=' + encodeURIComponent(option.apiUrl || this.apiUrl) + '&t=' + t
 				}
 			});
 		},		
 		//选择产品结构
 		product: function (option) {
 			window.productCallback = option.callback;
-
-			var width = 530, t = new Date().getTime();
-
-			if (option.level == 'cp' || option.level === undefined) {
-				width = 830;
-			}
+			var t = new Date().getTime();
+			var cloneOption = $.extend({}, option);
+			
+			delete cloneOption.callback;
+			delete cloneOption.apiUrl;
+			var param = $.param(cloneOption);
 
 			$.content({
 				layerID: option.layerID || false,
 				theme: 'blue',
 				header: '产品选择',
 				content: {
-					width: width,
+					width: 530,
 					height: 480,
 					padding: 0,
-					src: this.baseUrl + 'product.html?callback=productCallback&apiurl=' + encodeURIComponent(this.apiUrl) + '&level=' + option.level + '&multi=' + option.multi + '&t=' + t
+					src: this.baseUrl + 'product.html?callback=productCallback&apiurl=' + encodeURIComponent(option.apiUrl || this.apiUrl) + '&' + param + '&t=' + t
 				}
 			});
 		}

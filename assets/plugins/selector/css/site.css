@@ -69,12 +69,6 @@ body {
 .container-selector .find {
 	width: 220px;
 }
-.container-selector .find .form-control,
-.container-selector .find .btn {
-	height: 30px;
-	font-size: 12px;
-	padding: 5px 12px;
-}
 .part-content {
 	overflow: auto;
 	position: relative;
@@ -127,9 +121,10 @@ body {
 	line-height: 30px;
 }
 .part-opt .btn {
-	padding-left: 10px;
-	padding-right: 10px;
 	vertical-align: middle;
+}
+.part-opt .btn + .btn {
+	margin-left: 20px;
 }
 .product .part-opt {
 	display: none;
@@ -146,13 +141,9 @@ body {
 .opt-item + .opt-item {
 	margin-left: 10px;
 }
-.opt-item .btn {
-	height: 30px;
-    font-size: 12px;
-    padding: 5px 12px;
-}
 .opt-item .item-name {
 	padding-top: 5px;
+	width: 120px;
 }
 .search-result {
 	display: none;
@@ -171,4 +162,10 @@ body {
 }
 .search-result .table-body {
 	overflow: auto;
+}
+
+.text-hidden {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }

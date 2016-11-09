@@ -1122,19 +1122,14 @@
         },
         
         //淡入一个可以设置图标的提示框
-        tips: function (msg, type, fn) {
+        tips: function (msg, type, fn, time) {
             if (arguments.length == 1) {
                 type = 1;
-            } else if (arguments.length == 2) {
-                if (typeof type == 'function') {
-                    fn = type;
-                    type = 1;
-                }                
             }
 
             //开启深度拷贝
             var settings = {
-                delay           : 1500,             //提示框框特有的延时消失时间，单位ms
+                delay           : time || 1500,     //提示框框特有的延时消失时间，单位ms
                 showMask        : false,            //不显示阴影层
                 layerType       : 'tips',
                 bodyScroll      : true,             //不设置body的overflow: hidden;

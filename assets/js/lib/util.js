@@ -177,18 +177,13 @@
         })(),
 
         // 获取查询字符串
-        queryString: function (_key, _window) {
+        queryString: function (key, url) {
             var o = {};
-            var search = window.location.search;
 
-            if (_window) {
-                search = _window.location.search;
-            }
+            url = url ? url : window.location.href;
 
-            if (search) {
-                search = search.substring(1);
-                
-                var arr = search.split('&');
+            if (url && url.indexOf('?') > -1) {
+                var arr = url.split('?')[1].split('&');
                 var d;
 
                 util.forEach(arr, function (item) {
@@ -197,7 +192,7 @@
                 });
             }            
 
-            return _key === undefined ? o : o[_key];
+            return key === undefined ? o : o[key];
         },
 
         // 格式化数字，在数字前面加0
@@ -213,76 +208,28 @@
             return str;
         },
 
-        // 获取字符串的长度，ASCII字符为一个长度单位，非ASCII字符为两个长度单位
-        getStrLength: function (str) {
-            if (typeof str == 'undefined') return 0;
-            return str.replace(/[^\x00-\xff]/g, 'aa').length;
-        },
-
-        // 截取字符串，ASCII以外的字符算两个长度
-        getSubString: function (str, len, repStr) {
-            if (!str) {
-                return '';
-            }
-
-            str = str.trim();
-
-            var rstr = '',
-                slen = str.length,
-                c = 0,
-                repStr = repStr || '';
-
-            for (var i = 0; i < slen; i++) {
-                if (str.charCodeAt(i) < 65 || (str.charCodeAt(i) > 90 && str.charCodeAt(i) < 255)) {
-                    c += 1;
-                } else {
-                    c += 2;
-                }
-
-                if (c > len) {
-                    break;
-                }
-
-                rstr += str.charAt(i);
-            }
-
-            return rstr.length < slen ? rstr + repStr : rstr;
-        },
-
         // 将html标记转化为html实体
-        HTMLEncode: function (str) {
-            var s = '';
+        htmlEncode: function (str) {
+            if (!str) {
+                return str;
+            }
 
-            if (str.length == 0) return '';
-
-            s = str.replace(/&/g, '&amp;')
+            return String(str).replace(/&/g, '&amp;')
                     .replace(/</g, '&lt;')
                     .replace(/>/g, '&gt;')
                     .replace(/\"/g, '&quot;');
-
-            return s;
         },
 
         // 将html实体转化为html标记
-        HTMLDecode: function (str) {
-            var s = '';
-            if (str.length == 0) return '';
+        htmlDecode: function (str) {
+            if (!str) {
+                return str;
+            }
 
-            s = str.replace(/&amp;/g, '&')
+            return String(str).replace(/&amp;/g, '&')
                     .replace(/&lt;/g, '<')
                     .replace(/&gt;/g, '>')
                     .replace(/&quot;/g, '\"');
-
-            return s;
-        },
-
-        // 判断是否是DOM元素
-        isDOM: function (obj) {
-            if (typeof HTMLElement === 'object') {
-                return obj instanceof HTMLElement;
-            } else {
-                return typeof obj === 'object' && obj.nodeType === 1 && typeof obj.nodeName === 'string';
-            }
         },
 
         // 获取文件扩展名的icon
@@ -372,24 +319,6 @@
             });
         },
 
-        // 浏览器滚动条宽度
-        scrollBarWidth: function () {
-            var body = document.getElementsByTagName('body')[0];
-            var scrollDiv = document.createElement('div');
-
-            scrollDiv.style.position = 'absolute';
-            scrollDiv.style.top = '-9999px';
-            scrollDiv.style.width = '1px';
-            scrollDiv.style.height = '1px';
-            scrollDiv.style.overflow = 'scroll';
-
-            body.appendChild(scrollDiv);
-            var scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth;
-            body.removeChild(scrollDiv);
-
-            return scrollbarWidth;
-        },
-
         // 格式化数字，将数字格式化成precision位数，separator分隔的数字
         formatNumber: function (num, precision, separator) {
             //null is number 0?
@@ -406,6 +335,48 @@
             parts[0] = parts[0].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + (separator || ','));
 
             return parts.join('.');
+        },
+
+        // 判断是否是DOM元素
+        isDOM: function (obj) {
+            if (typeof HTMLElement === 'object') {
+                return obj instanceof HTMLElement;
+            } else {
+                return obj != null && typeof obj === 'object' && (obj.nodeType === 1 || obj.nodeType === 9);
+            }
+        },
+
+        // 是否出现滚动条
+        isOverflow: function ($ele) {
+            var obj = {};
+
+            if ($ele[0].scrollWidth > $ele.outerWidth(true)) {
+                obj.x = true;
+            }
+
+            if ($ele[0].scrollHeight > $ele.outerHeight(true)) {
+                obj.y = true;
+            }
+
+            return $.isEmptyObject(obj) ? false : obj;
+        },
+
+        // 浏览器滚动条宽度
+        scrollBarWidth: function () {
+            var body = document.getElementsByTagName('body')[0];
+            var scrollDiv = document.createElement('div');
+
+            scrollDiv.style.position = 'absolute';
+            scrollDiv.style.top = '-9999px';
+            scrollDiv.style.width = '1px';
+            scrollDiv.style.height = '1px';
+            scrollDiv.style.overflow = 'scroll';
+
+            body.appendChild(scrollDiv);
+            var scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth;
+            body.removeChild(scrollDiv);
+
+            return scrollbarWidth;
         },
 
         // 获取DOM视口信息，包括宽高、相对于body的left、top，以及body的scrollLeft、scrollTop
