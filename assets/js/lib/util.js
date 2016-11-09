@@ -180,6 +180,8 @@
         queryString: function (key, url) {
             var o = {};
 
+            url = url ? url : window.location.href;
+
             if (url && url.indexOf('?') > -1) {
                 var arr = url.split('?')[1].split('&');
                 var d;
