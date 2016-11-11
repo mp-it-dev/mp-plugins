@@ -29,7 +29,7 @@
 
         // 是否为数字
         isNumber: function (it, isString) {
-            return isString ? !isNaN(Number(it)) && !isNaN(parseFloat(it)) : Object.prototype.toString.call(it) === '[object Number]';
+            return isString ? !isNaN(Number(it)) && !isNaN(parseFloat(it)) : Object.prototype.toString.call(it) === '[object Number]' && !isNaN(it);
         },
 
         // 是否为整数

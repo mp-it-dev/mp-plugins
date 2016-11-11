@@ -1712,12 +1712,19 @@ $.extend($.fn, {
         // 页码翻页事件
         ele.on('keydown', '.pageinfo-skip', function (e) {
             if (e.which == 13) {
-                var pageIndex = parseInt($(this).val());
-
                 e.preventDefault();
 
-                if (!util.isNumber(pageIndex) || pageIndex > setting.totalPage || pageIndex <= 0) {
-                    alert('请输入有效页码');
+                var pageIndex = $(this).val();
+
+                if (!util.isInteger(pageIndex, true)) {
+                    alert('请输入整数页码');
+                    return;
+                }
+
+                pageIndex = parseInt(pageIndex);
+
+                if (pageIndex > setting.totalPage || pageIndex <= 0) {
+                    alert('页码不在范围内');
                     return;
                 }
 
