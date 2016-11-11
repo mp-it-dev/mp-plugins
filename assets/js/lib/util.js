@@ -331,8 +331,7 @@
 
         // 格式化数字，将数字格式化成precision位数，separator分隔的数字
         formatNumber: function (num, precision, separator) {
-            //null is number 0?
-            if (num === null || isNaN(num)) {
+            if (!util.isNumber(num, true)) {
                 return num;
             }
 

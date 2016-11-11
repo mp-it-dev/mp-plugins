@@ -184,10 +184,6 @@ $.extend($.fn, {
          *             async: true                  // 是否远程筛选
          *         }
          *     },
-         *     numberFormat: {
-         *         toThousands: true,
-         *         toWarning: true
-         *     }
          *     handler: function (value, data) {    // 列处理函数，在该列的所有数据
          *                                          // 都会被此函数处理，一定要返回数据
          *         return value;
@@ -546,7 +542,7 @@ $.extend($.fn, {
             }
 
             if (col.width) {
-                if (!isNaN(col.width)) {
+                if (util.isNumber(col.width, true)) {
                     style = ' style="width: ' + col.width + 'px;"';
                     attr = ' data-width="' + col.width + 'px"';
                 } else {
@@ -1311,39 +1307,6 @@ $.extend($.fn, {
             }
         });
     }());
-
-    var NumberFormat = {
-        toThousands: function (num, precision) {
-            //null is number 0?
-            if (num === null || isNaN(num)) {
-                return num;
-            }
-
-            num = Number(num);
-            // 处理小数点位数
-            num = (typeof precision !== 'undefined' ? num.toFixed(precision) : num).toString();
-            // 分离数字的小数部分和整数部分
-            parts = num.split('.');
-            // 整数部分加[separator]分隔, 借用一个著名的正则表达式
-            parts[0] = parts[0].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + (','));
-
-            return parts.join('.');
-        },
-        toWarning: function (num) {
-            //null is number 0?
-            if (num === null || num === undefined) {
-                return num;
-            }
-
-            var newNum = Number(num.toString().replace(/,/g, ''));
-
-            if (isNaN(newNum)) {
-                return num;
-            }
-
-            return newNum < 0 ? '<span style="color: red;">' + num + '</span>' : num;
-        }
-    }
     
     $.fn.table = function (method) {
         if (methods[method]) {
@@ -1753,7 +1716,7 @@ $.extend($.fn, {
 
                 e.preventDefault();
 
-                if (isNaN(pageIndex) || pageIndex > setting.totalPage || pageIndex <= 0) {
+                if (!util.isNumber(pageIndex) || pageIndex > setting.totalPage || pageIndex <= 0) {
                     alert('请输入有效页码');
                     return;
                 }
