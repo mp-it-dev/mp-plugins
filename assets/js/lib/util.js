@@ -27,6 +27,16 @@
             return Object.prototype.toString.call(it) === '[object Object]';
         },
 
+        // 是否为数字
+        isNumber: function (it, isString) {
+            return isString ? !isNaN(Number(it)) && !isNaN(parseFloat(it)) : Object.prototype.toString.call(it) === '[object Number]';
+        },
+
+        // 是否为整数
+        isInteger: function (it, isString) {
+            return isString ? Math.floor(it) === Number(it) : Math.floor(it) === it;
+        },
+
         // 数组循环
         forEach: function (arr, callback) {
             if (!util.isArray(arr)) {
