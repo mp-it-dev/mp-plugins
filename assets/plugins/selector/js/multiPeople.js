@@ -82,6 +82,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                             }
 
                             $('#jobList').html(html);
+                            $('#peopleList').empty();
                             $('#jobList li:eq(0)').trigger('click');
                         }
                     });
