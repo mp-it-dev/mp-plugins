@@ -32,7 +32,7 @@
 					width: 930,
 					height: 480,
 					padding: 0,
-					src: this.baseUrl + 'singlePeople.html?callback=singlePeopleCallback&apiurl=' + encodeURIComponent(this.apiUrl) + '&t=' + t
+					src: this.baseUrl + 'singlePeople.html?callback=singlePeopleCallback&apiurl=' + encodeURIComponent(this.apiUrl) + '&badge=' + option.badge + '&t=' + t
 				}
 			});
 		},
@@ -49,7 +49,7 @@
 					width: 930,
 					height: 480,
 					padding: 0,
-					src: this.baseUrl + 'multiPeople.html?callback=multiPeopleCallback&apiurl=' + encodeURIComponent(this.apiUrl) + '&t=' + t
+					src: this.baseUrl + 'multiPeople.html?callback=multiPeopleCallback&apiurl=' + encodeURIComponent(this.apiUrl) + '&badge=' + option.badge + '&t=' + t
 				}
 			});
 		},

@@ -1,6 +1,12 @@
 require(['jquery', 'util', 'ztree'], function($, util) {
 	var apiUrl = decodeURIComponent(util.queryString('apiurl'));
-	var rootNodes = { id: 'C01', name: '迈普通信', pid: null, isParent: true, nocheck: true };
+    var badge = util.queryString('badge');
+	var rootNodes = [{ id: 'C01', name: '迈普通信', pid: null, isParent: true, nocheck: true }];
+
+    if (badge) {
+        rootNodes.push({ id: 'C02', name: '自定义组', pid: null, isParent: false, nocheck: true, icon: './img/file.png' });
+    }
+
     var setting = {
         data: {
             simpleData: {
@@ -33,30 +39,53 @@ require(['jquery', 'util', 'ztree'], function($, util) {
             },
             onClick: function(event, treeId, treeNode) {
 		        $('#jobList').empty();
-		        searchPeople();
 
-		        $.ajax({
-		        	url: apiUrl + 'Organization/GetJobNode',
-		        	data: {
-		        		depId: treeNode.id
-		        	},
-		        	dataType: 'jsonp',
-		        	success: function(data) {
-		        		var html = '<li class="selected">' +
-	        							'<img src="./img/group.png" />' +
-	        							'<span>所有职位</span>' +
-	        						'</li>';
+		        if (treeNode.id != 'C02') {
+                    searchPeople(false);
+                    $.ajax({
+                        url: apiUrl + 'Organization/GetJobNode',
+                        data: {
+                            depId: treeNode.id
+                        },
+                        dataType: 'jsonp',
+                        success: function(data) {
+                            var html = '<li class="selected">' +
+                                            '<img src="./img/group.png" />' +
+                                            '<span>所有职位</span>' +
+                                        '</li>';
 
-	        			for (var i = 0; i < data.length; i++) {
-	        			    html += '<li data-jobid="' + data[i].JobId + '">'+
-	        			    			'<img src="./img/worker.png" />' +
-	        			    			'<span>' + data[i].JobName + '</span>'+
-	        			    		'</li>';
-	        			}
+                            for (var i = 0; i < data.length; i++) {
+                                html += '<li data-type="job" data-jobid="' + data[i].JobId + '">'+
+                                            '<img src="./img/worker.png" />' +
+                                            '<span>' + data[i].JobName + '</span>'+
+                                        '</li>';
+                            }
 
-	        			$('#jobList').html(html);		        		
-		        	}
-		        });
+                            $('#jobList').html(html);                     
+                        }
+                    });
+                } else {
+                    $.ajax({
+                        url: apiUrl + 'Organization/GetGroupList',
+                        data: {
+                            badge: badge
+                        },
+                        dataType: 'jsonp',
+                        success: function(data) {
+                            var html = '';
+
+                            for (var i = 0; i < data.length; i++) {
+                                html += '<li data-type="group" data-id="' + data[i].Id + '" data-ygid="' + data[i].YgId + '">'+
+                                            '<img src="./img/worker.png" />' +
+                                            '<span>' + data[i].GroupName + '</span>'+
+                                        '</li>';
+                            }
+
+                            $('#jobList').html(html);
+                            $('#jobList li:eq(0)').trigger('click');
+                        }
+                    });
+                }
             }
         }
     };
@@ -81,7 +110,11 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     	$('#jobList li').removeClass('selected');
     	$(this).addClass('selected');
 
-    	searchPeople(false);
+    	if ($(this).data('type') == 'job') {
+           searchPeople(false);
+        } else {
+            getGroupPeople();
+        }
     });
 
     $(document).on('click', '#peopleList tr', function() {    	
@@ -143,6 +176,44 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         			}
         		}        		
         	}
+        });
+    }
+
+    function getGroupPeople() {
+        var groupId = $('#jobList li.selected').data('id');
+        var ygId = $('#jobList li.selected').data('ygid');
+        var result = $('#peopleList').empty();
+
+        $('#loading').show();
+        $('.js-select-all[data-target="#peopleList"]').prop('checked', false);
+
+        $.ajax({
+            url: apiUrl + 'Organization/GetGroupPeopleList',
+            data: {
+                groupId: groupId,
+                ygId: ygId
+            },
+            dataType: 'jsonp',
+            success: function(data) {
+                $('#loading').hide();
+
+                if (data && data.length > 0) {
+                    var tr;
+
+                    for (var i = 0; i < data.length; i++) {
+                        tr = $(
+                            '<tr>' +
+                                '<td width="80">' + data[i].Badge + '</td>' +
+                                '<td width="80">' + data[i].Name + '</td>' +
+                                '<td><div class="text-hidden" title="' + data[i].DepName + '">' + (data[i].DepName || '') + '</div></td>' +
+                                '<td><div class="text-hidden" title="' + data[i].JobName + '">' + (data[i].JobName || '') + '</div></td>' +
+                            '</tr>'
+                        ).data('data', data[i]);                        
+
+                        result.append(tr);
+                    }
+                }               
+            }
         });
     }
 });

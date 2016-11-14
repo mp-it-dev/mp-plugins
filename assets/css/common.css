@@ -435,7 +435,8 @@ fieldset[disabled] .btn-primary:hover {
 }
 .item-static {
     display: table-cell;
-    padding-top: 7px;
+    padding-top: 7px;    
+    word-break: break-all;
 }
 .item-bordered {
     padding: 6px 12px;
