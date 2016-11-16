@@ -107,7 +107,7 @@
                 throw new Error(str + ' is not a String');
             }
 
-            return str.replace(/(^\s*)|(\s*$)/g, "");
+            return str.replace(/(^\s*)|(\s*$)/g, '');
         },
 
         // 格式化时间参数
