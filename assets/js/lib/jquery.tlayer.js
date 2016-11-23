@@ -1284,18 +1284,24 @@
                 var w = target.outerWidth();
                 var h = target.outerHeight();
 
-                if (oX < 0) oX = 0;
-                if (oY < 0) oY = 0;
-
-                if (oX + w > $(win).width()) {
-                    oX = $(win).width() - w;
+                if (oX < 0) {
+                    oX = 0;
                 }
-                if (oY + h > $(win).height()) {
-                    oY = $(win).height() - h;
+                if (oY < 0) {
+                    oY = 0;
                 }
+                if (w < $(win).width()) {
+                    if (oX + w > $(win).width()) {
+                        oX = $(win).width() - w;
+                    }
+                }
+                if (h < $(win).height()) {
+                    if (oY + h > $(win).height()) {
+                        oY = $(win).height() - h;
+                    }
+                }                
 
                 target.css({ "left": oX + "px", "top": oY + "px" });
-
                 return false;
             }
         });

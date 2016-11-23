@@ -765,7 +765,7 @@ $.extend($.fn, {
     Table.prototype.initError = function (msg) {
         var ele = this.ele;
         var thLen = ele.find('.table-body thead th').length;
-        var tbody = $('<tbody><tr class="table-tr table-errorInfo"><td colspan="' + thLen + '" style="align: center;">' + msg + '</td></tr></tbody>');
+        var tbody = $('<tbody><tr class="table-tr table-errorInfo"><td colspan="' + thLen + '" style="text-align: center;">' + msg + '</td></tr></tbody>');
 
         ele.find('.table-body table tbody').remove();
         ele.find('.table-body table').append(tbody);
