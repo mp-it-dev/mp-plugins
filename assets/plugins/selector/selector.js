@@ -87,6 +87,40 @@
 				}
 			});
 		},
+		//单职位
+		singleJob: function (option) {
+			window.singleJobCallback = option.callback;
+			var t = new Date().getTime();
+
+			$.content({
+				layerID: option.layerID || false,
+				theme: 'blue',
+				header: '单职位',				
+				content: {
+					width: 400,
+					height: 480,
+					padding: 0,
+					src: this.baseUrl + 'singleJob.html?callback=singleJobCallback&apiurl=' + encodeURIComponent(this.apiUrl) + '&t=' + t
+				}
+			});
+		},
+		//多职位
+		multiJob: function (option) {
+			window.multiJobCallback = option.callback;
+			var t = new Date().getTime();
+
+			$.content({
+				layerID: option.layerID || false,
+				theme: 'blue',
+				header: '多职位',
+				content: {
+					width: 630,
+					height: 480,
+					padding: 0,
+					src: this.baseUrl + 'multiJob.html?callback=multiJobCallback&apiurl=' + encodeURIComponent(option.apiUrl || this.apiUrl) + '&t=' + t
+				}
+			});
+		},
 		//单部门职位
 		singleDepJob: function (option) {
 			window.singleDepJobCallback = option.callback;
