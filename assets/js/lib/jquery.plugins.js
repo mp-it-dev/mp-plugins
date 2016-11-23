@@ -1127,7 +1127,7 @@ $.extend($.fn, {
             var ret = ele.trigger(ev, [rowData, this]);
 
             if (ret !== false) {
-                text.show();
+                tdText.show();
                 el.remove();
             }
         });
