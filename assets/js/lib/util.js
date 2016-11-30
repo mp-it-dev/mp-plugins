@@ -4,7 +4,6 @@
  * @author helin
  */
 (function (factory, global) {
-    global.util = factory();
     if (typeof define === 'function' && define.amd) {
         define([], factory);
     } else {
