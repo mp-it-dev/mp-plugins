@@ -316,7 +316,7 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 					if (settings.onInit) settings.onInit.call($this, swfuploadify);
 
 				} else {
-
+					alert('当前浏览器未检测到flash，无法使用文件上传功能');
 					// Call the fallback function
 					if (settings.onFallback) settings.onFallback.call($this);
 

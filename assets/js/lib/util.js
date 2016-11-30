@@ -4,6 +4,7 @@
  * @author helin
  */
 (function (factory, global) {
+    global.util = factory();
     if (typeof define === 'function' && define.amd) {
         define([], factory);
     } else {
@@ -34,7 +35,7 @@
 
         // 是否为整数
         isInteger: function (it, isString) {
-            return isString ? Math.floor(it) === Number(it) : Math.floor(it) === it;
+            return isString ? it !== '' && Math.floor(it) === Number(it) : Math.floor(it) === it;
         },
 
         // 数组循环
@@ -111,12 +112,17 @@
         },
 
         // 格式化时间参数
-        // 参数1： date 日期对象
+        // 参数1： date 日期对象或可转为日期对象的值
         // 参数2： format 字符串，格式化形式，年月日用大写Y、M、D代表，时分秒分别用h、m、s代表，毫秒用S代表
         formatDate: function (date, format) {
-            if (!date instanceof Date) {
-                throw new Error(date + ' is not a Date object');
+            if (!(date instanceof Date)) {
+                date = new Date(date);
             }
+            if (isNaN(date.getDate())) {
+                return null;
+            }
+
+            format = format || 'YYYY/MM/DD hh:mm:ss';
 
             var o = {
                 'M+': date.getMonth() + 1,                      //month 
@@ -143,8 +149,6 @@
         // 格式化c#后台返回的/Date(1473133893427)/类型的时间
         formatMSDate: function (str, format) {
             var match = /\/Date\((\d+)\)\//.exec(str);
-            format = format || 'YYYY/MM/DD hh:mm:ss';
-
             return match ? util.formatDate(new Date(+match[1]), format) : '';
         },
 
