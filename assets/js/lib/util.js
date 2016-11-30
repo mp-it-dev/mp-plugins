@@ -328,6 +328,10 @@
         // 解析模板中的变量
         parseTpl: function (template, templateData) {
             return template.replace(/\#\{([\w\.]*)\}/g, function (s0, s1) {
+                if (s1 === '') {
+                    return templateData;
+                }
+                
                 var namespaceList = s1.split('.');                
                 var data;
 
