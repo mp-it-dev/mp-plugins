@@ -3,32 +3,19 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 	selector.apiUrl = 'http://192.168.4.86:100/Selector/';
 
 	$('#cc').scrollbar();
-	$('#searchProductTree').autoComplete({
-		width: '400px',
+	$('#searchProduct').autoComplete({
 		async: {
-            url: 'http://webapi.maipu.com/Selector/Product/SearchProduct',
+            url: 'http://192.168.4.86:100/Selector/Product/GetCpList',
             dataType: 'jsonp',
             dataField: null,
-            searchField: 'wpbm'
-        },
-        template: '<td>#{cpBm}</td><td>#{cpName}</td><td>#{zhengjiName}</td>',
-        maxNum: 10,
-        callback: function (data) {
-        	$(this).val(data.zhengjiName);
-        }
-	});
-	$('#searchProductByWpbm').autoComplete({
-		async: {
-            url: 'http://192.168.4.86:100/Selector/Product/SearchProductByFilter',
-            dataType: 'jsonp',
-            dataField: null,
-            searchField: 'wpbm',
+            searchField: 'name',
             delay: 0
         },
-        template: '<td>#{cpBm}</td><td>#{cpName}</td>',
+        width: 300,
+        template: '<td width="100">#{ID}</td><td>#{Name}</td><td width="50">#{OriginData.SaleVersion}</td>',
         maxNum: 10,
         callback: function (data) {
-        	$(this).val(data.cpName);
+        	$(this).val(data.Name);
         }
 	});
 	

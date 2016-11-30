@@ -3165,13 +3165,17 @@ $.extend($.fn, {
             setting.rules = eval(setting.rules);
         }
 
-        setting.originPlacement = setting.placement;
-        this.tipDom = $(
-                            '<div class="validate-tip" id="' + this.targetId + '">' +
-                                '<span class="glyphicon glyphicon-warning-sign"></span>' + 
-                                '<span class="validate-tip-text"></span>' +
-                            '</div>'
-                        ).appendTo('body');
+        var outer = $('<div class="ui-validate"></div>').css('display', this.ele.css('display'));
+        var inner = $(
+            '<div class="ui-validate-tip">' +
+                '<span class="glyphicon glyphicon-warning-sign"></span>' + 
+                '<span class="ui-validate-tip-text"></span>' +
+            '</div>'
+        );
+        this.ele.addClass('ui-validate-input').wrap(outer);
+        this.ele = this.ele.parent();
+        this.ele.append(inner);
+
         this.createRegExp();
         this.bindEvents();
     };
@@ -3209,18 +3213,32 @@ $.extend($.fn, {
     // 显示提示框
     Validate.prototype.showTip = function (msg) {
         var ele = this.ele;
-        var setting = this.setting;
-        
-        ele.addClass('validate-error');
-        this.setTip(msg);
+        var placement = this.setting.placement;
+        var tip = ele.find('.ui-validate-tip');
+        var input = ele.find('.ui-validate-input');
+
+        // 自动设置提示框位置为右边
+        if (!/^((top)|(right)|(bottom)|(left))$/.test(placement)) {
+            placement = 'right';
+        }
+
+        input.addClass('ui-validate-error');
+        tip.show().addClass(placement);
+        ele.find('.ui-validate-tip-text').html(msg);
+
+        if (placement === 'top' || placement === 'bottom') {
+            tip.css('margin-left', -(tip.outerWidth() / 2));
+        } else {
+            tip.css('margin-top', -(tip.outerHeight() / 2));
+        }
     };
 
     // 隐藏提示框
     Validate.prototype.hideTip = function () {
         var ele = this.ele;
 
-        ele.removeClass('validate-error');
-        $('#' + this.targetId).hide().removeClass('top right bottom left');
+        ele.find('.ui-validate-input').removeClass('ui-validate-error');
+        ele.find('.ui-validate-tip').hide().removeClass('top right bottom left');
     };
 
     // 设置提示框内容和位置
@@ -3228,7 +3246,7 @@ $.extend($.fn, {
         var ele = this.ele;
         var setting = this.setting;
 
-        var tip = $('#' + this.targetId).show();
+        var tip = ele.find('.ui-validate-tip').show();
 
         tip.find('.validate-tip-text').html(msg);
 
@@ -3277,8 +3295,9 @@ $.extend($.fn, {
         var setting = this.setting;
         var rules = setting.rules;
         var self = this;
+        var input = ele.find('.ui-validate-input');
 
-        ele.on('blur', function () {
+        input.on('blur', function () {
             var val = $(this).val();
 
             self.hideTip();
@@ -3296,7 +3315,7 @@ $.extend($.fn, {
             }
         });
 
-        ele.on('focus', function () {
+        input.on('focus', function () {
             self.hideTip();
         });
     };
