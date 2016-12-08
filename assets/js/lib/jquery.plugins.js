@@ -1914,7 +1914,7 @@ $.extend($.fn, {
             for (var i = 0, l = dataList.length; i < l; i++) {
                 var data = dataList[i];
                 var key = setting.valueField ? data[setting.valueField] : data;
-                var html = util.parseTpl('<tr data-key="' + key + '">' + template + '</tr>', data);
+                var html = util.parseTpl('<tr data-key="' + key + '">' + template + '</tr>', data, true);
 
                 $(html).appendTo(table).data('data', data);
             }
@@ -1978,7 +1978,8 @@ $.extend($.fn, {
         // 触发change事件
         if (isTriggerChangeEvent !== false) {
             var e = $.Event('change.' + namespace);
-            this.ele.trigger(e, [selectedData.slice(0)]);
+            var dataList = selectedData.slice(0);
+            this.ele.trigger(e, [setting.multi ? dataList : dataList[0]]);
         }
     }
 

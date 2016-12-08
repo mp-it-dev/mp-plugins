@@ -326,7 +326,9 @@
         },
 
         // 解析模板中的变量
-        parseTpl: function (template, templateData) {
+        parseTpl: function (template, templateData, emptyStrEscape) {
+            emptyStrEscape = emptyStrEscape || false;
+
             return template.replace(/\#\{([\w\.]*)\}/g, function (s0, s1) {
                 if (s1 === '') {
                     return templateData;
@@ -347,7 +349,7 @@
                     }
                 }
 
-                return data || '';
+                return data || (emptyStrEscape ? '&nbsp;' : '');
             });
         },
 
