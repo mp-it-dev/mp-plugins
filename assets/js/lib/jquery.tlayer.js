@@ -6,7 +6,7 @@
     if (typeof define === 'function' && define.amd) {
         define(['jquery'], factory);
     } else {
-        if (!jQuery) {
+        if (typeof jQuery === 'undefined') {
             throw new Error('jquery tlayer depends on jquery');
         }
 

@@ -7,7 +7,7 @@
     if (typeof define === 'function' && define.amd) {
         define(['jquery', 'util'], factory);
     } else {
-        if (!jQuery || !util) {
+        if (typeof jQuery === 'undefined' || typeof util === 'undefined') {
             throw new Error('jquery.plugin depends on jquery, util');
         }
 
