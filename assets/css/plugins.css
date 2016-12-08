@@ -468,15 +468,13 @@
     margin-left: 20px;
     vertical-align: middle;
 }
-.uploadify-queue-item,
-.finish-queue-item  {
+.uploadify-queue-item {
     display: table;
     width: 100%;
     margin-top: 10px;
     table-layout: fixed;
 }
-.uploadify-queue-item > *,
-.finish-queue-item > *  {
+.uploadify-queue-item > * {
     display: table-cell;
     padding-right: 10px;
     vertical-align: middle;

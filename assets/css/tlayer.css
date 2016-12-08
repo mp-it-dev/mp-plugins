@@ -51,6 +51,8 @@
     width: 100%;
     border-bottom: 1px solid #eee;
     font-family: "微软雅黑";
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
 }
 
 .layer-box-container.default .layer-box-header {
