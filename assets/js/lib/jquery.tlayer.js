@@ -450,11 +450,11 @@
                 var button = buttons[i];
 
                 button.buttonID = button.buttonID || layerID+"-"+block+"-"+i;
-                button.style = 'layer-btn-' + (button.style || 'default');
+                button.style = 'btn-' + (button.style || 'default');
 
                 var attrs = {
                     "id"            : button.buttonID ? ' id="'+button.buttonID+'"' : '',
-                    "cls"         : ' class="layer-btn '+button.style+ '"',
+                    "cls"         : ' class="btn ' + button.style+ '"',
                     "text"          : button.text || "&nbsp;",
                     "title"         : 'title="' + (button.text || "&nbsp;") + '"',
                     "unselectable"  : ' unselectable="on" onselectstart="return false;"'

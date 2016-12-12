@@ -303,7 +303,13 @@ $.extend($.fn, {
         var data;
 
         if (typeof setting.data === 'function') {
-            data = $.extend(true, {}, setting.data());
+            var retData = setting.data();
+
+            if (retData === false) {
+                return;
+            }
+
+            data = $.extend(true, {}, retData);
         } else {
             data = $.extend(true, {}, setting.data);
         }
@@ -365,7 +371,7 @@ $.extend($.fn, {
                 }
 
                 this.pager = ele.find('.table-pager').pager(ajaxOpt);
-            }            
+            }
         } else {
             ajaxOpt = {
                 url             : setting.url,
@@ -599,14 +605,21 @@ $.extend($.fn, {
                 colClass = ' table-menu';
 
                 if (menu.sort) {
-                    attr += ' data-sorder="' + (menu.sort.defaultOrder ? menu.sort.defaultOrder : '') + '"';
                     colClass += ' table-sort';
 
-                    // 保存默认排序
-                    if (!this.sname && menu.sort.defaultOrder) {
-                        this.sname = col.field;
-                        this.sorder = menu.sort.defaultOrder;
-                        colClass += ' table-sort-active';
+                    // 查找排序
+                    if (this.sname) {
+                        if (this.sname === col.field) {
+                            colClass += ' table-sort-active';
+                            attr += ' data-sorder="' + this.sorder + '"';
+                        }
+                    } else {
+                        if (menu.sort.defaultOrder) {
+                            this.sname = col.field;
+                            this.sorder = menu.sort.defaultOrder;
+                            colClass += ' table-sort-active';
+                            attr += ' data-sorder="' + menu.sort.defaultOrder + '"';
+                        }                        
                     }
                 }                
             }
@@ -1432,7 +1445,13 @@ $.extend($.fn, {
         var data;
 
         if (typeof setting.data === 'function') {
-            data = $.extend(true, {}, setting.data(), this.extraData);
+            var retData = setting.data();
+
+            if (retData === false) {
+                return;
+            }
+            
+            data = $.extend(true, {}, retData, this.extraData);
         } else {
             data = $.extend(true, {}, setting.data, this.extraData);
         }

@@ -106,7 +106,7 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
     if (typeof define === 'function' && define.amd) {
         define(['jquery', 'util'], factory);
     } else {
-        if (!jQuery || !util) {
+        if (typeof jQuery === 'undefined' || typeof util === 'undefined') {
             throw new Error('uploadify depends on jquery, util');
         }
 
