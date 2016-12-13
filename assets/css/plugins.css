@@ -852,17 +852,15 @@
 
 /*右键菜单 start*/
 .ui-menu {
+    display: none;
     position: absolute;
     z-index: 9999;
     min-width: 120px;
-    max-height: 300px;
     margin: 0;
     padding: 0;
     border: 1px solid #ddd;
     border-radius: 3px;
-    display: none;
     list-style: none;
-    overflow: auto;
 }
 .ui-menu-item {
     position: relative;

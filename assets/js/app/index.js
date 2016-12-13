@@ -22,12 +22,13 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 	var table = $("#table").table({
 		tableClass: 'table-bordered',
 		height: 400,
-		url: 'http://192.168.4.86:100/Test/User/GetList',
+		url: 'http://192.168.4.86:100/Test/User/GetList?pageIndex=1&pageSize=0',
 		dataType: 'jsonp',
 		jsonp: 'callback',
 		rownum: true,
 		paging: {
 			enable: true,
+			localPage: true,
 			pageSize: 20,
 			pageSizeArray: [20, 40, 60]
 		},
@@ -44,9 +45,6 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 			menu: {
 				sort: {
 					defaultOrder: 'asc'
-				},
-				filter: {
-					async: true
 				}
 			}
 		}, {
@@ -56,7 +54,7 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 			menu: {
 				sort: true,
 				filter: {
-					async: true
+					async: false
 				}
 			}
 		}, {

@@ -650,7 +650,7 @@ $.extend($.fn, {
             if (typeof menu === 'object') {
                 for (var i in menu) {
                     if (i != 'sort') {
-                        reg = true;
+                        ret = true;
                         break;
                     }
                 }
@@ -708,14 +708,13 @@ $.extend($.fn, {
 
             // 遍历列
             for (j = 0; j < colLen; j++) {
-                var col = colOptions[j];
-                var text;
+                var col = colOptions[j];                
+                var text = undefined;
+                var val = undefined;
 
                 if (col.hide) {
                     continue;
                 }
-
-                var val;
 
                 if (col.field && data) {
                     val = data[col.field];
