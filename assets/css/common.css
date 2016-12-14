@@ -81,6 +81,10 @@ a:hover {
     margin-left: -15px;
 }
 
+textarea.form-control {
+    resize: vertical;
+}
+
 /*去除IE输入框后面的x和眼睛*/
 ::-ms-clear,
 ::-ms-reveal {

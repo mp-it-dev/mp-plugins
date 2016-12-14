@@ -208,7 +208,7 @@
                     <span class="file-name">\
                         <span class="file-name-text" title="#{name}">#{name}</span>\
                     </span>\
-                    <span class="file-data">Waiting</span>\
+                    <span class="file-data">waiting</span>\
                     <span class="file-operate">\
                         <a class="file-cancel" href="#">取消</a>\
                     </span>\
@@ -275,13 +275,15 @@
         };
 
         s.success = function (data, response) {
-            self.onUploadSuccess(file, data, response)
+            self.onUploadSuccess(file, data, response);
         };
+
         s.error = function (xhr, errorMsg) {
-            self.onUploadError(file, xhr.status, errorMsg)
+            self.onUploadError(file, xhr.status, errorMsg);
         };
+
         s.complete = function () {
-            self.onUploadComplete(file)
+            self.onUploadComplete(file);
         };
 
         file.xhr = $.ajax(s);
@@ -337,12 +339,13 @@
         if (setting.onUploadError) {
             setting.onUploadError.call(this, file, errorCode, errorMsg);
         } else if (setting.defaultTemplate) {
-            // 0为用户取消上传
-            if (errorCode != 0) {
+            // errorMsg为'abort'表示用户取消上传
+            if (errorMsg !== 'abort') {
                 alert('上传出错，错误代码：' + errorCode + '。错误信息：' + errorMsg);
 
                 // 设置错误样式
-                $('#' + file.id).attr('data-status', ' error');
+                $('#' + file.id).attr('data-status', 'error');
+                $('#' + file.id).find('.file-data').html('error');
                 $('#' + file.id).find('.file-icon').attr('<span class="icon error"></span>');
             }
         }
