@@ -462,7 +462,7 @@ $.extend($.fn, {
 
             // 出现竖直滚动条则设置padding-right
             if (tbodyTable.outerHeight() > tbody.outerHeight()) {
-                var w = Math.max(parseInt(theadLastTh[0].style.width) || $theadLastTh.width(), 40);
+                var w = Math.max(parseInt(theadLastTh[0].style.width) || theadLastTh.width(), 40);
 
                 theadLastTh.width(w - sWidth);
                 thead.css('padding-right', sWidth + 1);

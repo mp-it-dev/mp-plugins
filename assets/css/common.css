@@ -419,6 +419,7 @@ fieldset[disabled] .btn-primary:hover {
     position: relative;
     display: table;
     width: 100%;
+    table-layout: fixed;
 }
 .item-name {
     display: table-cell;
