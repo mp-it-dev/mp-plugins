@@ -178,6 +178,7 @@ $.extend($.fn, {
          *     fixed: false,                        // 是否固定列不被隐藏
          *     menu: {                              // 列操作菜单
          *         sort: {                          // 排序
+         *             type: '',                    // 本地排序时需要指定类型
          *             defaultOrder: 'asc'          // 默认排序方式
          *         },
          *         filter: {                        // 筛选
@@ -1006,6 +1007,51 @@ $.extend($.fn, {
     }
 
     /**
+     * [sort 本地排序]
+     */
+    Table.prototype.sort = function (fieldIndex) {
+        var setting = this.setting;
+        var col = setting.colOptions[fieldIndex];
+        var order = this.sorder;
+        var name = this.sname;
+        var type = col.menu.sort.type || 'string';
+
+        if (setting.paging.enable) {
+            if (col.menu.sort.async) {
+                this.reload(1);
+            } else {
+                this.pager.pager('sort', order, name, type);
+            }
+        } else {
+            this.dataList.sort(function (a, b) {
+                //  先排除空值
+                if (order === 'asc') {
+                    if (a[name] === null || a[name] === undefined) {
+                        return -1;
+                    }
+                } else {
+                    if (a[name] === null || a[name] === undefined) {
+                        return 1;
+                    }
+                }
+
+                if (type === 'number') {
+                    return order === 'asc' ? Number(a[name]) - Number(b[name]) : Number(b[name]) - Number(a[name]);
+                }
+                if (type === 'string') {
+                    return order === 'asc' ? String(a[name]).localeCompare(String(b[name])) : String(b[name]).localeCompare(String(a[name]));
+                }
+                if (type === 'date') {
+                    return order === 'asc' ? Date(a[name]) - Date(b[name]) : Date(b[name]) - Date(a[name]);
+                }
+            });
+
+            setting.dataList = this.dataList.slice(0);
+            this.refresh();
+        }
+    }
+
+    /**
      * [resize 窗口变化时重新计算表格宽度等信息]
      * @return {[type]} [description]
      */
@@ -1110,7 +1156,7 @@ $.extend($.fn, {
                 self.sorder = 'asc';
             }
 
-            self.reload(1);
+            self.sort(+th.data('field-index'));           
         });
 
         // 编辑单元格
@@ -1382,6 +1428,19 @@ $.extend($.fn, {
         filter: function (filterName, keyword) {
             return this.each(function () {
                 $(this).data(namespace).filter(filterName, keyword);
+            });
+        },
+
+        /**
+         * [sort 在结果中排序]
+         * @param  {[type]} order [description]
+         * @param  {[type]} name  [description]
+         * @param  {[type]} type  [description]
+         * @return {[type]}            [description]
+         */
+        sort: function (order, name, type) {
+            return this.each(function () {
+                $(this).data(namespace).sort(order, name, type);
             });
         }
     };
@@ -1699,6 +1758,54 @@ $.extend($.fn, {
     }
 
     /**
+     * [sort 结果中排序]
+     * @param  {[type]} filterName  [筛选字段名]
+     * @param  {[type]} keyword [筛选值]
+     */
+    Pager.prototype.sort = function (order, name, type) {
+        var setting = this.setting;
+
+        this.dataList.sort(function (a, b) {
+            //  先排除空值
+            if (order === 'asc') {
+                if (a[name] === null || a[name] === undefined) {
+                    return -1;
+                }
+            } else {
+                if (a[name] === null || a[name] === undefined) {
+                    return 1;
+                }
+            }
+
+            if (type === 'number') {
+                return order === 'asc' ? Number(a[name]) - Number(b[name]) : Number(b[name]) - Number(a[name]);
+            }
+            if (type === 'string') {
+                return order === 'asc' ? String(a[name]).localeCompare(String(b[name])) : String(b[name]).localeCompare(String(a[name]));
+            }
+            if (type === 'date') {
+                return order === 'asc' ? Date(a[name]) - Date(b[name]) : Date(b[name]) - Date(a[name]);
+            }
+        });
+
+        setting.dataList = this.dataList.slice(0);
+
+        // 计算总页码等信息
+        setting.pageIndex = 1;
+        setting.total = setting.dataList.length;
+        setting.totalPage = Math.ceil(setting.total / setting.pageSize);
+
+        this.initPage();
+
+        // 返回数据
+        if (setting.localPage) {
+            setting.success(setting.dataList.slice(0, setting.pageIndex * setting.pageSize));
+        } else {
+            setting.success(setting.dataList.slice(0));
+        }
+    }
+
+    /**
      * [bindEvents 绑定事件]
      * @return {[type]} [description]
      */
@@ -1869,9 +1976,7 @@ $.extend($.fn, {
     };
 
     /**
-     * [initData 初始化数据]
-     * 1、如果选项中有数据列表则直接使用该数据
-     * 2、如果选项中没有数据列表则表示是从select中提取数据
+     * [init]
      */
     UiSelect.prototype.init = function () {
         var setting = this.setting;
