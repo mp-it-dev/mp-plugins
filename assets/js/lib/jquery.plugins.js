@@ -178,6 +178,7 @@ $.extend($.fn, {
          *     fixed: false,                        // 是否固定列不被隐藏
          *     menu: {                              // 列操作菜单
          *         sort: {                          // 排序
+         *             async: true,                 // 是否远程排序
          *             type: '',                    // 本地排序时需要指定类型
          *             defaultOrder: 'asc'          // 默认排序方式
          *         },
@@ -316,7 +317,7 @@ $.extend($.fn, {
         }
 
         // 如果有排序则添加
-        if (this.sname && this.sorder) {
+        if (this.sname && this.sorder && this.sasync) {
             data[setting.snameField] = this.sname;
             data[setting.sorderField] = this.sorder;
         }
@@ -608,19 +609,15 @@ $.extend($.fn, {
                 if (menu.sort) {
                     colClass += ' table-sort';
 
-                    // 查找排序
-                    if (this.sname) {
-                        if (this.sname === col.field) {
-                            colClass += ' table-sort-active';
-                            attr += ' data-sorder="' + this.sorder + '"';
-                        }
-                    } else {
-                        if (menu.sort.defaultOrder) {
-                            this.sname = col.field;
-                            this.sorder = menu.sort.defaultOrder;
-                            colClass += ' table-sort-active';
-                            attr += ' data-sorder="' + menu.sort.defaultOrder + '"';
-                        }                        
+                    // 查找默认排序
+                    if (menu.sort.defaultOrder) {
+                        this.sname = col.field;
+                        this.sorder = menu.sort.defaultOrder;
+                        this.sasync = menu.sort.async;
+                    }                    
+                    if (this.sname && this.sname === col.field) {
+                        colClass += ' table-sort-active';
+                        attr += ' data-sorder="' + this.sorder + '"';
                     }
                 }                
             }
@@ -975,6 +972,9 @@ $.extend($.fn, {
                 this.reload(1);
             } else {
                 this.pager.pager('filter', this.filterName, this.keyword);
+                // 使用之后清除掉，以免在结果中筛选时传递到服务器端
+                this.filterName = null;
+                this.keyword = null;
             }
         } else {
             if (col.menu.filter.async) {
@@ -998,12 +998,11 @@ $.extend($.fn, {
                 }
 
                 this.refresh();
+                // 使用之后清除掉，以免在结果中筛选时传递到服务器端
+                this.filterName = null;
+                this.keyword = null;
             }
         }
-
-        // 使用之后清除掉，以免在结果中筛选时传递到服务器端
-        this.filterName = null;
-        this.keyword = null;
     }
 
     /**
