@@ -718,13 +718,12 @@ $.extend($.fn, {
                     val = data[col.field];
                 }
 
-                // html编码
-                if (setting.autoEncode) {
-                    val = util.htmlEncode(val);
-                }
-
                 // 换行
                 if (typeof val === 'string') {
+                    // html编码
+                    if (setting.autoEncode) {
+                        val = util.htmlEncode(val);
+                    }
                     val = val.replace(/\n/g, '<br>');
                 }
 
