@@ -203,6 +203,9 @@ textarea.form-control {
 .navbar-padding-top {
     padding-top: 51px;
 }
+.navbar-fixed-top .navbar-right {
+    margin-right: 0;
+}
 .navbar-blue {
     background-color: #148CCA;
     color: #fff;

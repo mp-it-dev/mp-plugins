@@ -43,7 +43,7 @@
                 var setting = $.extend(true, {}, Uploadify.DEFAULTS, option);
 
                 if (!setting.id) {
-                    setting.id = $(this).attr('id') || 'uploadify-' +uploadifyId++;
+                    setting.id = $(this).attr('id') || 'uploadify-' + uploadifyId++;
                 }
                 
                 $this.data(namespace, new Uploadify($this, setting));
@@ -201,7 +201,7 @@
         } else if (setting.defaultTemplate) {
             // 在DOM中创建上传模板
             var itemTemplate = 
-                '<div id="#{id}" class="uploadify-queue-item" data-status="queued">\
+                '<div class="uploadify-queue-item" id="#{id}" data-status="queued">\
                     <span class="file-icon">\
                         <span class="icon queued"></span>\
                     </span>\
@@ -269,7 +269,7 @@
                 setting.onUploadStart.call(self, file); 
             } else if (setting.defaultTemplate) {
                 //更新状态
-                $('#' + file.id).attr('data-status', ' uploading');
+                $('#' + file.id).attr('data-status', 'uploading');
                 $('#' + file.id).find('.file-icon').html('<span class="icon uploading"></span>');
             }
         };
@@ -313,7 +313,7 @@
             setting.onUploadSuccess.call(this, file, data, response); 
         } else if (setting.defaultTemplate) {
             var html = 
-                '<div id="'+file.id+'" class="uploadify-queue-item" data-status="success">\
+                '<div class="uploadify-queue-item" id="'+file.id+'" data-status="success">\
                     <span class="file-icon">\
                         <span class="icon ' + util.getFileIcon(file.name) + '"></span>\
                     </span>\
