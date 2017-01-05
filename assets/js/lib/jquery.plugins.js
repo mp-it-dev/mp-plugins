@@ -3742,6 +3742,7 @@ $.extend($.fn, {
     // 隐藏菜单
     Menu.prototype.hide = function () {
         this.ele.hide();
+        this.ele.find('.ui-menu-item').removeClass('hover');
     };
 
     // 销毁组件
