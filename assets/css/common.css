@@ -12,7 +12,7 @@
 }
 
 body {
-    font: 14px/1.5 "Helvetica Neue",Helvetica Neue,Helvetica,Arial,Hiragino Sans GB,Microsoft Yahei,sans-serif;
+    font: 14px/1.5 Helvetica Neue,Arial,Microsoft Yahei;
 }
 
 article,
@@ -428,7 +428,7 @@ fieldset[disabled] .btn-primary:hover {
     display: table-cell;
     width: 100px;
     margin: 0;
-    padding: 7px 10px 0 0;
+    padding: 7px 10px 7px 0;
     vertical-align: top;
 }
 .item-name.required:before {
@@ -443,7 +443,8 @@ fieldset[disabled] .btn-primary:hover {
 }
 .item-static {
     display: table-cell;
-    padding-top: 7px;    
+    padding-top: 7px;
+    padding-bottom: 7px;
     word-break: break-all;
 }
 .item-bordered {
@@ -453,5 +454,16 @@ fieldset[disabled] .btn-primary:hover {
     background-color: #eee;
     -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
     box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+}
+.item-sm .item-name,
+.item-sm .item-static {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    font-size: 12px;
+    line-height: 1.5;
+}
+.item-sm .item-bordered {
+    padding: 5px 10px;
+    border-radius: 3px;
 }
 /*表单行item end*/

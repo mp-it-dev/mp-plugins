@@ -739,7 +739,6 @@ $.extend($.fn, {
                 if (typeof colParam === 'function') {
                     colParam = colParam(data, i, col);
                 }
-
                 for (var key in colParam) {
                     colData += ' data-' + key + '="' + colParam[key] + '"';
                 }
@@ -748,12 +747,12 @@ $.extend($.fn, {
                 var div = $('<div class="table-td-text"></div>').appendTo(td);
 
                 if (col.edit) {
-                    td.addClass('table-td-edit').data('editData', col.edit);
+                    td.addClass('table-td-edit');
                 }
-
                 if (col.align) {
                     td.css('text-align', col.align);
                 }
+                td.data('colOption', col);
 
                 // 如果返回的是DOM或jquery元素则使用append
                 if (text instanceof jQuery || util.isDOM(text)) {
@@ -1160,14 +1159,18 @@ $.extend($.fn, {
         // 编辑单元格
         ele.on('dblclick', '.table-td-edit', function (e) {
             var td = $(this);
-            var edit = td.data('editData');
+            var colOption = td.data('colOption');
+            var rp;
 
             // 调用用户定义的编辑元素
-            var rp = edit.replace.call(this, td.parent().data('rowData'));
+            if (typeof colOption.edit.replace == 'function') {
+                rp = colOption.edit.replace.call(this, colOption, td.parent().data('rowData'));
+            } else {
+                rp = colOption.edit.replace;
+            }
 
             $(rp).addClass('table-td-editEle').appendTo(this).focus();
             td.find('.table-td-text').hide();
-
             e.preventDefault();
         });
 
@@ -1175,17 +1178,16 @@ $.extend($.fn, {
         ele.on('change', '.table-td-editEle', function (e) {
             var el = $(this);
             var td = el.parent();
-            var tr = td.parent();
-            var tdText = el.siblings('.table-td-text');
-            var rowData = tr.data('rowData');
+            var colOption = td.data('colOption');
 
-            var ev = $.Event('editen.ui.table');
-            var ret = ele.trigger(ev, [rowData, this]);
+            if (typeof colOption.edit.callback == 'function') {
+                var ret = colOption.edit.callback.call(this, colOption, td.parent().data('rowData'));
 
-            if (ret !== false) {
-                tdText.show();
-                el.remove();
-            }
+                if (ret !== false) {
+                    el.siblings('.table-td-text').show();
+                    el.remove();
+                }
+            }            
         });
 
         // 确定修改
@@ -3987,21 +3989,21 @@ $.extend($.fn, {
 
             e.stopPropagation();
         });
+
+        // 输入框失去焦点时，延迟隐藏下拉框
+        ele.on('blur', '.ui-autoComplete-input', function (e) {
+            setTimeout(function () {
+                ele.find('.ui-autoComplete-result').hide();
+            }, 200);
+        });
     
         // 选中候选
         ele.on('click', '.ui-autoComplete-result tr', function (e) {
-            var data = $(this).data('data');
-
             if (typeof setting.callback == 'function') {
-                setting.callback.call(ele.find('.ui-autoComplete-input')[0], data);
+                setting.callback.call(ele.find('.ui-autoComplete-input')[0], $(this).data('data'));
             }
         });
     }
-
-    // 隐藏候选框
-    $(document).on('click', function () {
-        $('.ui-autoComplete-result').hide();
-    });
 
     $.fn.autoComplete = function (method) {
         if (methods[method]) {
