@@ -111,6 +111,9 @@ textarea.form-control {
     border-bottom: 1px solid #ddd;
     vertical-align: middle;
 }
+.table-fixed {
+    table-layout: fixed;
+}
 /*table end*/
 
 /*滚动条 start*/

@@ -103,8 +103,8 @@
 
         // 去掉字符串两边的空格
         trim: function (str) {
-            if (typeof str !== 'string') {
-                throw new Error(str + ' is not a String');
+            if (!str) {
+                return str;
             }
 
             return str.replace(/(^\s*)|(\s*$)/g, '');
