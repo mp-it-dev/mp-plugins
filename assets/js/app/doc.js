@@ -24,12 +24,12 @@ require(['jquery', 'highlight', 'highlight/xml', 'highlight/css', 'highlight/jav
 	tinymce.init({
 		selector: "#example-richtext",	//textarea选择器
 		theme: "modern",			//主题
+		language: 'zh_CN',
 		plugins: [
 			"advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker",
 			"searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking",
 			"save table contextmenu directionality emoticons template paste textcolor importcss"
 		],				//菜单栏的额外功能，如图片，链接等
-
 		toolbar1: "undo redo | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | preview | forecolor backcolor emoticons table"	//菜单栏1
 	});
 

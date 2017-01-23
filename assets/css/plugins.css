@@ -412,7 +412,7 @@
 }
 .ui-select-box {
     position: absolute;
-    z-index: 9999;
+    z-index: 100;
     display: none;
     width: 100%;
     border: 1px solid #bbb;
@@ -468,15 +468,13 @@
     margin-left: 20px;
     vertical-align: middle;
 }
-.uploadify-queue-item,
-.finish-queue-item  {
+.uploadify-queue-item {
     display: table;
     width: 100%;
     margin-top: 10px;
     table-layout: fixed;
 }
-.uploadify-queue-item > *,
-.finish-queue-item > *  {
+.uploadify-queue-item > * {
     display: table-cell;
     padding-right: 10px;
     vertical-align: middle;
@@ -854,17 +852,15 @@
 
 /*右键菜单 start*/
 .ui-menu {
+    display: none;
     position: absolute;
     z-index: 9999;
     min-width: 120px;
-    max-height: 300px;
     margin: 0;
     padding: 0;
     border: 1px solid #ddd;
     border-radius: 3px;
-    display: none;
     list-style: none;
-    overflow: auto;
 }
 .ui-menu-item {
     position: relative;
@@ -955,22 +951,24 @@
 /*input自动补全 end*/
 
 /*正则验证 start*/
-.validate-error {
+.ui-validate {
+    position: relative;
+}
+.ui-validate-error {
     border-color: #a94442;
     -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
     box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
 }
-.validate-error:focus {
+.ui-validate-error:focus {
     border-color: #843534;
     -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 6px #ce8483;
     box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 6px #ce8483;
 }
-.validate-tip {
+.ui-validate-tip {
     position: absolute;
-    top: 0;
-    left: 0;
+    z-index: 2;
     display: none;
-    z-index: 9999;
+    min-width: 200px;
     padding: 3px 8px;
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
     font-size: 12px;
@@ -978,26 +976,34 @@
     background-color: #f2dede;
     border-radius: 4px;
 }
-.validate-tip.top {
-    margin-top: -8px;
+.ui-validate-tip.top {
+    bottom: 100%;
+    left: 50%;
+    margin-bottom: 8px;
 }
-.validate-tip.right {
+.ui-validate-tip.right {
+    top: 50%;
+    left: 100%;
     margin-left: 8px;
 }
-.validate-tip.bottom {
+.ui-validate-tip.bottom {
+    top: 100%;
+    left: 50%;
     margin-top: 8px;
 }
-.validate-tip.left {
-    margin-left: -8px;
+.ui-validate-tip.left {
+    top: 50%;
+    right: 100%;
+    margin-right: 8px;
 }
-.validate-tip:before {
+.ui-validate-tip:before {
     position: absolute;
     width: 0;
     height: 0;
     content: "";
     border: 5px solid transparent;
 }
-.validate-tip.top:before {
+.ui-validate-tip.top:before {
     bottom: 0;
     left: 50%;
     margin-bottom: -5px;
@@ -1005,7 +1011,7 @@
     border-bottom-width: 0;
     border-top-color: #f2dede;
 }
-.validate-tip.right:before {
+.ui-validate-tip.right:before {
     top: 50%;
     left: 0;
     margin-top: -5px;
@@ -1013,7 +1019,7 @@
     border-left-width: 0;
     border-right-color: #f2dede;
 }
-.validate-tip.bottom:before {
+.ui-validate-tip.bottom:before {
     top: 0;
     left: 50%;
     margin-top: -5px;
@@ -1021,7 +1027,7 @@
     border-top-width: 0;
     border-bottom-color: #f2dede;
 }
-.validate-tip.left:before {
+.ui-validate-tip.left:before {
     top: 50%;
     right: 0;
     margin-top: -5px;
@@ -1029,12 +1035,12 @@
     border-right-width: 0;
     border-left-color: #f2dede;
 }
-.validate-tip .glyphicon {
+.ui-validate-tip .glyphicon {
     margin-right: 8px;
     vertical-align: middle;
     color: #a94442;
 }
-.validate-tip-text {
+.ui-validate-tip-text {
     display: inline-block;
     max-width: 200px;
     vertical-align: middle;

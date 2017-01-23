@@ -12,7 +12,7 @@
 }
 
 body {
-    font: 14px/1.5 "Helvetica Neue",Helvetica Neue,Helvetica,Arial,Hiragino Sans GB,Microsoft Yahei,sans-serif;
+    font-family: Helvetica Neue, Arial, Microsoft Yahei;
 }
 
 article,
@@ -81,6 +81,10 @@ a:hover {
     margin-left: -15px;
 }
 
+textarea.form-control {
+    resize: vertical;
+}
+
 /*去除IE输入框后面的x和眼睛*/
 ::-ms-clear,
 ::-ms-reveal {
@@ -106,6 +110,9 @@ a:hover {
     border-top: 0;
     border-bottom: 1px solid #ddd;
     vertical-align: middle;
+}
+.table-fixed {
+    table-layout: fixed;
 }
 /*table end*/
 
@@ -144,13 +151,6 @@ a:hover {
 /*滚动条 end*/
 
 /*icon start*/
-.icon-link {
-    display: inline-block;
-    height: 20px;
-    line-height: 20px;
-    font-size: 12px;
-    color: #000;
-}
 .icon {
     display: inline-block;
     *display: inline;
@@ -198,6 +198,9 @@ a:hover {
 }
 .navbar-padding-top {
     padding-top: 51px;
+}
+.navbar-fixed-top .navbar-right {
+    margin-right: 0;
 }
 .navbar-blue {
     background-color: #148CCA;
@@ -415,12 +418,13 @@ fieldset[disabled] .btn-primary:hover {
     position: relative;
     display: table;
     width: 100%;
+    table-layout: fixed;
 }
 .item-name {
     display: table-cell;
     width: 100px;
     margin: 0;
-    padding: 7px 10px 0 0;
+    padding: 7px 10px 7px 0;
     vertical-align: top;
 }
 .item-name.required:before {
@@ -436,6 +440,8 @@ fieldset[disabled] .btn-primary:hover {
 .item-static {
     display: table-cell;
     padding-top: 7px;
+    padding-bottom: 7px;
+    word-break: break-all;
 }
 .item-bordered {
     padding: 6px 12px;
@@ -444,5 +450,16 @@ fieldset[disabled] .btn-primary:hover {
     background-color: #eee;
     -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
     box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+}
+.item-sm .item-name,
+.item-sm .item-static {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    font-size: 12px;
+    line-height: 1.5;
+}
+.item-sm .item-bordered {
+    padding: 5px 10px;
+    border-radius: 3px;
 }
 /*表单行item end*/

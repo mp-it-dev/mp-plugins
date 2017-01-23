@@ -1,6 +1,12 @@
 require(['jquery', 'util', 'ztree'], function($, util) {
 	var apiUrl = decodeURIComponent(util.queryString('apiurl'));
-	var rootNodes = { id: 'C01', name: '迈普通信', pid: null, isParent: true, nocheck: true };
+    var badge = util.queryString('badge');
+	var rootNodes = [{ id: 'C01', name: '迈普通信', pid: null, isParent: true, nocheck: true }];
+
+    if (badge) {
+        rootNodes.push({ id: 'C02', name: '自定义组', pid: null, isParent: false, nocheck: true, icon: './img/file.png' });
+    }
+
     var setting = {
         data: {
             simpleData: {
@@ -32,31 +38,55 @@ require(['jquery', 'util', 'ztree'], function($, util) {
 			    });
             },
             onClick: function(event, treeId, treeNode) {
-		        $('#jobList').empty();
-		        searchPeople();
+                $('#jobList').empty();
 
-		        $.ajax({
-		        	url: apiUrl + 'Organization/GetJobNode',
-		        	data: {
-		        		depId: treeNode.id
-		        	},
-		        	dataType: 'jsonp',
-		        	success: function(data) {
-		        		var html = '<li class="selected">' +
-	        							'<img src="./img/group.png" />' +
-	        							'<span>所有职位</span>' +
-	        						'</li>';
+                if (treeNode.id != 'C02') {
+                    searchPeople();                    
+                    $.ajax({
+                        url: apiUrl + 'Organization/GetJobNode',
+                        data: {
+                            depId: treeNode.id
+                        },
+                        dataType: 'jsonp',
+                        success: function(data) {
+                            var html = '<li class="selected">' +
+                                            '<img src="./img/group.png" />' +
+                                            '<span>所有职位</span>' +
+                                        '</li>';
 
-	        			for (var i = 0; i < data.length; i++) {
-	        			    html += '<li data-jobid="' + data[i].JobId + '">'+
-	        			    			'<img src="./img/worker.png" />' +
-	        			    			'<span>' + data[i].JobName + '</span>'+
-	        			    		'</li>';
-	        			}
+                            for (var i = 0; i < data.length; i++) {
+                                html += '<li data-type="job" data-jobid="' + data[i].JobId + '">'+
+                                            '<img src="./img/worker.png" />' +
+                                            '<span>' + data[i].JobName + '</span>'+
+                                        '</li>';
+                            }
 
-	        			$('#jobList').html(html);		        		
-		        	}
-		        });
+                            $('#jobList').html(html);                     
+                        }
+                    });
+                } else {
+                    $.ajax({
+                        url: apiUrl + 'Organization/GetGroupList',
+                        data: {
+                            badge: badge
+                        },
+                        dataType: 'jsonp',
+                        success: function(data) {
+                            var html = '';
+
+                            for (var i = 0; i < data.length; i++) {
+                                html += '<li data-type="group" data-id="' + data[i].Id + '" data-ygid="' + data[i].YgId + '">'+
+                                            '<img src="./img/worker.png" />' +
+                                            '<span>' + data[i].GroupName + '</span>'+
+                                        '</li>';
+                            }
+
+                            $('#jobList').html(html);
+                            $('#peopleList').empty();
+                            $('#jobList li:eq(0)').trigger('click');
+                        }
+                    });
+                }		        
             }
         }
     };
@@ -76,12 +106,16 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     ///////////////
     //事件绑定
     //////////////
-    // 查询职位下的员工
+    // 查询职位/分组下的员工
     $(document).on('click', '#jobList li', function() {
     	$('#jobList li').removeClass('selected');
     	$(this).addClass('selected');
 
-    	searchPeople(false);
+        if ($(this).data('type') == 'job') {
+    	   searchPeople(false);
+        } else {
+            getGroupPeople();
+        }
     });
 
     // 点击行勾选/取消勾选复选框
@@ -175,8 +209,8 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     
     function searchPeople(isSearch) {
     	var depId = isSearch ? '' : treeObj.getSelectedNodes()[0].id;
-        var jobId = isSearch? '' : $('#jobList li.selected').data('jobid');
-        var keyword = isSearch? $('#search-keyword').val() : '';
+        var jobId = isSearch ? '' : $('#jobList li.selected').data('jobid');
+        var keyword = isSearch ? $('#search-keyword').val() : '';
         var result = $('#peopleList').empty();
 
         $('#loading').show();
@@ -214,6 +248,45 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         });
     }
 
+    function getGroupPeople() {
+        var groupId = $('#jobList li.selected').data('id');
+        var ygId = $('#jobList li.selected').data('ygid');
+        var result = $('#peopleList').empty();
+
+        $('#loading').show();
+        $('.js-select-all[data-target="#peopleList"]').prop('checked', false);
+
+        $.ajax({
+            url: apiUrl + 'Organization/GetGroupPeopleList',
+            data: {
+                groupId: groupId,
+                ygId: ygId
+            },
+            dataType: 'jsonp',
+            success: function(data) {
+                $('#loading').hide();
+
+                if (data && data.length > 0) {
+                    var tr;
+
+                    for (var i = 0; i < data.length; i++) {
+                        tr = $(
+                            '<tr>' +
+                                '<td width="40"><input type="checkbox"></td>' +
+                                '<td width="80">' + data[i].Badge + '</td>' +
+                                '<td width="80">' + data[i].Name + '</td>' +
+                                '<td><div class="text-hidden" title="' + data[i].DepName + '">' + (data[i].DepName || '') + '</div></td>' +
+                                '<td><div class="text-hidden" title="' + data[i].JobName + '">' + (data[i].JobName || '') + '</div></td>' +
+                            '</tr>'
+                        ).data('data', data[i]);                        
+
+                        result.append(tr);
+                    }
+                }               
+            }
+        });
+    }
+
     function showSelectedData() {
         var selectedData = $('#selectedList').data('selectedData');
         var result = $('#selectedList').empty();
@@ -225,8 +298,8 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                     '<td width="40"><input type="checkbox"></td>' +
                     '<td width="80">' + selectedData[i].Badge + '</td>' +
                     '<td width="80">' + selectedData[i].Name + '</td>' +
-                    '<td><div class="text-hidden" title="' + selectedData[i].DepName + '">' + selectedData[i].DepName + '</div></td>' +
-                    '<td><div class="text-hidden" title="' + selectedData[i].JobName + '">' + selectedData[i].JobName + '</div></td>' +
+                    '<td><div class="text-hidden" title="' + selectedData[i].DepName + '">' + (selectedData[i].DepName || '') + '</div></td>' +
+                    '<td><div class="text-hidden" title="' + selectedData[i].JobName + '">' + (selectedData[i].JobName || '') + '</div></td>' +
                 '</tr>'
             ).data('index', i);                        
 

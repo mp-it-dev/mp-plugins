@@ -3,44 +3,32 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 	// selector.apiUrl = 'http://192.168.4.86:100/Selector/';
 
 	$('#cc').scrollbar();
-	$('#searchProductTree').autoComplete({
-		width: '400px',
+	$('#searchProduct').autoComplete({
 		async: {
-            url: 'http://webapi.maipu.com/Selector/Product/SearchProduct',
+            url: 'http://192.168.4.86:100/Selector/Product/GetCpList',
             dataType: 'jsonp',
             dataField: null,
-            searchField: 'wpbm'
-        },
-        template: '<td>#{cpBm}</td><td>#{cpName}</td><td>#{zhengjiName}</td>',
-        maxNum: 10,
-        callback: function (data) {
-        	$(this).val(data.zhengjiName);
-        }
-	});
-	$('#searchProductByWpbm').autoComplete({
-		async: {
-            url: 'http://192.168.4.86:100/Selector/Product/SearchProductByFilter',
-            dataType: 'jsonp',
-            dataField: null,
-            searchField: 'wpbm',
+            searchField: 'name',
             delay: 0
         },
-        template: '<td>#{cpBm}</td><td>#{cpName}</td>',
+        width: 300,
+        template: '<td width="100">#{ID}</td><td>#{Name}</td><td width="50">#{OriginData.SaleVersion}</td>',
         maxNum: 10,
         callback: function (data) {
-        	$(this).val(data.cpName);
+        	$(this).val(data.Name);
         }
 	});
 	
 	var table = $("#table").table({
 		tableClass: 'table-bordered',
 		height: 400,
-		url: 'http://192.168.4.86:100/Test/User/GetList',
+		url: 'http://192.168.4.86:100/Test/User/GetList?pageIndex=1&pageSize=0',
 		dataType: 'jsonp',
 		jsonp: 'callback',
 		rownum: true,
 		paging: {
 			enable: true,
+			localPage: true,
 			pageSize: 20,
 			pageSizeArray: [20, 40, 60]
 		},
@@ -56,10 +44,8 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 			},
 			menu: {
 				sort: {
+					async: true,
 					defaultOrder: 'asc'
-				},
-				filter: {
-					async: true
 				}
 			}
 		}, {
@@ -69,7 +55,7 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 			menu: {
 				sort: true,
 				filter: {
-					async: true
+					async: false
 				}
 			}
 		}, {
@@ -104,8 +90,10 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 
 	$('.selector-organiztion').on('click', function () {
 		var type = $(this).data('type');
+		var badge = $(this).data('badge');
 
         selector[type]({
+        	badge: badge,
             callback: function(data) {
                 console.log(data);
                 $.tlayer('close');

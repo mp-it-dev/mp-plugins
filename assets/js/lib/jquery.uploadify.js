@@ -106,7 +106,7 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
     if (typeof define === 'function' && define.amd) {
         define(['jquery', 'util'], factory);
     } else {
-        if (!jQuery || !util) {
+        if (typeof jQuery === 'undefined' || typeof util === 'undefined') {
             throw new Error('uploadify depends on jquery, util');
         }
 
@@ -316,7 +316,7 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 					if (settings.onInit) settings.onInit.call($this, swfuploadify);
 
 				} else {
-
+					alert('当前浏览器未检测到flash，无法使用文件上传功能');
 					// Call the fallback function
 					if (settings.onFallback) settings.onFallback.call($this);
 
@@ -684,7 +684,7 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 						<span class="file-name">\
 							<span class="file-name-text" title="${origin_name}">${fileName}</span>\
 						</span>\
-						<span class="file-data">Waiting</span>\
+						<span class="file-data">waiting</span>\
 						<span class="file-operate">\
 							<a class="file-cancel" href="#" onclick="$(\'#${instanceID}\').uploadify(\'cancel\', \'${fileID}\');return false;">取消</a>\
 						</span>\
@@ -889,6 +889,7 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 			} else if (settings.defaultTemplate) {
 				//更新状态
 				$('#' + file.id).attr('data-status', 'error');
+				$('#' + file.id).find('.file-data').html('error');
 				$('#' + file.id).find('.file-icon').html('<span class="icon error"></span>');
 			}
 		},

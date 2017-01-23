@@ -7,7 +7,7 @@
     if (typeof define === 'function' && define.amd) {
         define(['jquery', 'util'], factory);
     } else {
-        if (!jQuery || !util) {
+        if (typeof jQuery === 'undefined' || typeof util === 'undefined') {
             throw new Error('jquery.plugin depends on jquery, util');
         }
 
@@ -178,16 +178,14 @@ $.extend($.fn, {
          *     fixed: false,                        // 是否固定列不被隐藏
          *     menu: {                              // 列操作菜单
          *         sort: {                          // 排序
+         *             async: true,                 // 是否远程排序
+         *             type: '',                    // 本地排序时需要指定类型
          *             defaultOrder: 'asc'          // 默认排序方式
          *         },
          *         filter: {                        // 筛选
          *             async: true                  // 是否远程筛选
          *         }
          *     },
-         *     numberFormat: {
-         *         toThousands: true,
-         *         toWarning: true
-         *     }
          *     handler: function (value, data) {    // 列处理函数，在该列的所有数据
          *                                          // 都会被此函数处理，一定要返回数据
          *         return value;
@@ -307,13 +305,19 @@ $.extend($.fn, {
         var data;
 
         if (typeof setting.data === 'function') {
-            data = $.extend(true, {}, setting.data());
+            var retData = setting.data();
+
+            if (retData === false) {
+                return;
+            }
+
+            data = $.extend(true, {}, retData);
         } else {
             data = $.extend(true, {}, setting.data);
         }
 
         // 如果有排序则添加
-        if (this.sname && this.sorder) {
+        if (this.sname && this.sorder && this.sasync) {
             data[setting.snameField] = this.sname;
             data[setting.sorderField] = this.sorder;
         }
@@ -369,7 +373,7 @@ $.extend($.fn, {
                 }
 
                 this.pager = ele.find('.table-pager').pager(ajaxOpt);
-            }            
+            }
         } else {
             ajaxOpt = {
                 url             : setting.url,
@@ -460,7 +464,7 @@ $.extend($.fn, {
 
             // 出现竖直滚动条则设置padding-right
             if (tbodyTable.outerHeight() > tbody.outerHeight()) {
-                var w = Math.max(parseInt(theadLastTh[0].style.width) || $theadLastTh.width(), 40);
+                var w = Math.max(parseInt(theadLastTh[0].style.width) || theadLastTh.width(), 40);
 
                 theadLastTh.width(w - sWidth);
                 thead.css('padding-right', sWidth + 1);
@@ -546,7 +550,7 @@ $.extend($.fn, {
             }
 
             if (col.width) {
-                if (!isNaN(col.width)) {
+                if (util.isNumber(col.width, true)) {
                     style = ' style="width: ' + col.width + 'px;"';
                     attr = ' data-width="' + col.width + 'px"';
                 } else {
@@ -603,14 +607,17 @@ $.extend($.fn, {
                 colClass = ' table-menu';
 
                 if (menu.sort) {
-                    attr += ' data-sorder="' + (menu.sort.defaultOrder ? menu.sort.defaultOrder : '') + '"';
                     colClass += ' table-sort';
 
-                    // 保存默认排序
-                    if (!this.sname && menu.sort.defaultOrder) {
+                    // 查找默认排序
+                    if (menu.sort.defaultOrder) {
                         this.sname = col.field;
                         this.sorder = menu.sort.defaultOrder;
+                        this.sasync = menu.sort.async;
+                    }                    
+                    if (this.sname && this.sname === col.field) {
                         colClass += ' table-sort-active';
+                        attr += ' data-sorder="' + this.sorder + '"';
                     }
                 }                
             }
@@ -641,7 +648,7 @@ $.extend($.fn, {
             if (typeof menu === 'object') {
                 for (var i in menu) {
                     if (i != 'sort') {
-                        reg = true;
+                        ret = true;
                         break;
                     }
                 }
@@ -699,26 +706,24 @@ $.extend($.fn, {
 
             // 遍历列
             for (j = 0; j < colLen; j++) {
-                var col = colOptions[j];
-                var text;
+                var col = colOptions[j];                
+                var text = undefined;
+                var val = undefined;
 
                 if (col.hide) {
                     continue;
                 }
 
-                var val;
-
                 if (col.field && data) {
                     val = data[col.field];
                 }
 
-                // html编码
-                if (setting.autoEncode) {
-                    val = util.htmlEncode(val);
-                }
-
                 // 换行
                 if (typeof val === 'string') {
+                    // html编码
+                    if (setting.autoEncode) {
+                        val = util.htmlEncode(val);
+                    }
                     val = val.replace(/\n/g, '<br>');
                 }
 
@@ -734,7 +739,6 @@ $.extend($.fn, {
                 if (typeof colParam === 'function') {
                     colParam = colParam(data, i, col);
                 }
-
                 for (var key in colParam) {
                     colData += ' data-' + key + '="' + colParam[key] + '"';
                 }
@@ -743,12 +747,12 @@ $.extend($.fn, {
                 var div = $('<div class="table-td-text"></div>').appendTo(td);
 
                 if (col.edit) {
-                    td.addClass('table-td-edit').data('editData', col.edit);
+                    td.addClass('table-td-edit');
                 }
-
                 if (col.align) {
                     td.css('text-align', col.align);
                 }
+                td.data('colOption', col);
 
                 // 如果返回的是DOM或jquery元素则使用append
                 if (text instanceof jQuery || util.isDOM(text)) {
@@ -769,7 +773,7 @@ $.extend($.fn, {
     Table.prototype.initError = function (msg) {
         var ele = this.ele;
         var thLen = ele.find('.table-body thead th').length;
-        var tbody = $('<tbody><tr class="table-tr table-errorInfo"><td colspan="' + thLen + '" style="align: center;">' + msg + '</td></tr></tbody>');
+        var tbody = $('<tbody><tr class="table-tr table-errorInfo"><td colspan="' + thLen + '" style="text-align: center;">' + msg + '</td></tr></tbody>');
 
         ele.find('.table-body table tbody').remove();
         ele.find('.table-body table').append(tbody);
@@ -966,6 +970,9 @@ $.extend($.fn, {
                 this.reload(1);
             } else {
                 this.pager.pager('filter', this.filterName, this.keyword);
+                // 使用之后清除掉，以免在结果中筛选时传递到服务器端
+                this.filterName = null;
+                this.keyword = null;
             }
         } else {
             if (col.menu.filter.async) {
@@ -989,12 +996,56 @@ $.extend($.fn, {
                 }
 
                 this.refresh();
+                // 使用之后清除掉，以免在结果中筛选时传递到服务器端
+                this.filterName = null;
+                this.keyword = null;
             }
         }
+    }
 
-        // 使用之后清除掉，以免在结果中筛选时传递到服务器端
-        this.filterName = null;
-        this.keyword = null;
+    /**
+     * [sort 本地排序]
+     */
+    Table.prototype.sort = function (fieldIndex) {
+        var setting = this.setting;
+        var col = setting.colOptions[fieldIndex];
+        var order = this.sorder;
+        var name = this.sname;
+        var type = col.menu.sort.type || 'string';
+
+        if (setting.paging.enable) {
+            if (col.menu.sort.async) {
+                this.reload(1);
+            } else {
+                this.pager.pager('sort', order, name, type);
+            }
+        } else {
+            this.dataList.sort(function (a, b) {
+                //  先排除空值
+                if (order === 'asc') {
+                    if (a[name] === null || a[name] === undefined) {
+                        return -1;
+                    }
+                } else {
+                    if (a[name] === null || a[name] === undefined) {
+                        return 1;
+                    }
+                }
+
+                if (type === 'number') {
+                    return order === 'asc' ? Number(a[name]) - Number(b[name]) : Number(b[name]) - Number(a[name]);
+                }
+                if (type === 'string') {
+                    return order === 'asc' ? String(a[name]).localeCompare(String(b[name])) : String(b[name]).localeCompare(String(a[name]));
+                }
+                if (type === 'date') {
+                    return order === 'asc' ? Date(a[name]) - Date(b[name]) : Date(b[name]) - Date(a[name]);
+                }
+            });
+
+            setting.dataList = this.dataList.slice(0);
+            this.refresh();
+        }
     }
 
     /**
@@ -1102,20 +1153,24 @@ $.extend($.fn, {
                 self.sorder = 'asc';
             }
 
-            self.reload(1);
+            self.sort(+th.data('field-index'));           
         });
 
         // 编辑单元格
         ele.on('dblclick', '.table-td-edit', function (e) {
             var td = $(this);
-            var edit = td.data('editData');
+            var colOption = td.data('colOption');
+            var rp;
 
             // 调用用户定义的编辑元素
-            var rp = edit.replace.call(this, td.parent().data('rowData'));
+            if (typeof colOption.edit.replace == 'function') {
+                rp = colOption.edit.replace.call(this, colOption, td.parent().data('rowData'));
+            } else {
+                rp = colOption.edit.replace;
+            }
 
             $(rp).addClass('table-td-editEle').appendTo(this).focus();
             td.find('.table-td-text').hide();
-
             e.preventDefault();
         });
 
@@ -1123,17 +1178,16 @@ $.extend($.fn, {
         ele.on('change', '.table-td-editEle', function (e) {
             var el = $(this);
             var td = el.parent();
-            var tr = td.parent();
-            var tdText = el.siblings('.table-td-text');
-            var rowData = tr.data('rowData');
+            var colOption = td.data('colOption');
 
-            var ev = $.Event('editen.ui.table');
-            var ret = ele.trigger(ev, [rowData, this]);
+            if (typeof colOption.edit.callback == 'function') {
+                var ret = colOption.edit.callback.call(this, colOption, td.parent().data('rowData'));
 
-            if (ret !== false) {
-                text.show();
-                el.remove();
-            }
+                if (ret !== false) {
+                    el.siblings('.table-td-text').show();
+                    el.remove();
+                }
+            }            
         });
 
         // 确定修改
@@ -1311,39 +1365,6 @@ $.extend($.fn, {
             }
         });
     }());
-
-    var NumberFormat = {
-        toThousands: function (num, precision) {
-            //null is number 0?
-            if (num === null || isNaN(num)) {
-                return num;
-            }
-
-            num = Number(num);
-            // 处理小数点位数
-            num = (typeof precision !== 'undefined' ? num.toFixed(precision) : num).toString();
-            // 分离数字的小数部分和整数部分
-            parts = num.split('.');
-            // 整数部分加[separator]分隔, 借用一个著名的正则表达式
-            parts[0] = parts[0].toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + (','));
-
-            return parts.join('.');
-        },
-        toWarning: function (num) {
-            //null is number 0?
-            if (num === null || num === undefined) {
-                return num;
-            }
-
-            var newNum = Number(num.toString().replace(/,/g, ''));
-
-            if (isNaN(newNum)) {
-                return num;
-            }
-
-            return newNum < 0 ? '<span style="color: red;">' + num + '</span>' : num;
-        }
-    }
     
     $.fn.table = function (method) {
         if (methods[method]) {
@@ -1408,6 +1429,19 @@ $.extend($.fn, {
             return this.each(function () {
                 $(this).data(namespace).filter(filterName, keyword);
             });
+        },
+
+        /**
+         * [sort 在结果中排序]
+         * @param  {[type]} order [description]
+         * @param  {[type]} name  [description]
+         * @param  {[type]} type  [description]
+         * @return {[type]}            [description]
+         */
+        sort: function (order, name, type) {
+            return this.each(function () {
+                $(this).data(namespace).sort(order, name, type);
+            });
         }
     };
 
@@ -1469,7 +1503,13 @@ $.extend($.fn, {
         var data;
 
         if (typeof setting.data === 'function') {
-            data = $.extend(true, {}, setting.data(), this.extraData);
+            var retData = setting.data();
+
+            if (retData === false) {
+                return;
+            }
+            
+            data = $.extend(true, {}, retData, this.extraData);
         } else {
             data = $.extend(true, {}, setting.data, this.extraData);
         }
@@ -1718,6 +1758,54 @@ $.extend($.fn, {
     }
 
     /**
+     * [sort 结果中排序]
+     * @param  {[type]} filterName  [筛选字段名]
+     * @param  {[type]} keyword [筛选值]
+     */
+    Pager.prototype.sort = function (order, name, type) {
+        var setting = this.setting;
+
+        this.dataList.sort(function (a, b) {
+            //  先排除空值
+            if (order === 'asc') {
+                if (a[name] === null || a[name] === undefined) {
+                    return -1;
+                }
+            } else {
+                if (a[name] === null || a[name] === undefined) {
+                    return 1;
+                }
+            }
+
+            if (type === 'number') {
+                return order === 'asc' ? Number(a[name]) - Number(b[name]) : Number(b[name]) - Number(a[name]);
+            }
+            if (type === 'string') {
+                return order === 'asc' ? String(a[name]).localeCompare(String(b[name])) : String(b[name]).localeCompare(String(a[name]));
+            }
+            if (type === 'date') {
+                return order === 'asc' ? Date(a[name]) - Date(b[name]) : Date(b[name]) - Date(a[name]);
+            }
+        });
+
+        setting.dataList = this.dataList.slice(0);
+
+        // 计算总页码等信息
+        setting.pageIndex = 1;
+        setting.total = setting.dataList.length;
+        setting.totalPage = Math.ceil(setting.total / setting.pageSize);
+
+        this.initPage();
+
+        // 返回数据
+        if (setting.localPage) {
+            setting.success(setting.dataList.slice(0, setting.pageIndex * setting.pageSize));
+        } else {
+            setting.success(setting.dataList.slice(0));
+        }
+    }
+
+    /**
      * [bindEvents 绑定事件]
      * @return {[type]} [description]
      */
@@ -1749,12 +1837,19 @@ $.extend($.fn, {
         // 页码翻页事件
         ele.on('keydown', '.pageinfo-skip', function (e) {
             if (e.which == 13) {
-                var pageIndex = parseInt($(this).val());
-
                 e.preventDefault();
 
-                if (isNaN(pageIndex) || pageIndex > setting.totalPage || pageIndex <= 0) {
-                    alert('请输入有效页码');
+                var pageIndex = $(this).val();
+
+                if (!util.isInteger(pageIndex, true)) {
+                    alert('请输入整数页码');
+                    return;
+                }
+
+                pageIndex = parseInt(pageIndex);
+
+                if (pageIndex > setting.totalPage || pageIndex <= 0) {
+                    alert('页码不在范围内');
                     return;
                 }
 
@@ -1881,9 +1976,7 @@ $.extend($.fn, {
     };
 
     /**
-     * [initData 初始化数据]
-     * 1、如果选项中有数据列表则直接使用该数据
-     * 2、如果选项中没有数据列表则表示是从select中提取数据
+     * [init]
      */
     UiSelect.prototype.init = function () {
         var setting = this.setting;
@@ -1944,7 +2037,7 @@ $.extend($.fn, {
             for (var i = 0, l = dataList.length; i < l; i++) {
                 var data = dataList[i];
                 var key = setting.valueField ? data[setting.valueField] : data;
-                var html = util.parseTpl('<tr data-key="' + key + '">' + template + '</tr>', data);
+                var html = util.parseTpl('<tr data-key="' + key + '">' + template + '</tr>', data, true);
 
                 $(html).appendTo(table).data('data', data);
             }
@@ -2008,7 +2101,8 @@ $.extend($.fn, {
         // 触发change事件
         if (isTriggerChangeEvent !== false) {
             var e = $.Event('change.' + namespace);
-            this.ele.trigger(e, [selectedData.slice(0)]);
+            var dataList = selectedData.slice(0);
+            this.ele.trigger(e, [setting.multi ? dataList : dataList[0]]);
         }
     }
 
@@ -3195,13 +3289,17 @@ $.extend($.fn, {
             setting.rules = eval(setting.rules);
         }
 
-        setting.originPlacement = setting.placement;
-        this.tipDom = $(
-                            '<div class="validate-tip" id="' + this.targetId + '">' +
-                                '<span class="glyphicon glyphicon-warning-sign"></span>' + 
-                                '<span class="validate-tip-text"></span>' +
-                            '</div>'
-                        ).appendTo('body');
+        var outer = $('<div class="ui-validate"></div>').css('display', this.ele.css('display'));
+        var inner = $(
+            '<div class="ui-validate-tip">' +
+                '<span class="glyphicon glyphicon-warning-sign"></span>' + 
+                '<span class="ui-validate-tip-text"></span>' +
+            '</div>'
+        );
+        this.ele.addClass('ui-validate-input').wrap(outer);
+        this.ele = this.ele.parent();
+        this.ele.append(inner);
+
         this.createRegExp();
         this.bindEvents();
     };
@@ -3239,18 +3337,32 @@ $.extend($.fn, {
     // 显示提示框
     Validate.prototype.showTip = function (msg) {
         var ele = this.ele;
-        var setting = this.setting;
-        
-        ele.addClass('validate-error');
-        this.setTip(msg);
+        var placement = this.setting.placement;
+        var tip = ele.find('.ui-validate-tip');
+        var input = ele.find('.ui-validate-input');
+
+        // 自动设置提示框位置为右边
+        if (!/^((top)|(right)|(bottom)|(left))$/.test(placement)) {
+            placement = 'right';
+        }
+
+        input.addClass('ui-validate-error');
+        tip.show().addClass(placement);
+        ele.find('.ui-validate-tip-text').html(msg);
+
+        if (placement === 'top' || placement === 'bottom') {
+            tip.css('margin-left', -(tip.outerWidth() / 2));
+        } else {
+            tip.css('margin-top', -(tip.outerHeight() / 2));
+        }
     };
 
     // 隐藏提示框
     Validate.prototype.hideTip = function () {
         var ele = this.ele;
 
-        ele.removeClass('validate-error');
-        $('#' + this.targetId).hide().removeClass('top right bottom left');
+        ele.find('.ui-validate-input').removeClass('ui-validate-error');
+        ele.find('.ui-validate-tip').hide().removeClass('top right bottom left');
     };
 
     // 设置提示框内容和位置
@@ -3258,7 +3370,7 @@ $.extend($.fn, {
         var ele = this.ele;
         var setting = this.setting;
 
-        var tip = $('#' + this.targetId).show();
+        var tip = ele.find('.ui-validate-tip').show();
 
         tip.find('.validate-tip-text').html(msg);
 
@@ -3307,8 +3419,9 @@ $.extend($.fn, {
         var setting = this.setting;
         var rules = setting.rules;
         var self = this;
+        var input = ele.find('.ui-validate-input');
 
-        ele.on('blur', function () {
+        input.on('blur', function () {
             var val = $(this).val();
 
             self.hideTip();
@@ -3326,7 +3439,7 @@ $.extend($.fn, {
             }
         });
 
-        ele.on('focus', function () {
+        input.on('focus', function () {
             self.hideTip();
         });
     };
@@ -3631,6 +3744,7 @@ $.extend($.fn, {
     // 隐藏菜单
     Menu.prototype.hide = function () {
         this.ele.hide();
+        this.ele.find('.ui-menu-item').removeClass('hover');
     };
 
     // 销毁组件
@@ -3875,21 +3989,21 @@ $.extend($.fn, {
 
             e.stopPropagation();
         });
+
+        // 输入框失去焦点时，延迟隐藏下拉框
+        ele.on('blur', '.ui-autoComplete-input', function (e) {
+            setTimeout(function () {
+                ele.find('.ui-autoComplete-result').hide();
+            }, 200);
+        });
     
         // 选中候选
         ele.on('click', '.ui-autoComplete-result tr', function (e) {
-            var data = $(this).data('data');
-
             if (typeof setting.callback == 'function') {
-                setting.callback.call(ele.find('.ui-autoComplete-input')[0], data);
+                setting.callback.call(ele.find('.ui-autoComplete-input')[0], $(this).data('data'));
             }
         });
     }
-
-    // 隐藏候选框
-    $(document).on('click', function () {
-        $('.ui-autoComplete-result').hide();
-    });
 
     $.fn.autoComplete = function (method) {
         if (methods[method]) {

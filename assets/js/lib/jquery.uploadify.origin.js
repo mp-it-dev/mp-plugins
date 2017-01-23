@@ -10,7 +10,7 @@
     if (typeof define === 'function' && define.amd) {
         define(['jquery', 'util'], factory);
     } else {
-        if (!jQuery || !util) {
+        if (typeof jQuery === 'undefined' || typeof util === 'undefined') {
             throw new Error('uploadify depends on jquery, util');
         }
 
@@ -43,7 +43,7 @@
                 var setting = $.extend(true, {}, Uploadify.DEFAULTS, option);
 
                 if (!setting.id) {
-                    setting.id = $(this).attr('id') || 'uploadify-' +uploadifyId++;
+                    setting.id = $(this).attr('id') || 'uploadify-' + uploadifyId++;
                 }
                 
                 $this.data(namespace, new Uploadify($this, setting));
@@ -173,7 +173,7 @@
 
             arr[0] = Number(arr[0]);
 
-            if (isNaN(arr[0])) {
+            if (util.isNumber(arr[0], true)) {
                 switch (arr[1].trim().toUpperCase()) {
                     case 'GB':
                         fileSize = arr[0] * 1024 * 1024 * 1024;
@@ -201,14 +201,14 @@
         } else if (setting.defaultTemplate) {
             // 在DOM中创建上传模板
             var itemTemplate = 
-                '<div id="#{id}" class="uploadify-queue-item" data-status="queued">\
+                '<div class="uploadify-queue-item" id="#{id}" data-status="queued">\
                     <span class="file-icon">\
                         <span class="icon queued"></span>\
                     </span>\
                     <span class="file-name">\
                         <span class="file-name-text" title="#{name}">#{name}</span>\
                     </span>\
-                    <span class="file-data">Waiting</span>\
+                    <span class="file-data">waiting</span>\
                     <span class="file-operate">\
                         <a class="file-cancel" href="#">取消</a>\
                     </span>\
@@ -269,19 +269,21 @@
                 setting.onUploadStart.call(self, file); 
             } else if (setting.defaultTemplate) {
                 //更新状态
-                $('#' + file.id).attr('data-status', ' uploading');
+                $('#' + file.id).attr('data-status', 'uploading');
                 $('#' + file.id).find('.file-icon').html('<span class="icon uploading"></span>');
             }
         };
 
         s.success = function (data, response) {
-            self.onUploadSuccess(file, data, response)
+            self.onUploadSuccess(file, data, response);
         };
+
         s.error = function (xhr, errorMsg) {
-            self.onUploadError(file, xhr.status, errorMsg)
+            self.onUploadError(file, xhr.status, errorMsg);
         };
+
         s.complete = function () {
-            self.onUploadComplete(file)
+            self.onUploadComplete(file);
         };
 
         file.xhr = $.ajax(s);
@@ -311,7 +313,7 @@
             setting.onUploadSuccess.call(this, file, data, response); 
         } else if (setting.defaultTemplate) {
             var html = 
-                '<div id="'+file.id+'" class="uploadify-queue-item" data-status="success">\
+                '<div class="uploadify-queue-item" id="'+file.id+'" data-status="success">\
                     <span class="file-icon">\
                         <span class="icon ' + util.getFileIcon(file.name) + '"></span>\
                     </span>\
@@ -337,12 +339,13 @@
         if (setting.onUploadError) {
             setting.onUploadError.call(this, file, errorCode, errorMsg);
         } else if (setting.defaultTemplate) {
-            // 0为用户取消上传
-            if (errorCode != 0) {
+            // errorMsg为'abort'表示用户取消上传
+            if (errorMsg !== 'abort') {
                 alert('上传出错，错误代码：' + errorCode + '。错误信息：' + errorMsg);
 
                 // 设置错误样式
-                $('#' + file.id).attr('data-status', ' error');
+                $('#' + file.id).attr('data-status', 'error');
+                $('#' + file.id).find('.file-data').html('error');
                 $('#' + file.id).find('.file-icon').attr('<span class="icon error"></span>');
             }
         }
