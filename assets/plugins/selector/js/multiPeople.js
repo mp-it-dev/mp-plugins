@@ -208,10 +208,13 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     //////////////
     
     function searchPeople(isSearch) {
+        if ($('#loading').is(':visible')) {
+            return;
+        }
+        
     	var depId = isSearch ? '' : treeObj.getSelectedNodes()[0].id;
         var jobId = isSearch ? '' : $('#jobList li.selected').data('jobid');
         var keyword = isSearch ? $('#search-keyword').val() : '';
-        var result = $('#peopleList').empty();
 
         $('#loading').show();
         $('.js-select-all[data-target="#peopleList"]').prop('checked', false);
@@ -226,6 +229,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         	dataType: 'jsonp',
         	success: function(data) {
         		$('#loading').hide();
+                var result = $('#peopleList').empty();
 
         		if (data && data.length > 0) {
                     var tr;
@@ -251,7 +255,6 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     function getGroupPeople() {
         var groupId = $('#jobList li.selected').data('id');
         var ygId = $('#jobList li.selected').data('ygid');
-        var result = $('#peopleList').empty();
 
         $('#loading').show();
         $('.js-select-all[data-target="#peopleList"]').prop('checked', false);
@@ -265,6 +268,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
             dataType: 'jsonp',
             success: function(data) {
                 $('#loading').hide();
+                var result = $('#peopleList').empty();
 
                 if (data && data.length > 0) {
                     var tr;

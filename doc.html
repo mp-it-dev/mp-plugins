@@ -18,7 +18,7 @@
 	<script type="text/javascript" src="./assets/plugins/tinymce/tinymce.min.js"></script>
 </head>
 <body>
-	<div class="navbar navbar-gray" role="navigation" id="header">
+	<div class="navbar navbar-gray navbar-fixed-top" role="navigation" id="header">
         <div class="container">
             <div class="navbar-header">
                 <button class="collapsed navbar-toggle" type="button" data-toggle="collapse" data-target="#menu">
@@ -174,26 +174,34 @@ require.config({
 						<p>
 							文本框自动补全组件提供在输入过程中需要根据关键字进行搜索，然后将结果展示在待选列表中的功能。
 						</p>
-						<pre class="highlight doc-example">
+						<div class="row">
+							<div class="col-md-4">
+								<input type="text" class="form-control" id="example-autoComolete" />
+							</div>
+							<div class="col-md-8">
+<pre class="highlight doc-example">
 							<code class="language-xml">
-&lt;input type="text" id="example-autoComolete"&gt;
+&lt;input type="text" class="form-control" id="example-autoComolete"&gt;
 							</code>
 							<code class="language-javascript">
 $('#example-autoComolete').autoComplete({
 	async: {
-        url: 'http://10.0.0.5:8011/Selector/Product/SearchProduct',
+        url: 'http://webapi.maipu.com/Selector/Product/GetCpList',
         dataType: 'jsonp',
         dataField: null,
-        searchField: 'keyword'
+        searchField: 'name'
     },
-    template: '&lt;td&gt;#{zhengjiBm}&lt;/td&gt;&lt;td&gt;#{zhengjiName}&lt;/td&gt;',
+    template: '&lt;td width="100"&gt;#{ID}&lt;/td&gt;&lt;td&gt;#{Name}&lt;/td&gt;&lt;td width="50"&gt;#{OriginData.SaleVersion}&lt;/td&gt;',
     maxNum: 10,
     callback: function (data) {
-    	$('#autoComplete').val(data.zhengjiName);
+    	$(this).val(data.zhengjiName);
     }
 });
 							</code>
 						</pre>
+							</div>
+						</div>
+						
 						<h2 class="title-normal">选项</h2>
 						<p>
 							文本框自动补全接收一个对象参数，详细配置如下所示：

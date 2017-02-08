@@ -4,6 +4,9 @@
     font-size: 20px;
     color: #666;
 }
+.page-main {
+    padding-top: 50px;
+}
 .page-footer {
     padding: 15px 0;
     border-top: 1px solid #ddd;
@@ -17,7 +20,7 @@
 }
 .page-sidebar.fixed {
     position: fixed;
-    top: 0;
+    top: 50px;
 }
 .page-sidebar .nav > li > a {
     display: block;

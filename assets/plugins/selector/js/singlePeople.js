@@ -142,10 +142,13 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     //////////////
     
     function searchPeople(isSearch) {
+        if ($('#loading').is(':visible')) {
+            return;
+        }
+
     	var depId = isSearch ? '' : treeObj.getSelectedNodes()[0].id;
     	var jobId = isSearch? '' : $('#jobList li.selected').data('jobid');
         var keyword = isSearch? $('#search-keyword').val() : '';
-        var result = $('#peopleList').empty();
 
         $('#loading').show();
 
@@ -159,6 +162,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         	dataType: 'jsonp',
         	success: function(data) {
         		$('#loading').hide();
+                var result = $('#peopleList').empty();
 
         		if (data && data.length > 0) {
         			var tr;
