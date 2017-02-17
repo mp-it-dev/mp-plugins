@@ -427,11 +427,17 @@ fieldset[disabled] .btn-primary:hover {
     padding: 7px 10px 7px 0;
     vertical-align: top;
 }
+.item-name.required {
+    position: relative;
+}
 .item-name.required:before {
     content: "*";
+    position: absolute;
+    left: -8px;
+    top: 13px;
+    font-size: 18px;
+    line-height: 1;
     color: red;
-    position: relative;
-    right: 2px;
 }
 .item-control {
     display: table-cell;

@@ -129,9 +129,11 @@
 .table-container .table-body .table-tr:first-child td {
     border-top: 0;
 }
-.table-checkbox {
-    width: 14px;
-    height: 14px;
+.table-container .table-checkbox {
+    display: block;
+    width: 20px;
+    height: 20px;
+    margin: 0 0 0 2px;
 }
 .table-sort-icon {
     display: inline-block;

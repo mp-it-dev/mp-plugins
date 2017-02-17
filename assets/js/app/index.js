@@ -26,6 +26,7 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 		dataType: 'jsonp',
 		jsonp: 'callback',
 		rownum: true,
+		checkbox: true,
 		paging: {
 			enable: true,
 			localPage: true,

@@ -589,7 +589,9 @@ $.extend($.fn, {
         // 复选框
         if (setting.checkbox) {
             html += '<th class="table-th" style="text-align: center;">'+
-                        '<input class="table-checkbox" type="checkbox" />'+
+                        '<div class="table-th-text">' +
+                            '<input class="table-checkbox" type="checkbox" />'+
+                        '</div>' +
                     '</th>';
         }
 
@@ -699,7 +701,9 @@ $.extend($.fn, {
             if (setting.checkbox) {
                 tr.append(
                     '<td class="table-td" style="text-align: center;">' +
-                        '<input class="table-checkbox" type="checkbox" />' +
+                        '<div class="table-td-text">' +
+                            '<input class="table-checkbox" type="checkbox" />' +
+                        '</div>' +
                     '</td>'
                 );
             }
