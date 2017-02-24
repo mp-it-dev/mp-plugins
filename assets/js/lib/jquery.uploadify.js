@@ -685,8 +685,8 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 							<span class="file-name-text" title="${origin_name}">${fileName}</span>\
 						</span>\
 						<span class="file-data">waiting</span>\
-						<span class="file-operate">\
-							<a class="file-cancel" href="#" onclick="$(\'#${instanceID}\').uploadify(\'cancel\', \'${fileID}\');return false;">取消</a>\
+						<span class="file-opt">\
+							<a class="file-opt-i file-cancel" href="#" onclick="$(\'#${instanceID}\').uploadify(\'cancel\', \'${fileID}\');return false;">取消</a>\
 						</span>\
 					</div>';
 
@@ -1006,8 +1006,8 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 							<span class="file-name-text" title="' + file.name + '">' + file.name + '</span>\
 						</span>\
 	                    <span class="file-data">' + util.getFileSize(file.size) + '</span>\
-	                    <span class="file-operate">\
-	                        <a class="file-del" href="#">删除</a>\
+	                    <span class="file-opt">\
+	                        <a class="file-opt-i file-del" href="#">删除</a>\
 	                    </span>\
 	                </div>';
 

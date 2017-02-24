@@ -500,14 +500,15 @@
 .uploadify-queue .file-data {
     width: 80px;
 }
-.uploadify-queue .file-operate {
+.uploadify-queue .file-opt {
     width: 100px;
 }
-.uploadify-queue .file-operate > * {
+.uploadify-queue .file-opt-i {
     color: #0068B7;
     cursor: pointer;
+    margin-right: 10px;
 }
-.uploadify-queue .file-operate > *:hover {
+.uploadify-queue .file-opt-i:hover {
     color: #f00;
     text-decoration: underline;
 }
