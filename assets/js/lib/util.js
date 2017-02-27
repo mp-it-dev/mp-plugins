@@ -331,7 +331,7 @@
 
             return template.replace(/\#\{([\w\.]*)\}/g, function (s0, s1) {
                 if (s1 === '') {
-                    return templateData;
+                    return templateData || (emptyStrEscape ? '&nbsp;' : '');
                 }
                 
                 var namespaceList = s1.split('.');                
