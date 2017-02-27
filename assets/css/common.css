@@ -85,6 +85,17 @@ textarea.form-control {
     resize: vertical;
 }
 
+.table-row {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+}
+.table-cell {
+    display: table-cell;
+    vertical-align: middle;
+    word-break: break-all;
+}
+
 /*去除IE输入框后面的x和眼睛*/
 ::-ms-clear,
 ::-ms-reveal {
