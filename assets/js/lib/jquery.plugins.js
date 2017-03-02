@@ -610,6 +610,14 @@ $.extend($.fn, {
 
                 if (menu.sort) {
                     colClass += ' table-sort';
+                    if (menu.sort === true) {
+                        menu.sort = {
+                            enable: true,
+                            async: true
+                        };
+                    } else {
+                        menu.sort.async = menu.sort.async === undefined ? true : menu.sort.async;
+                    }
 
                     // 查找默认排序
                     if (menu.sort.defaultOrder) {
@@ -1013,6 +1021,8 @@ $.extend($.fn, {
     Table.prototype.sort = function (fieldIndex) {
         var setting = this.setting;
         var col = setting.colOptions[fieldIndex];
+        this.sasync = col.menu.sort.async;
+        
         var order = this.sorder;
         var name = this.sname;
         var type = col.menu.sort.type || 'string';
