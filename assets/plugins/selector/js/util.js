@@ -29,12 +29,12 @@
 
         // 是否为数字
         isNumber: function (it, isString) {
-            return isString ? !isNaN(Number(it)) && !isNaN(parseFloat(it)) : Object.prototype.toString.call(it) === '[object Number]';
+            return isString ? !isNaN(Number(it)) && !isNaN(parseFloat(it)) : Object.prototype.toString.call(it) === '[object Number]' && !isNaN(it);
         },
 
         // 是否为整数
         isInteger: function (it, isString) {
-            return isString ? Math.floor(it) === Number(it) : Math.floor(it) === it;
+            return isString ? it !== '' && Math.floor(it) === Number(it) : Math.floor(it) === it;
         },
 
         // 数组循环
@@ -103,20 +103,25 @@
 
         // 去掉字符串两边的空格
         trim: function (str) {
-            if (typeof str !== 'string') {
-                throw new Error(str + ' is not a String');
+            if (!str) {
+                return str;
             }
 
-            return str.replace(/(^\s*)|(\s*$)/g, "");
+            return str.replace(/(^\s*)|(\s*$)/g, '');
         },
 
         // 格式化时间参数
-        // 参数1： date 日期对象
+        // 参数1： date 日期对象或可转为日期对象的值
         // 参数2： format 字符串，格式化形式，年月日用大写Y、M、D代表，时分秒分别用h、m、s代表，毫秒用S代表
         formatDate: function (date, format) {
-            if (!date instanceof Date) {
-                throw new Error(date + ' is not a Date object');
+            if (!(date instanceof Date)) {
+                date = new Date(date);
             }
+            if (isNaN(date.getDate())) {
+                return null;
+            }
+
+            format = format || 'YYYY/MM/DD hh:mm:ss';
 
             var o = {
                 'M+': date.getMonth() + 1,                      //month 
@@ -143,8 +148,6 @@
         // 格式化c#后台返回的/Date(1473133893427)/类型的时间
         formatMSDate: function (str, format) {
             var match = /\/Date\((\d+)\)\//.exec(str);
-            format = format || 'YYYY/MM/DD hh:mm:ss';
-
             return match ? util.formatDate(new Date(+match[1]), format) : '';
         },
 
@@ -323,16 +326,95 @@
         },
 
         // 解析模板中的变量
-        parseTpl: function (template, itemData) {
-            return template.replace(/\#\{([\w]*)\}/g, function (s0, s1) {
-                return s1 == '' ? itemData : itemData[s1] || '';
+        parseTpl: function (template, templateData, emptyStrEscape) {
+            emptyStrEscape = emptyStrEscape || false;
+
+            return template.replace(/\#\{([\w\.]*)\}/g, function (s0, s1) {
+                if (s1 === '') {
+                    return templateData || (emptyStrEscape ? '&nbsp;' : '');
+                }
+                
+                var namespaceList = s1.split('.');                
+                var data;
+
+                if (util.isObject(templateData)) {
+                    data = util.extend(true, {}, templateData);
+                } else {
+                    data = templateData;
+                }
+
+                for (var i in namespaceList) {
+                    if ((data = data[namespaceList[i]]) === undefined) {
+                        break;
+                    }
+                }
+
+                return data || (emptyStrEscape ? '&nbsp;' : '');
             });
+        },
+
+        // 拷贝对象，移植于jQuery
+        extend: function () {
+            var src, copyIsArray, copy, name, options, clone,
+                target = arguments[0] || {},
+                i = 1,
+                length = arguments.length,
+                deep = false;
+
+            // Handle a deep copy situation
+            if ( typeof target === 'boolean' ) {
+                deep = target;
+
+                // skip the boolean and the target
+                target = arguments[ i ] || {};
+                i++;
+            }
+
+            // Handle case when target is a string or something (possible in deep copy)
+            if ( !util.isObject(target) && !util.isFunction(target) ) {
+                target = {};
+            }
+
+            for ( ; i < length; i++ ) {
+                // Only deal with non-null/undefined values
+                if ( (options = arguments[ i ]) != null ) {
+                    // Extend the base object
+                    for ( name in options ) {
+                        src = target[ name ];
+                        copy = options[ name ];
+
+                        // Prevent never-ending loop
+                        if ( target === copy ) {
+                            continue;
+                        }
+
+                        // Recurse if we're merging plain objects or arrays
+                        if ( deep && copy && (copyIsArray = util.isArray(copy) ) ) {
+                            if ( copyIsArray ) {
+                                copyIsArray = false;
+                                clone = src && util.isArray(src) ? src : [];
+                            } else {
+                                clone = src ? src : {};
+                            }
+
+                            // Never move original objects, clone them
+                            target[ name ] = util.extend( deep, clone, copy );
+
+                        // Don't bring in undefined values
+                        } else if ( copy !== undefined ) {
+                            target[ name ] = copy;
+                        }
+                    }
+                }
+            }
+
+            // Return the modified object
+            return target;
         },
 
         // 格式化数字，将数字格式化成precision位数，separator分隔的数字
         formatNumber: function (num, precision, separator) {
-            //null is number 0?
-            if (num === null || isNaN(num)) {
+            if (!util.isNumber(num, true)) {
                 return num;
             }
 
