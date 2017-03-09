@@ -1,6 +1,14 @@
 require(['jquery', 'util', 'ztree'], function($, util) {
-	var apiUrl = decodeURIComponent(util.queryString('apiurl'));
+    var option = parent.selectorGlobal.multiDep;
+    var apiUrl = option.apiUrl;
+    var callback = option.callback;
 	var rootNodes = { id: 'C01', name: '迈普通信', pid: null, isParent: true, nocheck: true };
+    var selectedData = [];
+
+    if (option.oldData && option.oldData.length) {
+        selectedData = option.oldData.slice(0);
+    }
+
     var setting = {
         data: {
             simpleData: {
@@ -34,6 +42,21 @@ require(['jquery', 'util', 'ztree'], function($, util) {
 			            treeObj.updateNode(treeNode);
 			    	}
 			    });
+            },
+            onCheck: function (event, treeId, treeNode) {
+                var data = {
+                    DepId: treeNode.id,
+                    DepName: treeNode.name
+                }
+
+                if (treeNode.checked) {
+                    if (util.indexOf(selectedData, data, 'DepId') == -1) {
+                        selectedData.push(data);
+                    } 
+                } else {
+                    util.removeOf(selectedData, data, 'DepId');
+                }
+                showSelectedData();
             }
         }
     };
@@ -43,6 +66,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     //////////////
     
     var treeObj = $.fn.zTree.init($('#ztree'), setting, rootNodes);
+    showSelectedData();
 
     //展开第一个节点
     var defaultNode = treeObj.getNodes()[0];
@@ -53,27 +77,61 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     ///////////////
     //事件绑定
     //////////////
-    
-    $('#submitSelected').on('click', function() {
-        var cb = parent[util.queryString('callback')];
+    // 全选
+    $(document).on('change', '.js-select-all', function(e) {      
+        var checked = $(this).prop('checked');
+        var target = $(this).data('target');
 
-        if (typeof cb == 'function') {
-            var selectedData = [];
-            var nodes = treeObj.getCheckedNodes();
+        $(target).find('input[type="checkbox"]').each(function () {
+            $(this).prop('checked', checked).trigger('change');
+        });
+    });
 
-            for (var i = 0, l = nodes.length; i < l; i++) {
-                selectedData.push({
-                    DepId: nodes[i].id,
-                    DepName: nodes[i].name
-                });
-            }
+    // 勾选/取消勾选已选择列表
+    $(document).on('click', '#selectedList tr', function() {        
+        $(this).find('input[type="checkbox"]').prop('checked', !$(this).find('input[type="checkbox"]').prop('checked'));
+    });
 
-            cb(selectedData);
+    // 删除
+    $('#deleteSelected').on('click', function() {
+        var delData = [];
+
+        $('#selectedList input[type="checkbox"]:checked').each(function() {
+            var idx = $(this).parents('tr').data('index');
+            delData.push(selectedData[idx]);
+        });
+
+        for (var i = 0; i < delData.length; i++) {
+            util.removeOf(selectedData, delData[i], 'DepId');
         }
-    });    
+        
+        showSelectedData();
+    });
+
+    // 确定
+    $('#submitSelected').on('click', function() {
+        if (typeof callback == 'function') {
+            callback(selectedData);
+        }
+    });
 
     //////////////
     ///函数声明
     //////////////
-    
+    function showSelectedData() {
+        var result = $('#selectedList').empty();
+        var tr;
+
+        for (var i = 0; i < selectedData.length; i++) {
+            tr = $(
+                '<tr>' +
+                    '<td width="40"><input type="checkbox"></td>' +
+                    '<td width="80">' + selectedData[i].DepId + '</td>' +
+                    '<td><div class="text-hidden" title="' + selectedData[i].DepName + '">' + (selectedData[i].DepName || '') + '</div></td>' +
+                '</tr>'
+            ).data('index', i);                        
+
+            result.append(tr);
+        }
+    }
 });

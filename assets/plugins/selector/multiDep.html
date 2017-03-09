@@ -7,9 +7,9 @@
 	<title>多部门选择</title>
     <link rel="stylesheet" href="./css/bootstrap.min.css">
 	<link rel="stylesheet" href="./css/bootstrap-theme.min.css">
-	<link rel="stylesheet" href="./css/common.css">
 	<link rel="stylesheet" href="./css/zTreeStyle.css">
-	<link rel="stylesheet" href="./css/site.css">
+    <link rel="stylesheet" href="./css/common.css?v=20170309">
+	<link rel="stylesheet" href="./css/site.css?v=20170309">
 </head>
 <body>
     <div class="container-selector">
@@ -17,13 +17,35 @@
             <div class="loading-mask"></div>
             <img class="loading-img" src="./img/waiting.gif">
         </div>
-    	<div class="ztree part-content" id="ztree" style="height: 420px;"></div>
-        <div class="text-right part-opt">
-            <button class="btn btn-sm btn-primary" id="submitSelected">选中</button>
+        <div class="part tree">
+            <div class="ztree part-content" id="ztree" style="height: 420px;"></div>
+        </div>
+        <div class="part result">
+            <h5 class="part-title">
+                已选部门
+            </h5>
+            <div class="table-header">
+                <table class="table table-hover table-condensed table-content">
+                    <thead>
+                        <tr>
+                            <th width="40"><input type="checkbox" class="js-select-all" data-target="#selectedList"></th>
+                            <th width="80">部门ID</th>
+                            <th>部门</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div class="part-content" style="height: 364px;">
+                <table class="table table-hover table-condensed table-content" id="selectedList"></table>
+            </div>
+            <div class="text-right part-opt">
+                <button class="btn btn-sm btn-danger" id="deleteSelected">删除</button>
+                <button class="btn btn-sm btn-primary" id="submitSelected">确定</button>
+            </div>
         </div>
     </div>
     <script src="./js/require.min.js"></script>
-    <script src="./js/main.js"></script>
-    <script src="./js/multiDep.js"></script>
+    <script src="./js/main.js?v=20170309"></script>
+    <script src="./js/multiDep.js?v=20170309"></script>
 </body>
 </html>

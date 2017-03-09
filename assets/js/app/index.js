@@ -1,6 +1,6 @@
 require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], function ($, util, selector) {
 	selector.baseUrl = './assets/plugins/selector/';
-	selector.apiUrl = 'http://192.168.4.86:100/Selector/';
+	// selector.apiUrl = 'http://192.168.4.86:100/Selector/';
 
 	$('#cc').scrollbar();
 	$('#searchProduct').autoComplete({
@@ -89,14 +89,17 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 		}
 	});
 
+	var oldData;
 	$('.selector-organiztion').on('click', function () {
 		var type = $(this).data('type');
 		var badge = $(this).data('badge');
 
         selector[type]({
         	badge: badge,
+        	oldData: oldData,
             callback: function(data) {
                 console.log(data);
+                oldData = data;
                 $.tlayer('close');
             }
         });

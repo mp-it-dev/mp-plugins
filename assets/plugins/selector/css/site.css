@@ -38,6 +38,7 @@ body {
 }
 .container-selector .part {
 	float: left;
+	width: auto;
 	height: 100%;
 }
 .container-selector .part + .part {
@@ -49,18 +50,18 @@ body {
     height: 30px;
     line-height: 30px;
 }
-.selector-people .organization {
+.container-selector .part.tree {
 	width: 260px;
+}
+.container-selector .part.middle {
+	width: 180px;
+}
+.container-selector .part.result {
+	width: 460px;
+	/* border-left: 1px solid #ddd; */
 }
 .selector-product .product {
 	width: auto;
-}
-.job {
-	width: 180px;
-}
-.people {
-	width: 460px;
-	/* border-left: 1px solid #ddd; */
 }
 .container-selector .find {
 	width: 220px;
@@ -170,11 +171,4 @@ body {
 .job-list {
 	margin: 10px 0;
 	overflow-y: auto;
-}
-.all-job-list,
-.selected-job-list {
-	width: 300px;
-}
-.selected-job-list {
-	margin-top: 30px;
 }

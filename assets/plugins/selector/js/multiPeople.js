@@ -1,10 +1,16 @@
 require(['jquery', 'util', 'ztree'], function($, util) {
-	var apiUrl = decodeURIComponent(util.queryString('apiurl'));
-    var badge = util.queryString('badge');
+    var option = parent.selectorGlobal.multiPeople;
+    var apiUrl = option.apiUrl;
+    var badge = option.badge;
+    var callback = option.callback;
 	var rootNodes = [{ id: 'C01', name: '迈普通信', pid: null, isParent: true, nocheck: true }];
+    var selectedData = [];
 
     if (badge) {
         rootNodes.push({ id: 'C02', name: '自定义组', pid: null, isParent: false, nocheck: true, icon: './img/file.png' });
+    }
+    if (option.oldData && option.oldData.length) {
+        selectedData = option.oldData.slice(0);
     }
 
     var setting = {
@@ -49,7 +55,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                         },
                         dataType: 'jsonp',
                         success: function(data) {
-                            var html = '<li class="selected">' +
+                            var html = '<li class="selected" data-type="job">' +
                                             '<img src="./img/group.png" />' +
                                             '<span>所有职位</span>' +
                                         '</li>';
@@ -96,6 +102,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     //////////////
     
     var treeObj = $.fn.zTree.init($('#ztree'), setting, rootNodes);
+    showSelectedData();
 
     //展开第一个节点
     var defaultNode = treeObj.getNodes()[0];
@@ -126,7 +133,6 @@ require(['jquery', 'util', 'ztree'], function($, util) {
 
     // 加入选择或取消选择
     $(document).on('change', '#peopleList input[type="checkbox"]', function() {
-        var selectedData = $('#selectedList').data('selectedData') || [];
         var data = $(this).parents('tr').data('data');
 
         if ($(this).prop('checked')) {
@@ -137,7 +143,6 @@ require(['jquery', 'util', 'ztree'], function($, util) {
             util.removeOf(selectedData, data, 'Badge');
         }
 
-        $('#selectedList').data('selectedData', selectedData);
         showSelectedData();
 
         var totalNum = $('#peopleList input[type="checkbox"]').length;
@@ -166,18 +171,20 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         });
     });
 
+    // enter键搜索
     $('#search-keyword').on('keydown', function(e) {
         if (e.which == 13) {
             searchPeople(true);
         }
     });
 
+    // 搜索
     $('#search-btn').on('click', function(e) {
         searchPeople(true);
     });
 
+    // 删除
     $('#deleteSelected').on('click', function() {
-        var selectedData = $('#selectedList').data('selectedData') || [];
         var delData = [];
 
         $('#selectedList input[type="checkbox"]:checked').each(function() {
@@ -189,17 +196,13 @@ require(['jquery', 'util', 'ztree'], function($, util) {
             util.removeOf(selectedData, delData[i], 'Badge');
         }
         
-        $('#selectedList').data('selectedData', selectedData);
         showSelectedData();
     });
 
+    // 确定
     $('#submitSelected').on('click', function() {
-        var cb = parent[util.queryString('callback')];
-
-        if (typeof cb == 'function') {
-            var selectedData = $('#selectedList').data('selectedData') || [];
-
-            cb(selectedData);
+        if (typeof callback == 'function') {
+            callback(selectedData);
         }
     });
 
@@ -292,7 +295,6 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     }
 
     function showSelectedData() {
-        var selectedData = $('#selectedList').data('selectedData');
         var result = $('#selectedList').empty();
         var tr;
 

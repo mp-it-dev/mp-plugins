@@ -1,5 +1,7 @@
 require(['jquery', 'util', 'ztree'], function($, util) {
-	var apiUrl = decodeURIComponent(util.queryString('apiurl'));
+    var option = parent.selectorGlobal.singleDep;
+    var apiUrl = option.apiUrl;
+    var callback = option.callback;
 	var rootNodes = { id: 'C01', name: '迈普通信', pid: null, isParent: true, nocheck: true };
     var setting = {
         data: {
@@ -37,15 +39,13 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                     return false;
                 }                
 
-                var cb = parent[util.queryString('callback')];
-
-                if (typeof cb == 'function') {
+                if (typeof callback == 'function') {
                     var data = { 
                         DepId: treeNode.id,
                         DepName: treeNode.name
                     };
                     
-                    cb(data);
+                    callback(data);
                 }
             }
         }

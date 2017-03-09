@@ -1,6 +1,8 @@
 require(['jquery', 'util', 'ztree'], function($, util) {
-	var apiUrl = decodeURIComponent(util.queryString('apiurl'));
-    var badge = util.queryString('badge');
+    var option = parent.selectorGlobal.singlePeople;
+    var apiUrl = option.apiUrl;
+    var badge = option.badge;
+    var callback = option.callback;
 	var rootNodes = [{ id: 'C01', name: '迈普通信', pid: null, isParent: true, nocheck: true }];
 
     if (badge) {
@@ -49,7 +51,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                         },
                         dataType: 'jsonp',
                         success: function(data) {
-                            var html = '<li class="selected">' +
+                            var html = '<li class="selected" data-type="job">' +
                                             '<img src="./img/group.png" />' +
                                             '<span>所有职位</span>' +
                                         '</li>';
@@ -112,18 +114,16 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     	$(this).addClass('selected');
 
     	if ($(this).data('type') == 'job') {
-           searchPeople(false);
+            searchPeople(false);
         } else {
             getGroupPeople();
         }
     });
 
-    $(document).on('click', '#peopleList tr', function() {    	
-    	var cb = parent[util.queryString('callback')];
-
-    	if (typeof cb == 'function') {
+    $(document).on('click', '#peopleList tr', function() {
+    	if (typeof callback == 'function') {
 	    	var data = $(this).data('data');
-    		cb(data);
+    		callback(data);
     	}
     });
 

@@ -1,5 +1,7 @@
 require(['jquery', 'util', 'ztree'], function($, util) {
-	var apiUrl = decodeURIComponent(util.queryString('apiurl'));
+    var option = parent.selectorGlobal.singleDepJob;
+    var apiUrl = option.apiUrl;
+    var callback = option.callback;
 	var rootNodes = { id: 'C01', name: '迈普通信', pid: null, isParent: true, nocheck: true };
     var setting = {
         data: {
@@ -39,9 +41,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
             },
             onClick: function(event, treeId, treeNode) {
 		        if (treeNode.id.indexOf('J') > -1) {
-                    var cb = parent[util.queryString('callback')];
-
-                    if (typeof cb == 'function') {
+                    if (typeof callback == 'function') {
                         var pNode = treeNode.getParentNode();
                         var data = { 
                             DepId: pNode.id,
@@ -50,7 +50,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                             JobName: treeNode.name
                         };
                         
-                        cb(data);
+                        callback(data);
                     }
                 }
             }
