@@ -89,31 +89,36 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 		}
 	});
 
-	var oldData;
 	$('.selector-organiztion').on('click', function () {
+		var btn = $(this);
 		var type = $(this).data('type');
 		var badge = $(this).data('badge');
 
         selector[type]({
         	badge: badge,
-        	oldData: oldData,
+        	oldData: btn.data('data'),
             callback: function(data) {
                 console.log(data);
-                oldData = data;
+                btn.data('data', data);
                 $.tlayer('close');
             }
         });
 	});
 
 	$('.selector-product').on('click', function () {
-		var option = $(this).data();
+		var btn = $(this);
+		var type = $(this).data('type');
 
-		option.callback = function(data) {
-            console.log(data);
-            $.tlayer('close');
-        };
-
-        selector.product(option);
+        selector[type]({
+			type: $(this).data('level'),
+			zhujiOnly: $(this).data('zhuji-only'),
+			oldData: btn.data('data'),
+			callback: function(data) {
+	            console.log(data);
+                btn.data('data', data);
+	            $.tlayer('close');
+	        }
+		});
 	});
 
 	$('#msg').click(function () {

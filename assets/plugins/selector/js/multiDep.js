@@ -47,7 +47,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                 var data = {
                     DepId: treeNode.id,
                     DepName: treeNode.name
-                }
+                };
 
                 if (treeNode.checked) {
                     if (util.indexOf(selectedData, data, 'DepId') == -1) {

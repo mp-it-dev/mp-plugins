@@ -23,12 +23,8 @@
 		baseUrl: './',
 		//单人
 		singlePeople: function (option) {
-			var obj = selectorGlobal.singlePeople || (selectorGlobal.singlePeople = {});
-
-			obj.apiUrl = option.apiUrl || this.apiUrl;
-			obj.badge = option.badge;
-			obj.callback = option.callback;
-
+			option.apiUrl = option.apiUrl || this.apiUrl;
+			selectorGlobal.singlePeople = option;
 			$.content({
 				layerID: option.layerID || false,
 				theme: 'blue',
@@ -37,19 +33,14 @@
 					width: 930,
 					height: 480,
 					padding: 0,
-					src: this.baseUrl + 'singlePeople.html?callback=singlePeopleCallback&apiurl=' + encodeURIComponent(this.apiUrl) + '&badge=' + option.badge + '&t=' + new Date().getTime()
+					src: this.baseUrl + 'singlePeople.html?t=' + new Date().getTime()
 				}
 			});
 		},
 		//多人
 		multiPeople: function (option) {
-			var obj = selectorGlobal.multiPeople || (selectorGlobal.multiPeople = {});
-			
-			obj.apiUrl = option.apiUrl || this.apiUrl;
-			obj.badge = option.badge;
-			obj.callback = option.callback;
-			obj.oldData = option.oldData;
-
+			option.apiUrl = option.apiUrl || this.apiUrl;
+			selectorGlobal.multiPeople = option;			
 			$.content({
 				layerID: option.layerID || false,
 				theme: 'blue',
@@ -64,11 +55,8 @@
 		},
 		//单部门
 		singleDep: function (option) {
-			var obj = selectorGlobal.singleDep || (selectorGlobal.singleDep = {});
-			
-			obj.apiUrl = option.apiUrl || this.apiUrl;
-			obj.callback = option.callback;
-
+			option.apiUrl = option.apiUrl || this.apiUrl;
+			selectorGlobal.singleDep = option;
 			$.content({
 				layerID: option.layerID || false,
 				theme: 'blue',
@@ -83,12 +71,8 @@
 		},
 		//多部门
 		multiDep: function (option) {
-			var obj = selectorGlobal.multiDep || (selectorGlobal.multiDep = {});
-			
-			obj.apiUrl = option.apiUrl || this.apiUrl;
-			obj.callback = option.callback;
-			obj.oldData = option.oldData;
-
+			option.apiUrl = option.apiUrl || this.apiUrl;
+			selectorGlobal.multiDep = option;
 			$.content({
 				layerID: option.layerID || false,
 				theme: 'blue',
@@ -103,11 +87,8 @@
 		},
 		//单职位
 		singleJob: function (option) {
-			var obj = selectorGlobal.singleJob || (selectorGlobal.singleJob = {});
-			
-			obj.apiUrl = option.apiUrl || this.apiUrl;
-			obj.callback = option.callback;
-
+			option.apiUrl = option.apiUrl || this.apiUrl;
+			selectorGlobal.singleJob = option;
 			$.content({
 				layerID: option.layerID || false,
 				theme: 'blue',
@@ -122,12 +103,8 @@
 		},
 		//多职位
 		multiJob: function (option) {
-			var obj = selectorGlobal.multiJob || (selectorGlobal.multiJob = {});
-			
-			obj.apiUrl = option.apiUrl || this.apiUrl;
-			obj.callback = option.callback;
-			obj.oldData = option.oldData;
-
+			option.apiUrl = option.apiUrl || this.apiUrl;
+			selectorGlobal.multiJob = option;
 			$.content({
 				layerID: option.layerID || false,
 				theme: 'blue',
@@ -142,11 +119,8 @@
 		},
 		//单部门职位
 		singleDepJob: function (option) {
-			var obj = selectorGlobal.singleDepJob || (selectorGlobal.singleDepJob = {});
-			
-			obj.apiUrl = option.apiUrl || this.apiUrl;
-			obj.callback = option.callback;
-
+			option.apiUrl = option.apiUrl || this.apiUrl;
+			selectorGlobal.singleDepJob = option;
 			$.content({
 				layerID: option.layerID || false,
 				theme: 'blue',
@@ -161,12 +135,8 @@
 		},
 		//多部门职位
 		multiDepJob: function (option) {
-			var obj = selectorGlobal.multiDepJob || (selectorGlobal.multiDepJob = {});
-			
-			obj.apiUrl = option.apiUrl || this.apiUrl;
-			obj.callback = option.callback;
-			obj.oldData = option.oldData;
-
+			option.apiUrl = option.apiUrl || this.apiUrl;
+			selectorGlobal.multiDepJob = option;
 			$.content({
 				layerID: option.layerID || false,
 				theme: 'blue',
@@ -179,16 +149,10 @@
 				}
 			});
 		},		
-		//选择产品结构
-		product: function (option) {
-			selectorGlobal.productCallback = option.callback;
-			var t = new Date().getTime();
-			var cloneOption = $.extend({}, option);
-			
-			delete cloneOption.callback;
-			delete cloneOption.apiUrl;
-			var param = $.param(cloneOption);
-
+		//单产品
+		singleProduct: function (option) {
+			option.apiUrl = option.apiUrl || this.apiUrl;
+			selectorGlobal.singleProduct = option;
 			$.content({
 				layerID: option.layerID || false,
 				theme: 'blue',
@@ -197,7 +161,23 @@
 					width: 530,
 					height: 480,
 					padding: 0,
-					src: this.baseUrl + 'product.html?callback=productCallback&apiurl=' + encodeURIComponent(option.apiUrl || this.apiUrl) + '&' + param + '&t=' + t
+					src: this.baseUrl + 'singleProduct.html?t=' + new Date().getTime()
+				}
+			});
+		},
+		//多产品
+		multiProduct: function (option) {
+			option.apiUrl = option.apiUrl || this.apiUrl;
+			selectorGlobal.multiProduct = option;
+			$.content({
+				layerID: option.layerID || false,
+				theme: 'blue',
+				header: '产品选择',
+				content: {
+					width: 750,
+					height: 480,
+					padding: 0,
+					src: this.baseUrl + 'multiProduct.html?t=' + new Date().getTime()
 				}
 			});
 		}
