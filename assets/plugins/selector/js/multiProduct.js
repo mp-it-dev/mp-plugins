@@ -136,6 +136,11 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         $(this).find('input[type="checkbox"]').prop('checked', !$(this).find('input[type="checkbox"]').prop('checked'));
     });
 
+    // 阻止冒泡
+    $(document).on('click', '#selectedList tr input[type="checkbox"]', function(e) {      
+        e.stopPropagation();
+    });
+
     // 删除
     $('#deleteSelected').on('click', function() {
         var delData = [];
