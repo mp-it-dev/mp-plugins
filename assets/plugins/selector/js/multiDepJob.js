@@ -54,18 +54,18 @@ require(['jquery', 'util', 'ztree'], function($, util) {
             onCheck: function (event, treeId, treeNode) {
                 var pNode = treeNode.getParentNode();
                 var data = {
-                    DepId: pNode.id,
+                    DepID: pNode.id,
                     DepName: pNode.name,
-                    JobId: treeNode.id,
+                    JobID: treeNode.id,
                     JobName: treeNode.name
                 }
 
                 if (treeNode.checked) {
-                    if (util.indexOf(selectedData, data, 'JobId') == -1) {
+                    if (util.indexOf(selectedData, data, 'JobID') == -1) {
                         selectedData.push(data);
                     } 
                 } else {
-                    util.removeOf(selectedData, data, 'JobId');
+                    util.removeOf(selectedData, data, 'JobID');
                 }
                 showSelectedData();
             }
@@ -118,7 +118,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         });
 
         for (var i = 0; i < delData.length; i++) {
-            util.removeOf(selectedData, delData[i], 'JobId');
+            util.removeOf(selectedData, delData[i], 'JobID');
         }
         
         showSelectedData();
@@ -142,9 +142,9 @@ require(['jquery', 'util', 'ztree'], function($, util) {
             tr = $(
                 '<tr>' +
                     '<td width="40"><input type="checkbox"></td>' +
-                    '<td width="80">' + selectedData[i].DepId + '</td>' +
+                    '<td width="80">' + selectedData[i].DepID + '</td>' +
                     '<td><div class="text-hidden" title="' + selectedData[i].DepName + '">' + (selectedData[i].DepName || '') + '</div></td>' +
-                    '<td width="80">' + selectedData[i].JobId + '</td>' +
+                    '<td width="80">' + selectedData[i].JobID + '</td>' +
                     '<td><div class="text-hidden" title="' + selectedData[i].JobName + '">' + (selectedData[i].JobName || '') + '</div></td>' +
                 '</tr>'
             ).data('index', i);                        

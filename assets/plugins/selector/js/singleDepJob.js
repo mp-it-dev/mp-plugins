@@ -44,9 +44,9 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                     if (typeof callback == 'function') {
                         var pNode = treeNode.getParentNode();
                         var data = { 
-                            DepId: pNode.id,
+                            DepID: pNode.id,
                             DepName: pNode.name,
-                            JobId: treeNode.id,
+                            JobID: treeNode.id,
                             JobName: treeNode.name
                         };
                         

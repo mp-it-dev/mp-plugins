@@ -44,11 +44,11 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         var data = $(this).parent().data('data');
 
         if ($(this).prop('checked')) {
-            if (util.indexOf(selectedData, data, 'JobId') == -1) {
+            if (util.indexOf(selectedData, data, 'JobID') == -1) {
                 selectedData.push(data);
             }            
         } else {
-            util.removeOf(selectedData, data, 'JobId');
+            util.removeOf(selectedData, data, 'JobID');
         }
     });
 
@@ -75,7 +75,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
 
             $(
                 '<li>' + 
-                    '<input type="checkbox"' + (util.indexOf(selectedData, job, 'JobId') > -1 ? 'checked' : '') + '>' +
+                    '<input type="checkbox"' + (util.indexOf(selectedData, job, 'JobID') > -1 ? 'checked' : '') + '>' +
                     '<img src="./img/group.png">' +
                     '<span>' + job.JobName + '</span>' +
                 '</li>'

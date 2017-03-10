@@ -41,7 +41,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
 
                 if (typeof callback == 'function') {
                     var data = { 
-                        DepId: treeNode.id,
+                        DepID: treeNode.id,
                         DepName: treeNode.name
                     };
                     
