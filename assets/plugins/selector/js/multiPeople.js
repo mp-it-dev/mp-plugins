@@ -81,7 +81,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                             var html = '';
 
                             for (var i = 0; i < data.length; i++) {
-                                html += '<li data-type="group" data-id="' + data[i].Id + '" data-ygid="' + data[i].YgID + '">'+
+                                html += '<li data-type="group" data-id="' + data[i].ID + '" data-ygid="' + data[i].YgID + '">'+
                                             '<img src="./img/worker.png" />' +
                                             '<span>' + data[i].GroupName + '</span>'+
                                         '</li>';
@@ -256,7 +256,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     }
 
     function getGroupPeople() {
-        var groupId = $('#jobList li.selected').data('id');
+        var groupID = $('#jobList li.selected').data('id');
         var ygID = $('#jobList li.selected').data('ygid');
 
         $('#loading').show();
@@ -265,7 +265,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         $.ajax({
             url: apiUrl + 'Organization/GetGroupPeopleList',
             data: {
-                groupId: groupId,
+                groupID: groupID,
                 ygID: ygID
             },
             dataType: 'jsonp',
