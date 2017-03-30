@@ -63,13 +63,10 @@ body {
 .selector-product .product {
 	width: auto;
 }
-.container-selector .find {
-	width: 220px;
-}
 .part-content {
 	overflow: auto;
 	position: relative;
-	padding: 5px 0;
+	margin: 5px 0;
 }
 .people .part-content {
 	padding: 0;
