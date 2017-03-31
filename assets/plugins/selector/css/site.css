@@ -111,18 +111,8 @@ body {
 	cursor: pointer;
 	color: #368ee0;
 }
-.part-opt {
-	height: 30px;
-	line-height: 30px;
-}
-.part-opt .btn {
-	vertical-align: middle;
-}
 .part-opt .btn + .btn {
 	margin-left: 20px;
-}
-.product .part-opt {
-	display: none;
 }
 .opt-row {
 	overflow: hidden;
