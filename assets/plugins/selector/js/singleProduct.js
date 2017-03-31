@@ -1,9 +1,9 @@
 require(['jquery', 'util', 'ztree'], function($, util) {
-	var apiUrl = decodeURIComponent(util.queryString('apiurl'));
-    var type = util.queryString('type') || 'Cp';
-    var multi = util.queryString('multi') || 'false';
-    var zhuji = util.queryString('zhuji') || 'false';
-    var cb = parent[util.queryString('callback')];
+    var option = parent.selectorGlobal.singleProduct;
+    var apiUrl = option.apiUrl;
+    var type = option.type || 'Cp';
+    var zhujiOnly = option.zhujiOnly === undefined ? true : option.zhujiOnly;
+    var callback = option.callback;
 
     var setting = {
         data: {
@@ -29,7 +29,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                 if (treeNode.Type == 'Cpx') {
                     url += 'Product/GetCpxlList?cpxid=' + treeNode.ID;
                 } else if (treeNode.Type == 'Cpxl') {
-                    url += 'Product/GetCpList?cpxlid=' + treeNode.ID + '&zhuji=' + zhuji;
+                    url += 'Product/GetCpList?cpxlid=' + treeNode.ID + '&zhuji=' + zhujiOnly + '&pageSize=0';
                 }
 
             	$.ajax({
@@ -62,14 +62,16 @@ require(['jquery', 'util', 'ztree'], function($, util) {
 			    });
             },
             onClick: function(event, treeId, treeNode) {
-                if (multi == 'false' && treeNode.isLeaf) {
-                    if (typeof cb == 'function') {                        
-                        cb({
-                            Type: treeNode.Type,
+                if (treeNode.isLeaf) {
+                    if (typeof callback == 'function') {
+                        var data = { 
                             ID: treeNode.ID,
                             Name: treeNode.Name,
+                            Type: treeNode.Type,
                             Node: treeNode
-                        });
+                        };
+                        
+                        callback(data);
                     }
                 }
             }
@@ -78,16 +80,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
 
     ///////////////
     //页面初始化
-    //////////////    
-    if (multi == 'true') {
-        setting.check = {
-            enable: true,
-            chkboxType: { 'Y': '', 'N': '' }
-        };
-        $('.product .part-opt').show();
-        $('#ztree').height($('#ztree').height() - 30);
-    }
-
+    //////////////
     $.ajax({
         url: apiUrl + 'Product/GetCpxList',
         dataType: 'jsonp',
@@ -115,27 +108,4 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     ///////////////
     // 事件绑定
     //////////////
-    // 产品树选中结果
-    $('#submitSelected').on('click', function() {
-        if (typeof cb == 'function') {
-            var selectedData = [];
-            var nodes = treeObj.getCheckedNodes();
-
-            for (var i = 0, l = nodes.length; i < l; i++) {
-                selectedData.push({
-                    Type: nodes[i].Type,
-                    ID: nodes[i].ID,
-                    Name: nodes[i].Name,
-                    Node: nodes[i]
-                });
-            }            
-
-            if (!selectedData.length) {
-                alert('没有选择任何数据！');
-                return false;
-            }
-
-            cb(selectedData);
-        }
-    });
 });

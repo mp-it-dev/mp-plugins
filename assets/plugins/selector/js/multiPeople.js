@@ -1,10 +1,16 @@
 require(['jquery', 'util', 'ztree'], function($, util) {
-	var apiUrl = decodeURIComponent(util.queryString('apiurl'));
-    var badge = util.queryString('badge');
+    var option = parent.selectorGlobal.multiPeople;
+    var apiUrl = option.apiUrl;
+    var badge = option.badge;
+    var callback = option.callback;
 	var rootNodes = [{ id: 'C01', name: '迈普通信', pid: null, isParent: true, nocheck: true }];
+    var selectedData = [];
 
     if (badge) {
         rootNodes.push({ id: 'C02', name: '自定义组', pid: null, isParent: false, nocheck: true, icon: './img/file.png' });
+    }
+    if (option.oldData && option.oldData.length) {
+        selectedData = option.oldData.slice(0);
     }
 
     var setting = {
@@ -45,17 +51,17 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                     $.ajax({
                         url: apiUrl + 'Organization/GetJobNode',
                         data: {
-                            depId: treeNode.id
+                            depID: treeNode.id
                         },
                         dataType: 'jsonp',
                         success: function(data) {
-                            var html = '<li class="selected">' +
+                            var html = '<li class="selected" data-type="job">' +
                                             '<img src="./img/group.png" />' +
                                             '<span>所有职位</span>' +
                                         '</li>';
 
                             for (var i = 0; i < data.length; i++) {
-                                html += '<li data-type="job" data-jobid="' + data[i].JobId + '">'+
+                                html += '<li data-type="job" data-jobid="' + data[i].JobID + '">'+
                                             '<img src="./img/worker.png" />' +
                                             '<span>' + data[i].JobName + '</span>'+
                                         '</li>';
@@ -75,7 +81,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                             var html = '';
 
                             for (var i = 0; i < data.length; i++) {
-                                html += '<li data-type="group" data-id="' + data[i].Id + '" data-ygid="' + data[i].YgId + '">'+
+                                html += '<li data-type="group" data-id="' + data[i].ID + '" data-ygid="' + data[i].YgID + '">'+
                                             '<img src="./img/worker.png" />' +
                                             '<span>' + data[i].GroupName + '</span>'+
                                         '</li>';
@@ -96,6 +102,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     //////////////
     
     var treeObj = $.fn.zTree.init($('#ztree'), setting, rootNodes);
+    showSelectedData();
 
     //展开第一个节点
     var defaultNode = treeObj.getNodes()[0];
@@ -126,7 +133,6 @@ require(['jquery', 'util', 'ztree'], function($, util) {
 
     // 加入选择或取消选择
     $(document).on('change', '#peopleList input[type="checkbox"]', function() {
-        var selectedData = $('#selectedList').data('selectedData') || [];
         var data = $(this).parents('tr').data('data');
 
         if ($(this).prop('checked')) {
@@ -137,7 +143,6 @@ require(['jquery', 'util', 'ztree'], function($, util) {
             util.removeOf(selectedData, data, 'Badge');
         }
 
-        $('#selectedList').data('selectedData', selectedData);
         showSelectedData();
 
         var totalNum = $('#peopleList input[type="checkbox"]').length;
@@ -166,18 +171,20 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         });
     });
 
+    // enter键搜索
     $('#search-keyword').on('keydown', function(e) {
         if (e.which == 13) {
             searchPeople(true);
         }
     });
 
+    // 搜索
     $('#search-btn').on('click', function(e) {
         searchPeople(true);
     });
 
+    // 删除
     $('#deleteSelected').on('click', function() {
-        var selectedData = $('#selectedList').data('selectedData') || [];
         var delData = [];
 
         $('#selectedList input[type="checkbox"]:checked').each(function() {
@@ -189,17 +196,13 @@ require(['jquery', 'util', 'ztree'], function($, util) {
             util.removeOf(selectedData, delData[i], 'Badge');
         }
         
-        $('#selectedList').data('selectedData', selectedData);
         showSelectedData();
     });
 
+    // 确定
     $('#submitSelected').on('click', function() {
-        var cb = parent[util.queryString('callback')];
-
-        if (typeof cb == 'function') {
-            var selectedData = $('#selectedList').data('selectedData') || [];
-
-            cb(selectedData);
+        if (typeof callback == 'function') {
+            callback(selectedData);
         }
     });
 
@@ -208,10 +211,13 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     //////////////
     
     function searchPeople(isSearch) {
-    	var depId = isSearch ? '' : treeObj.getSelectedNodes()[0].id;
-        var jobId = isSearch ? '' : $('#jobList li.selected').data('jobid');
+        if ($('#loading').is(':visible')) {
+            return;
+        }
+        
+    	var depID = isSearch ? '' : treeObj.getSelectedNodes()[0].id;
+        var jobID = isSearch ? '' : $('#jobList li.selected').data('jobid');
         var keyword = isSearch ? $('#search-keyword').val() : '';
-        var result = $('#peopleList').empty();
 
         $('#loading').show();
         $('.js-select-all[data-target="#peopleList"]').prop('checked', false);
@@ -219,13 +225,14 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         $.ajax({
         	url: apiUrl + 'Organization/GetPeopleResult',
         	data: {
-        		depId: depId,
-        		jobId: jobId,
+        		depID: depID,
+        		jobID: jobID,
         		keyword: keyword
         	},
         	dataType: 'jsonp',
         	success: function(data) {
         		$('#loading').hide();
+                var result = $('#peopleList').empty();
 
         		if (data && data.length > 0) {
                     var tr;
@@ -249,9 +256,8 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     }
 
     function getGroupPeople() {
-        var groupId = $('#jobList li.selected').data('id');
-        var ygId = $('#jobList li.selected').data('ygid');
-        var result = $('#peopleList').empty();
+        var groupID = $('#jobList li.selected').data('id');
+        var ygID = $('#jobList li.selected').data('ygid');
 
         $('#loading').show();
         $('.js-select-all[data-target="#peopleList"]').prop('checked', false);
@@ -259,12 +265,13 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         $.ajax({
             url: apiUrl + 'Organization/GetGroupPeopleList',
             data: {
-                groupId: groupId,
-                ygId: ygId
+                groupID: groupID,
+                ygID: ygID
             },
             dataType: 'jsonp',
             success: function(data) {
                 $('#loading').hide();
+                var result = $('#peopleList').empty();
 
                 if (data && data.length > 0) {
                     var tr;
@@ -288,7 +295,6 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     }
 
     function showSelectedData() {
-        var selectedData = $('#selectedList').data('selectedData');
         var result = $('#selectedList').empty();
         var tr;
 

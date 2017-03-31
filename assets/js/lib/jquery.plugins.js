@@ -589,7 +589,9 @@ $.extend($.fn, {
         // 复选框
         if (setting.checkbox) {
             html += '<th class="table-th" style="text-align: center;">'+
-                        '<input class="table-checkbox" type="checkbox" />'+
+                        '<div class="table-th-text">' +
+                            '<input class="table-checkbox" type="checkbox" />'+
+                        '</div>' +
                     '</th>';
         }
 
@@ -608,6 +610,14 @@ $.extend($.fn, {
 
                 if (menu.sort) {
                     colClass += ' table-sort';
+                    if (menu.sort === true) {
+                        menu.sort = {
+                            enable: true,
+                            async: true
+                        };
+                    } else {
+                        menu.sort.async = menu.sort.async === undefined ? true : menu.sort.async;
+                    }
 
                     // 查找默认排序
                     if (menu.sort.defaultOrder) {
@@ -699,7 +709,9 @@ $.extend($.fn, {
             if (setting.checkbox) {
                 tr.append(
                     '<td class="table-td" style="text-align: center;">' +
-                        '<input class="table-checkbox" type="checkbox" />' +
+                        '<div class="table-td-text">' +
+                            '<input class="table-checkbox" type="checkbox" />' +
+                        '</div>' +
                     '</td>'
                 );
             }
@@ -1009,6 +1021,8 @@ $.extend($.fn, {
     Table.prototype.sort = function (fieldIndex) {
         var setting = this.setting;
         var col = setting.colOptions[fieldIndex];
+        this.sasync = col.menu.sort.async;
+        
         var order = this.sorder;
         var name = this.sname;
         var type = col.menu.sort.type || 'string';

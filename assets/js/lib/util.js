@@ -37,30 +37,35 @@
             return isString ? it !== '' && Math.floor(it) === Number(it) : Math.floor(it) === it;
         },
 
-        // 数组循环
-        forEach: function (arr, callback) {
-            if (!util.isArray(arr)) {
-                throw new TypeError(arr + ' is not a Array');
-            }
+        // 遍历数组或对象
+        forEach: function (obj, iterator, context) {
+            var key;
 
-            var k = 0;
-            var O = Object(arr);
-            var len = O.length >>> 0;
-
-            if (!util.isFunction(callback)) {
-                throw new TypeError(callback + ' is not a Function');
-            }
-
-            while (k < len) {
-                var kValue;
-
-                if (k in O) {
-                    kValue = O[k];
-                    callback.call(O, kValue, k, O);
+            if (obj) {
+                if (util.isFunction(obj)) {
+                    for (key in obj) {
+                        // Need to check if hasOwnProperty exists,
+                        // as on IE8 the result of querySelectorAll is an object without a hasOwnProperty function
+                        if (key != 'prototype' && key != 'length' && key != 'name' && (!obj.hasOwnProperty || obj.hasOwnProperty(key))) {
+                          iterator.call(context, obj[key], key);
+                        }
+                    }
+                } else if (util.isArray(obj)) {
+                    for (key = 0; key < obj.length; key++) {
+                        iterator.call(context, obj[key], key);
+                    }
+                } else if (obj.forEach && obj.forEach !== util.forEach) {
+                    obj.forEach(iterator, context);
+                } else {
+                    for (key in obj) {
+                        if (obj.hasOwnProperty(key)) {
+                            iterator.call(context, obj[key], key);
+                        }
+                    }
                 }
-
-                k++;
             }
+
+            return obj;
         },
 
         // 在数组中查找项的位置
@@ -73,12 +78,12 @@
 
             if (arr.length > 0) {
                 util.forEach(arr, function (item, idx) {
-                    if (typeof item == 'object' && typeof key != 'undefined') {
-                        if (item[key] == value[key]) {
+                    if (typeof item === 'object' && typeof key !== 'undefined') {
+                        if (item[key] === value[key]) {
                             index = idx;
                         }
                     } else {
-                        if (item == value) {
+                        if (item === value) {
                             index = idx;
                         }
                     }
@@ -331,14 +336,14 @@
 
             return template.replace(/\#\{([\w\.]*)\}/g, function (s0, s1) {
                 if (s1 === '') {
-                    return templateData;
+                    return templateData || (emptyStrEscape ? '&nbsp;' : '');
                 }
                 
                 var namespaceList = s1.split('.');                
                 var data;
 
                 if (util.isObject(templateData)) {
-                    data = util.extend(true, {}, templateData);
+                    data = util.copy(templateData);
                 } else {
                     data = templateData;
                 }
@@ -353,63 +358,67 @@
             });
         },
 
-        // 拷贝对象，移植于jQuery
-        extend: function () {
-            var src, copyIsArray, copy, name, options, clone,
-                target = arguments[0] || {},
-                i = 1,
-                length = arguments.length,
-                deep = false;
+        // 拷贝对象，移植于AngularJS
+        copy: function (source, destination, stackSource, stackDest) {
+            if (!destination) {
+                destination = source;
+                if (source) {
+                    if (util.isArray(source)) {
+                        destination = util.copy(source, [], stackSource, stackDest);
+                    } else if (util.isObject(source)) {
+                        destination = util.copy(source, {}, stackSource, stackDest);
+                    }
+                }
+            } else {
+                if (source === destination) {
+                    throw new Error('Can\'t copy! Source and destination are identical.');
+                }
 
-            // Handle a deep copy situation
-            if ( typeof target === 'boolean' ) {
-                deep = target;
+                stackSource = stackSource || [];
+                stackDest = stackDest || [];
 
-                // skip the boolean and the target
-                target = arguments[ i ] || {};
-                i++;
-            }
+                if (util.isObject(source)) {
+                    var index = util.indexOf(stackSource, source);
 
-            // Handle case when target is a string or something (possible in deep copy)
-            if ( !util.isObject(target) && !util.isFunction(target) ) {
-                target = {};
-            }
+                    if (index !== -1) {
+                        return stackDest[index];
+                    }
 
-            for ( ; i < length; i++ ) {
-                // Only deal with non-null/undefined values
-                if ( (options = arguments[ i ]) != null ) {
-                    // Extend the base object
-                    for ( name in options ) {
-                        src = target[ name ];
-                        copy = options[ name ];
+                    stackSource.push(source);
+                    stackDest.push(destination);
+                }
 
-                        // Prevent never-ending loop
-                        if ( target === copy ) {
-                            continue;
+                var result;
+                if (util.isArray(source)) {
+                    destination.length = 0;
+                    for ( var i = 0; i < source.length; i++) {
+                        result = util.copy(source[i], null);
+                        if (util.isObject(source[i])) {
+                            stackSource.push(source[i]);
+                            stackDest.push(result);
                         }
-
-                        // Recurse if we're merging plain objects or arrays
-                        if ( deep && copy && (copyIsArray = util.isArray(copy) ) ) {
-                            if ( copyIsArray ) {
-                                copyIsArray = false;
-                                clone = src && util.isArray(src) ? src : [];
-                            } else {
-                                clone = src ? src : {};
-                            }
-
-                            // Never move original objects, clone them
-                            target[ name ] = util.extend( deep, clone, copy );
-
-                        // Don't bring in undefined values
-                        } else if ( copy !== undefined ) {
-                            target[ name ] = copy;
+                        destination.push(result);
+                    }
+                } else {
+                    if (util.isArray(destination)) {
+                        destination.length = 0;
+                    } else {
+                        util.forEach(destination, function(value, key) {
+                          delete destination[key];
+                        });
+                    }
+                    for ( var key in source) {
+                        result = util.copy(source[key], null, stackSource, stackDest);
+                        if (util.isObject(source[key])) {
+                            stackSource.push(source[key]);
+                            stackDest.push(result);
                         }
+                        destination[key] = result;
                     }
                 }
             }
-
-            // Return the modified object
-            return target;
+            
+            return destination;
         },
 
         // 格式化数字，将数字格式化成precision位数，separator分隔的数字

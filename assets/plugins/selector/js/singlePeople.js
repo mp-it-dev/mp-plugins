@@ -1,6 +1,8 @@
 require(['jquery', 'util', 'ztree'], function($, util) {
-	var apiUrl = decodeURIComponent(util.queryString('apiurl'));
-    var badge = util.queryString('badge');
+    var option = parent.selectorGlobal.singlePeople;
+    var apiUrl = option.apiUrl;
+    var badge = option.badge;
+    var callback = option.callback;
 	var rootNodes = [{ id: 'C01', name: '迈普通信', pid: null, isParent: true, nocheck: true }];
 
     if (badge) {
@@ -45,17 +47,17 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                     $.ajax({
                         url: apiUrl + 'Organization/GetJobNode',
                         data: {
-                            depId: treeNode.id
+                            depID: treeNode.id
                         },
                         dataType: 'jsonp',
                         success: function(data) {
-                            var html = '<li class="selected">' +
+                            var html = '<li class="selected" data-type="job">' +
                                             '<img src="./img/group.png" />' +
                                             '<span>所有职位</span>' +
                                         '</li>';
 
                             for (var i = 0; i < data.length; i++) {
-                                html += '<li data-type="job" data-jobid="' + data[i].JobId + '">'+
+                                html += '<li data-type="job" data-jobid="' + data[i].JobID + '">'+
                                             '<img src="./img/worker.png" />' +
                                             '<span>' + data[i].JobName + '</span>'+
                                         '</li>';
@@ -75,7 +77,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                             var html = '';
 
                             for (var i = 0; i < data.length; i++) {
-                                html += '<li data-type="group" data-id="' + data[i].Id + '" data-ygid="' + data[i].YgId + '">'+
+                                html += '<li data-type="group" data-id="' + data[i].ID + '" data-ygid="' + data[i].YgID + '">'+
                                             '<img src="./img/worker.png" />' +
                                             '<span>' + data[i].GroupName + '</span>'+
                                         '</li>';
@@ -112,18 +114,16 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     	$(this).addClass('selected');
 
     	if ($(this).data('type') == 'job') {
-           searchPeople(false);
+            searchPeople(false);
         } else {
             getGroupPeople();
         }
     });
 
-    $(document).on('click', '#peopleList tr', function() {    	
-    	var cb = parent[util.queryString('callback')];
-
-    	if (typeof cb == 'function') {
+    $(document).on('click', '#peopleList tr', function() {
+    	if (typeof callback == 'function') {
 	    	var data = $(this).data('data');
-    		cb(data);
+    		callback(data);
     	}
     });
 
@@ -142,23 +142,27 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     //////////////
     
     function searchPeople(isSearch) {
-    	var depId = isSearch ? '' : treeObj.getSelectedNodes()[0].id;
-    	var jobId = isSearch? '' : $('#jobList li.selected').data('jobid');
+        if ($('#loading').is(':visible')) {
+            return;
+        }
+
+    	var depID = isSearch ? '' : treeObj.getSelectedNodes()[0].id;
+    	var jobID = isSearch? '' : $('#jobList li.selected').data('jobid');
         var keyword = isSearch? $('#search-keyword').val() : '';
-        var result = $('#peopleList').empty();
 
         $('#loading').show();
 
         $.ajax({
         	url: apiUrl + 'Organization/GetPeopleResult',
         	data: {
-                depId: depId,
-                jobId: jobId,
+                depID: depID,
+                jobID: jobID,
         		keyword: keyword
         	},
         	dataType: 'jsonp',
         	success: function(data) {
         		$('#loading').hide();
+                var result = $('#peopleList').empty();
 
         		if (data && data.length > 0) {
         			var tr;
@@ -181,8 +185,8 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     }
 
     function getGroupPeople() {
-        var groupId = $('#jobList li.selected').data('id');
-        var ygId = $('#jobList li.selected').data('ygid');
+        var groupID = $('#jobList li.selected').data('id');
+        var ygID = $('#jobList li.selected').data('ygid');
         var result = $('#peopleList').empty();
 
         $('#loading').show();
@@ -191,8 +195,8 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         $.ajax({
             url: apiUrl + 'Organization/GetGroupPeopleList',
             data: {
-                groupId: groupId,
-                ygId: ygId
+                groupID: groupID,
+                ygID: ygID
             },
             dataType: 'jsonp',
             success: function(data) {

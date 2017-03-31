@@ -1,5 +1,7 @@
 require(['jquery', 'util', 'ztree'], function($, util) {
-	var apiUrl = decodeURIComponent(util.queryString('apiurl'));
+	var option = parent.selectorGlobal.singleJob;
+    var apiUrl = option.apiUrl;
+    var callback = option.callback;
 	var jobList = [];
 
     ///////////////
@@ -22,12 +24,10 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     });
     
     // 选中职位
-    $('#job-list').on('click', 'li', function () {  
-        var cb = parent[util.queryString('callback')];
-
-        if (typeof cb == 'function') {
+    $('#job-list').on('click', 'li', function () {
+        if (typeof callback == 'function') {
             var data = $(this).data('data');
-            cb(data);
+            callback(data);
         }
     });
 

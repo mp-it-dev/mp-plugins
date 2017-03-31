@@ -29,38 +29,43 @@
 
         // 是否为数字
         isNumber: function (it, isString) {
-            return isString ? !isNaN(Number(it)) && !isNaN(parseFloat(it)) : Object.prototype.toString.call(it) === '[object Number]';
+            return isString ? !isNaN(Number(it)) && !isNaN(parseFloat(it)) : Object.prototype.toString.call(it) === '[object Number]' && !isNaN(it);
         },
 
         // 是否为整数
         isInteger: function (it, isString) {
-            return isString ? Math.floor(it) === Number(it) : Math.floor(it) === it;
+            return isString ? it !== '' && Math.floor(it) === Number(it) : Math.floor(it) === it;
         },
 
-        // 数组循环
-        forEach: function (arr, callback) {
-            if (!util.isArray(arr)) {
-                throw new TypeError(arr + ' is not a Array');
-            }
+        // 遍历数组或对象
+        forEach: function (obj, iterator, context) {
+            var key;
 
-            var k = 0;
-            var O = Object(arr);
-            var len = O.length >>> 0;
-
-            if (!util.isFunction(callback)) {
-                throw new TypeError(callback + ' is not a Function');
-            }
-
-            while (k < len) {
-                var kValue;
-
-                if (k in O) {
-                    kValue = O[k];
-                    callback.call(O, kValue, k, O);
+            if (obj) {
+                if (util.isFunction(obj)) {
+                    for (key in obj) {
+                        // Need to check if hasOwnProperty exists,
+                        // as on IE8 the result of querySelectorAll is an object without a hasOwnProperty function
+                        if (key != 'prototype' && key != 'length' && key != 'name' && (!obj.hasOwnProperty || obj.hasOwnProperty(key))) {
+                          iterator.call(context, obj[key], key);
+                        }
+                    }
+                } else if (util.isArray(obj)) {
+                    for (key = 0; key < obj.length; key++) {
+                        iterator.call(context, obj[key], key);
+                    }
+                } else if (obj.forEach && obj.forEach !== util.forEach) {
+                    obj.forEach(iterator, context);
+                } else {
+                    for (key in obj) {
+                        if (obj.hasOwnProperty(key)) {
+                            iterator.call(context, obj[key], key);
+                        }
+                    }
                 }
-
-                k++;
             }
+
+            return obj;
         },
 
         // 在数组中查找项的位置
@@ -73,12 +78,12 @@
 
             if (arr.length > 0) {
                 util.forEach(arr, function (item, idx) {
-                    if (typeof item == 'object' && typeof key != 'undefined') {
-                        if (item[key] == value[key]) {
+                    if (typeof item === 'object' && typeof key !== 'undefined') {
+                        if (item[key] === value[key]) {
                             index = idx;
                         }
                     } else {
-                        if (item == value) {
+                        if (item === value) {
                             index = idx;
                         }
                     }
@@ -103,20 +108,25 @@
 
         // 去掉字符串两边的空格
         trim: function (str) {
-            if (typeof str !== 'string') {
-                throw new Error(str + ' is not a String');
+            if (!str) {
+                return str;
             }
 
-            return str.replace(/(^\s*)|(\s*$)/g, "");
+            return str.replace(/(^\s*)|(\s*$)/g, '');
         },
 
         // 格式化时间参数
-        // 参数1： date 日期对象
+        // 参数1： date 日期对象或可转为日期对象的值
         // 参数2： format 字符串，格式化形式，年月日用大写Y、M、D代表，时分秒分别用h、m、s代表，毫秒用S代表
         formatDate: function (date, format) {
-            if (!date instanceof Date) {
-                throw new Error(date + ' is not a Date object');
+            if (!(date instanceof Date)) {
+                date = new Date(date);
             }
+            if (isNaN(date.getDate())) {
+                return null;
+            }
+
+            format = format || 'YYYY/MM/DD hh:mm:ss';
 
             var o = {
                 'M+': date.getMonth() + 1,                      //month 
@@ -143,8 +153,6 @@
         // 格式化c#后台返回的/Date(1473133893427)/类型的时间
         formatMSDate: function (str, format) {
             var match = /\/Date\((\d+)\)\//.exec(str);
-            format = format || 'YYYY/MM/DD hh:mm:ss';
-
             return match ? util.formatDate(new Date(+match[1]), format) : '';
         },
 
@@ -323,16 +331,99 @@
         },
 
         // 解析模板中的变量
-        parseTpl: function (template, itemData) {
-            return template.replace(/\#\{([\w]*)\}/g, function (s0, s1) {
-                return s1 == '' ? itemData : itemData[s1] || '';
+        parseTpl: function (template, templateData, emptyStrEscape) {
+            emptyStrEscape = emptyStrEscape || false;
+
+            return template.replace(/\#\{([\w\.]*)\}/g, function (s0, s1) {
+                if (s1 === '') {
+                    return templateData || (emptyStrEscape ? '&nbsp;' : '');
+                }
+                
+                var namespaceList = s1.split('.');                
+                var data;
+
+                if (util.isObject(templateData)) {
+                    data = util.copy(templateData);
+                } else {
+                    data = templateData;
+                }
+
+                for (var i in namespaceList) {
+                    if ((data = data[namespaceList[i]]) === undefined) {
+                        break;
+                    }
+                }
+
+                return data || (emptyStrEscape ? '&nbsp;' : '');
             });
+        },
+
+        // 拷贝对象，移植于AngularJS
+        copy: function (source, destination, stackSource, stackDest) {
+            if (!destination) {
+                destination = source;
+                if (source) {
+                    if (util.isArray(source)) {
+                        destination = util.copy(source, [], stackSource, stackDest);
+                    } else if (util.isObject(source)) {
+                        destination = util.copy(source, {}, stackSource, stackDest);
+                    }
+                }
+            } else {
+                if (source === destination) {
+                    throw new Error('Can\'t copy! Source and destination are identical.');
+                }
+
+                stackSource = stackSource || [];
+                stackDest = stackDest || [];
+
+                if (util.isObject(source)) {
+                    var index = util.indexOf(stackSource, source);
+
+                    if (index !== -1) {
+                        return stackDest[index];
+                    }
+
+                    stackSource.push(source);
+                    stackDest.push(destination);
+                }
+
+                var result;
+                if (util.isArray(source)) {
+                    destination.length = 0;
+                    for ( var i = 0; i < source.length; i++) {
+                        result = util.copy(source[i], null);
+                        if (util.isObject(source[i])) {
+                            stackSource.push(source[i]);
+                            stackDest.push(result);
+                        }
+                        destination.push(result);
+                    }
+                } else {
+                    if (util.isArray(destination)) {
+                        destination.length = 0;
+                    } else {
+                        util.forEach(destination, function(value, key) {
+                          delete destination[key];
+                        });
+                    }
+                    for ( var key in source) {
+                        result = util.copy(source[key], null, stackSource, stackDest);
+                        if (util.isObject(source[key])) {
+                            stackSource.push(source[key]);
+                            stackDest.push(result);
+                        }
+                        destination[key] = result;
+                    }
+                }
+            }
+            
+            return destination;
         },
 
         // 格式化数字，将数字格式化成precision位数，separator分隔的数字
         formatNumber: function (num, precision, separator) {
-            //null is number 0?
-            if (num === null || isNaN(num)) {
+            if (!util.isNumber(num, true)) {
                 return num;
             }
 

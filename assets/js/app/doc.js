@@ -16,7 +16,7 @@ require.config({
 	}
 });
 
-require(['jquery', 'highlight', 'highlight/xml', 'highlight/css', 'highlight/javascript', 'tinymce'], function ($, hljs) {
+require(['jquery', 'highlight', 'highlight/xml', 'highlight/css', 'highlight/javascript', 'tinymce', 'plugins'], function ($, hljs) {
 	
 	hljs.tabReplace = '    ';
 	hljs.initHighlighting();
@@ -70,5 +70,19 @@ require(['jquery', 'highlight', 'highlight/xml', 'highlight/css', 'highlight/jav
 	$('.page-sidebar .nav li').click(function () {
 		$(this).siblings('li').removeClass('active');
 		$(this).addClass('active');
+	});
+
+	$('#example-autoComolete').autoComplete({
+		async: {
+	        url: 'http://192.168.4.86:100/Selector/Product/GetCpList',
+	        dataType: 'jsonp',
+	        dataField: null,
+	        searchField: 'name'
+	    },
+	    template: '<td width="100">#{ID}</td><td>#{Name}</td><td width="50">#{OriginData.SaleVersion}</td>',
+	    maxNum: 10,
+	    callback: function (data) {
+	    	$(this).val(data.zhengjiName);
+	    }
 	});
 });

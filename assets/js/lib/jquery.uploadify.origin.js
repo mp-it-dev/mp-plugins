@@ -114,6 +114,9 @@
             inputFile.prop('accept', fileTypeExts);
         }
 
+        if (setting.onInit) {
+            setting.onInit.call(this.ele, this);
+        }
         this.bindEvents();
     };
 
@@ -135,7 +138,8 @@
         onUploadProgress    : false,        // 上传中回调
         onUploadSuccess     : false,        // 上传成功回调
         onUploadError       : false,        // 上传出错回调
-        onUploadComplete    : false         // 上传完成回调
+        onUploadComplete    : false,        // 上传完成回调
+        onInit              : false         // 初始化完成回调
     };
 
     Uploadify.prototype.onSelect = function (file, path) {
@@ -209,8 +213,8 @@
                         <span class="file-name-text" title="#{name}">#{name}</span>\
                     </span>\
                     <span class="file-data">waiting</span>\
-                    <span class="file-operate">\
-                        <a class="file-cancel" href="#">取消</a>\
+                    <span class="file-opt">\
+                        <a class="file-opt-i file-cancel" href="#">取消</a>\
                     </span>\
                 </div>';
 
@@ -321,8 +325,8 @@
                         <span class="file-name-text" title="' + file.name + '">' + file.name + '</span>\
                     </span>\
                     <span class="file-data">' + util.getFileSize(file.size) + '</span>\
-                    <span class="file-operate">\
-                        <a class="file-del" href="#">删除</a>\
+                    <span class="file-opt">\
+                        <a class="file-opt-i file-del" href="#">删除</a>\
                     </span>\
                 </div>';
 

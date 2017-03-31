@@ -85,6 +85,17 @@ textarea.form-control {
     resize: vertical;
 }
 
+.table-row {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+}
+.table-cell {
+    display: table-cell;
+    vertical-align: middle;
+    word-break: break-all;
+}
+
 /*去除IE输入框后面的x和眼睛*/
 ::-ms-clear,
 ::-ms-reveal {
@@ -427,11 +438,17 @@ fieldset[disabled] .btn-primary:hover {
     padding: 7px 10px 7px 0;
     vertical-align: top;
 }
+.item-name.required {
+    position: relative;
+}
 .item-name.required:before {
     content: "*";
+    position: absolute;
+    left: -8px;
+    top: 13px;
+    font-size: 18px;
+    line-height: 1;
     color: red;
-    position: relative;
-    right: 2px;
 }
 .item-control {
     display: table-cell;
