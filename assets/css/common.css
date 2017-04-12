@@ -127,40 +127,6 @@ textarea.form-control {
 }
 /*table end*/
 
-/*滚动条 start*/
-.scrollbar::-webkit-scrollbar { /* 滚动条的滑轨背景颜色 */
-    width: 10px;
-    height: 10px;
-}
-.scrollbar::-webkit-scrollbar-track-piece {     /* 滚动条的滑轨 */
-    background-color: #e9e9e9;
-    -webkit-border-radius: 6px;
-}
-.scrollbar::-webkit-scrollbar-thumb:vertical {  /* 垂直滑块 */
-    height: 9px;
-    background-color: #aaa;
-    -webkit-border-radius: 6px;
-}
-.scrollbar::-webkit-scrollbar-thumb:horizontal {    /* 水平滑块 */
-    width: 9px;
-    background-color: #aaa;
-    -webkit-border-radius: 6px;
-}
-
-/*IE*/
-.scrollbar {
-    /*scrollbar-base-color: #fff;       滚动条的基本颜色*/
-    /*scrollbar-arrow-color: #e9e9e9;     三角箭头的颜色*/
-    /*scrollbar-face-color: #b46868;      立体滚动条的颜色*/
-    /*scrollbar-3dlight-color: #666;      立体滚动条亮边的颜色*/
-    /*scrollbar-highlight-color: #666;    滚动条空白部分的颜色*/
-    /*scrollbar-shadow-color: #999;       立体滚动条阴影的颜色*/
-    /*scrollbar-darkshadow-color: #666;   立体滚动条强阴影的颜色*/
-    /*scrollbar-track-color: #e9e9e9;        立体滚动条背景颜色*/
-}
-
-/*滚动条 end*/
-
 /*icon start*/
 .icon {
     display: inline-block;
