@@ -287,9 +287,6 @@ textarea.form-control {
     box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
     background-image: none;
 }
-.navbar-gray .dropdown-menu > li > a:hover {
-    
-}
 .navbar-gray .dropdown-menu > .active > a, 
 .navbar-gray .dropdown-menu > .active > a:focus, 
 .navbar-gray .dropdown-menu > .active > a:hover {
@@ -303,34 +300,6 @@ textarea.form-control {
 /*导航栏自定义样式 end*/
 
 /*panel样式重写 start*/
-.panel-info {
-    border-color: #2aabd2;
-}
-.panel-info > .panel-heading {
-    color: #fff;
-    background-image: -moz-linear-gradient(top, #5bc0de, #2aabd2);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#5bc0de), to(#2aabd2));
-    background-image: -webkit-linear-gradient(top, #5bc0de, #2aabd2);
-    background-image: -o-linear-gradient(top, #5bc0de, #2aabd2);
-    background-image: linear-gradient(to bottom, #5bc0de, #2aabd2);
-    background-repeat: repeat-x;
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff5bc0de', endColorstr='#ff2aabd2', GradientType=0);
-    border-color: #2aabd2;
-}
-.panel-primary {
-    border-color: #0044cc;
-}
-.panel-primary > .panel-heading {
-    color: #fff;
-    background-image: -moz-linear-gradient(top, #0088cc, #0044cc);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0088cc), to(#0044cc));
-    background-image: -webkit-linear-gradient(top, #0088cc, #0044cc);
-    background-image: -o-linear-gradient(top, #0088cc, #0044cc);
-    background-image: linear-gradient(to bottom, #0088cc, #0044cc);
-    background-repeat: repeat-x;
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0044cc', GradientType=0);
-    border-color: #0044cc;
-}
 .panel-default > .panel-heading {
     border-color: #e8e8e8;
 }
@@ -375,54 +344,6 @@ textarea.form-control {
     display: none;
 }
 /*panel样式重写 end*/
-
-/*按钮重写 start*/
-.btn-primary {
-    color: #ffffff;
-    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-    background-color: #006dcc;
-    background-image: -moz-linear-gradient(top, #0088cc, #0044cc);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0088cc), to(#0044cc));
-    background-image: -webkit-linear-gradient(top, #0088cc, #0044cc);
-    background-image: -o-linear-gradient(top, #0088cc, #0044cc);
-    background-image: linear-gradient(to bottom, #0088cc, #0044cc);
-    background-repeat: repeat-x;
-    border-color: #0044cc #0044cc #002a80;
-    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
-}
-
-.btn-primary:hover, 
-.btn-primary:focus, 
-.btn-primary:active, 
-.btn-primary.active, 
-.btn-primary:active:hover,
-.btn-primary.active:hover,
-.btn-primary:active:focus,
-.btn-primary.active:focus,
-.btn-primary.disabled, 
-.btn-primary.disabled.active, 
-.btn-primary.disabled.focus, 
-.btn-primary.disabled:active, 
-.btn-primary.disabled:focus, 
-.btn-primary.disabled:hover, 
-.btn-primary[disabled],
-.btn-primary[disabled].active, 
-.btn-primary[disabled].focus, 
-.btn-primary[disabled]:active, 
-.btn-primary[disabled]:focus, 
-.btn-primary[disabled]:hover, 
-fieldset[disabled] .btn-primary, 
-fieldset[disabled] .btn-primary.active, 
-fieldset[disabled] .btn-primary.focus, 
-fieldset[disabled] .btn-primary:active, 
-fieldset[disabled] .btn-primary:focus, 
-fieldset[disabled] .btn-primary:hover {
-    color: #fff;
-    background-color: #04c;
-    border-color: #0044cc #0044cc #002a80;
-    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
-}
-/*按钮样式重写 end*/
 
 /*表单行item start*/
 .item {

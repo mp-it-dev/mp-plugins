@@ -2,7 +2,6 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 	selector.baseUrl = './assets/plugins/selector/';
 	// selector.apiUrl = 'http://192.168.4.86:100/Selector/';
 
-	$('#cc').scrollbar();
 	$('#searchProduct').autoComplete({
 		async: {
             url: 'http://192.168.4.86:100/Selector/Product/GetCpList',
