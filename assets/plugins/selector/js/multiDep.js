@@ -44,10 +44,24 @@ require(['jquery', 'util', 'ztree'], function($, util) {
 			    });
             },
             onCheck: function (event, treeId, treeNode) {
-                var data = {
+                var nodeList = [{ 
                     DepID: treeNode.id,
                     DepName: treeNode.name
+                }];
+                var data = {
+                    DepID: treeNode.id,
+                    DepName: treeNode.name,
+                    NodeList: nodeList
                 };
+                var pNode = treeNode.getParentNode();
+
+                while (pNode != null && pNode.pid != null) {
+                    nodeList.unshift({
+                        DepID: pNode.id,
+                        DepName: pNode.name
+                    });
+                    pNode = pNode.getParentNode();
+                }
 
                 if (treeNode.checked) {
                     if (util.indexOf(selectedData, data, 'DepID') == -1) {

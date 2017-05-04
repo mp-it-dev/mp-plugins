@@ -37,14 +37,28 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                 //顶级节点不能选中
 		        if (treeNode.pid == null) {
                     return false;
-                }                
+                }
 
                 if (typeof callback == 'function') {
-                    var data = { 
+                    var nodeList = [{ 
                         DepID: treeNode.id,
                         DepName: treeNode.name
+                    }];
+                    var data = { 
+                        DepID: treeNode.id,
+                        DepName: treeNode.name,
+                        NodeList: nodeList
                     };
-                    
+                    var pNode = treeNode.getParentNode();
+
+                    while (pNode != null && pNode.pid != null) {
+                        nodeList.unshift({
+                            DepID: pNode.id,
+                            DepName: pNode.name
+                        });
+                        pNode = pNode.getParentNode();
+                    }
+
                     callback(data);
                 }
             }
