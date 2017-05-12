@@ -3550,6 +3550,7 @@ $.extend($.fn, {
     }
 
     AutoComplete.DEFAULTS = {
+        display: false,                 // 手动指定组件的display属性
         async: {                        // 远程请求获取数据参数，和ajax请求参数基本一致
             url: '',                    // 远程请求url
             type: 'GET',                // 请求方式
@@ -3575,9 +3576,8 @@ $.extend($.fn, {
     // 初始化
     AutoComplete.prototype.init = function () {
         var setting = this.setting;
-
         var styleObj = {
-            display: this.ele.css('display')
+            display: setting.display || this.ele.css('display')
         };
 
         var outer = $('<div class="ui-autoComplete"></div>').css(styleObj);
