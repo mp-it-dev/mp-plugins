@@ -36,10 +36,10 @@ require(['jquery', 'util', 'ztree'], function($, util) {
 			    	url: url,
 			    	dataType: 'jsonp',
 			    	success: function(dataList) {
-                        if (dataList && dataList.length) {
+                        if (dataList && dataList.length) {                            
                             for (var i = 0, l = dataList.length; i < l; i++) {
                                 var data = dataList[i];
-                                
+
                                 if (data.Type == type) {
                                     data.isParent = false;
                                     data.isLeaf = true;
@@ -50,7 +50,6 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                                     data.icon = './img/file.png';
                                 }
                             }
-
                             treeObj.addNodes(treeNode, dataList);
                         } else {
                             treeNode.isParent = false;

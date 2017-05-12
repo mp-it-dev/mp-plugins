@@ -161,6 +161,7 @@ $.extend($.fn, {
         colOptions      : [],                       // 列设置
         autoLoad        : true,                     // 是否自动加载数据
         autoEncode      : true,                     // 是否自动将html标记转为实体
+        textTruncation  : true,                     // 是否对超长字符串进行截断处理
 
         /*
          * colOptions格式：[{
@@ -764,13 +765,26 @@ $.extend($.fn, {
                 if (col.align) {
                     td.css('text-align', col.align);
                 }
+                if (setting.textTruncation) {
+                    div.addClass('text-ellipsis');
+                }
                 td.data('colOption', col);
 
-                // 如果返回的是DOM或jquery元素则使用append
-                if (text instanceof jQuery || util.isDOM(text)) {
+                // 如果返回的是DOM或jquery元素或html string，则使用append
+                if (text instanceof jQuery || util.isDOM(text)
+                ) {
                     div.append(text);
+                // 处理字符串类型，区分HTML字符串
+                } else if (typeof text === 'string') {
+                    var tempText = util.trim(text);
+                    if (tempText.charAt(0) === '<' && tempText.charAt(tempText.length - 1) === '>' && tempText.length >= 3) {
+                        div.append(tempText);
+                    } else {
+                        div.html(text).attr('title', text);
+                    }
                 } else {
-                    div.html((text === undefined || text === null) ? '' : text + '');
+                    text = text === undefined || text === null ? '' : text;
+                    div.html(text).attr('title', text);
                 }
             }
         }
