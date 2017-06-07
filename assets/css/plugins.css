@@ -101,9 +101,6 @@
     height: 100%;
     cursor: e-resize;
 }
-.table-container .table-border .table-th-resize {
-    right: -1px;
-}
 .table-container .table-th-menu {
     position: absolute;
     right: 2px;
@@ -348,6 +345,9 @@
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
 }
+.ui-select-sm .ui-select {
+    line-height: 1.5;
+}
 .ui-select.disabled {
     background-color: #eee;
     background-image: none;
@@ -370,6 +370,12 @@
 
     -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
     box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+}
+.ui-select-sm .ui-select-bar {
+    height: 30px;
+    padding: 5px 20px 5px 10px;
+    font-size: 12px;
+    border-radius: 3px;
 }
 .ui-select.disabled .ui-select-bar {
     background-color: #eee;
@@ -439,6 +445,9 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+.ui-select-sm .ui-select-list table td {
+    padding: 5px 10px;
 }
 .ui-select-list table tr:hover {
 	background-color: #e3e8f7;

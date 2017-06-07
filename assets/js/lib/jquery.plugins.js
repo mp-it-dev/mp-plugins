@@ -161,7 +161,7 @@ $.extend($.fn, {
         colOptions      : [],                       // 列设置
         autoLoad        : true,                     // 是否自动加载数据
         autoEncode      : true,                     // 是否自动将html标记转为实体
-        textTruncation  : true,                     // 是否对超长字符串进行截断处理
+        textTruncation  : false,                    // 是否对超长字符串进行截断处理
 
         /*
          * colOptions格式：[{

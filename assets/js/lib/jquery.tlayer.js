@@ -319,7 +319,7 @@
                 layerData = this.layerData,
                 settings = layerData.layers[layerID].settings;
 
-            if (settings.showMask && !maskLength) {
+            if (settings.showMask/* && !maskLength*/) {
                 maskLength++;
                 layerData.layers[layerID].layer.prepend('<div class="layer-box-mask">&nbsp;</div>');
             }

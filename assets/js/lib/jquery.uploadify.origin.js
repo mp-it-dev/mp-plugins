@@ -408,6 +408,21 @@
             e.preventDefault();
         });
 
+        ele.on('drop', '.uploadify-btn', function (e) {
+            var files = e.originalEvent.dataTransfer.files;
+
+            for (var i = 0, l = files.length; i < l; i++) {      
+                self.onSelect(files[i], null);                
+            }
+            e.stopPropagation();
+            e.preventDefault();
+        });
+
+        ele.on('dragenter dragover dragleave', '.uploadify-btn', function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+        });
+
         ele.on('change', '.uploadify-input-file', function (e) {
             if (this.files.length) {
                 for (var i = 0, l = this.files.length; i < l; i++) {      
