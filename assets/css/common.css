@@ -125,6 +125,16 @@ textarea.form-control {
 .table-fixed {
     table-layout: fixed;
 }
+.table-colorheader > thead > tr > th {
+    background-color: #eee;
+}
+.table-outline {
+    border: 0 solid #ddd !important;
+    border-width: 0 1px 1px !important;
+}
+.table-outline > thead > tr > th {
+    border-top: 1px solid #ddd !important;
+}
 /*table end*/
 
 /*icon start*/
