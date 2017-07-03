@@ -146,6 +146,10 @@
     font-size: 0;
 }
 
+.icon-cell {
+    width: 40px;
+}
+
 .layer-box-icon {
     display: inline-block;
     width: 40px;
@@ -161,8 +165,9 @@
 }
 
 .layer-type-tips .layer-box-content,
-.layer-type-msg .layer-box-content {
-    min-width: 200px;
+.layer-type-msg .layer-box-content,
+.layer-type-loading .layer-box-content {
+    min-width: 100px;
     height: 70px;
 }
 

@@ -34,7 +34,7 @@
 
         // 是否为整数
         isInteger: function (it, isString) {
-            return isString ? it !== '' && Math.floor(it) === Number(it) : Math.floor(it) === it;
+            return isString ? it !== '' && it.indexOf('.') === -1 && Math.floor(it) === Number(it) : Math.floor(it) === it;
         },
 
         // 遍历数组或对象

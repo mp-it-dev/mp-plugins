@@ -51,7 +51,7 @@
             /**
              * 以下参数为公用参数，更多参数设置可在相应的弹出层中查看
              */
-            var settings = $.extend({
+            var settings = $.extend(true, {
                 layerID         : false,        //自定义弹出框的id
                 zIndex          : 1100,         //弹出框的层级，数值越大弹出框的层级越高
                 showMask        : true,         //是否显示背景透明层
@@ -118,7 +118,7 @@
             var tlayer = _tlayer;
             tlayer.globalSettings = tlayer.globalSettings || {};
 
-            $.extend(tlayer.globalSettings, options || {});
+            $.extend(true, tlayer.globalSettings, options || {});
         },
         /**
          * [getLayer 获取layer对象]
@@ -340,7 +340,7 @@
             //生成头部区域HTML
             var headerHTML  =   '<div class="layer-box-header">'+
                                     '<div class="layer-title">'+settings.header+'</div>'+
-                                    (settings.closeBtn ? '<div id="layer-cancel" class="layer-cancel" title="关闭" unselectable="on" onselectstart="return false;">×</div>' : '')+
+                                    (settings.closeBtn ? '<div id="layer-cancel" class="layer-cancel" title="关闭">×</div>' : '')+
                                 '</div>';
 
             return headerHTML;
@@ -393,7 +393,7 @@
 
                 if (c.icon) {
                     html =  '<div class="layer-table">' +
-                                '<div class="layer-table-cell">' +
+                                '<div class="layer-table-cell icon-cell">' +
                                     '<span class="layer-box-icon" style="background-image: url('+settings.imgPath + c.icon+');"></span>' +       
                                 '</div>' +
                                 '<div class="layer-table-cell">' +
@@ -456,11 +456,10 @@
                     "id"            : button.buttonID ? ' id="'+button.buttonID+'"' : '',
                     "cls"         : ' class="btn ' + button.style+ '"',
                     "text"          : button.text || "&nbsp;",
-                    "title"         : 'title="' + (button.text || "&nbsp;") + '"',
-                    "unselectable"  : ' unselectable="on" onselectstart="return false;"'
+                    "title"         : 'title="' + (button.text || "&nbsp;") + '"'
                 };
 
-                buttonsHTML +=  '<button'+attrs.id+attrs.cls+attrs.title+attrs.unselectable+'>'+attrs.text+'</button>';
+                buttonsHTML +=  '<button'+attrs.id+attrs.cls+attrs.title+'>'+attrs.text+'</button>';
             }
 
             return buttonsHTML;
@@ -1129,6 +1128,7 @@
 
             //开启深度拷贝
             var settings = {
+                top             : false,
                 delay           : time || 1500,     //提示框框特有的延时消失时间，单位ms
                 showMask        : false,            //不显示阴影层
                 layerType       : 'tips',
@@ -1186,6 +1186,7 @@
         loading: function (msg) {
             //开启深度拷贝
             var settings = $.extend(true, {
+                top             : false,
                 layerType       : 'loading',
 
                 content: {

@@ -320,7 +320,19 @@ textarea.form-control {
     display: none;
 }
 /*panel样式重写 end*/
-
+/* 按钮扩展start */
+.btn-dark {
+    background-color: #424F63;
+    border-color: #374152;
+    color: #fff;
+}
+.btn-dark:hover,
+.btn-dark.active {
+    background-color: #374152;
+    border-color: #2e3644;
+    color: #fff;
+}
+/* 按钮扩展end */
 /*表单行item start*/
 .item {
     position: relative;
