@@ -158,6 +158,18 @@ $.extend($.fn, {
         rowParam        : false,                    // 行自定义参数，对象形式，支持函数返回
         colParam        : false,                    // 列自定义参数，对象形式，支持函数返回
         groupHeaders    : false,                    // 多表头设置
+        /*
+         * groupHeaders格式
+         * {
+         *      headers: [{
+                    startIndex: 1,
+                    numberOfColumns: 5,
+                    name: '一月'
+                }]
+         * }
+         */
+
+
         colOptions      : [],                       // 列设置
         autoLoad        : true,                     // 是否自动加载数据
         autoEncode      : true,                     // 是否自动将html标记转为实体
@@ -514,7 +526,7 @@ $.extend($.fn, {
             if (!self.isBindedEvent) {
                 self.bindEvents();
             }
-
+            self.resize();
             if (setting.onInit) {
                 setting.onInit.call(ele[0], setting);
             }
