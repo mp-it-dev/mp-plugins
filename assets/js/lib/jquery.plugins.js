@@ -526,7 +526,7 @@ $.extend($.fn, {
             if (!self.isBindedEvent) {
                 self.bindEvents();
             }
-            self.resize();
+
             if (setting.onInit) {
                 setting.onInit.call(ele[0], setting);
             }
@@ -1100,8 +1100,6 @@ $.extend($.fn, {
             var width = $(this).data('width') || 'auto';
             $(this).css('width', width);
         });
-
-        this.initTable();
     }
 
     /**
