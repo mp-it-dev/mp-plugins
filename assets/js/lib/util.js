@@ -469,8 +469,8 @@
 
             scrollDiv.style.position = 'absolute';
             scrollDiv.style.top = '-9999px';
-            scrollDiv.style.width = '1px';
-            scrollDiv.style.height = '1px';
+            scrollDiv.style.width = '100px';
+            scrollDiv.style.height = '100px';
             scrollDiv.style.overflow = 'scroll';
 
             body.appendChild(scrollDiv);
