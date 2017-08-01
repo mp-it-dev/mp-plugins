@@ -66,7 +66,7 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 		}, {
 			name: '邮箱',
 			field: 'Email',
-			minWidth: 200
+			minWidth: 500
 		}, {
 			name: '顶级部门名称',
 			field: 'ZeroDepName',
