@@ -37,7 +37,7 @@
 
 .layer-box-container {
     position: absolute;
-    border-radius: 6px;
+    border-radius: 4px;
     color: #000;
     background-color: #fff;
     background-clip: padding-box;
@@ -51,8 +51,8 @@
     width: 100%;
     border-bottom: 1px solid #eee;
     font-family: "微软雅黑";
-    border-top-left-radius: 6px;
-    border-top-right-radius: 6px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
 }
 
 .layer-box-container.default .layer-box-header {
@@ -117,10 +117,6 @@
 /* header 结束 */
 
 /* content 开始 */
-.layer-box-content {
-    overflow: auto;
-}
-
 .layer-iframe-container {
     overflow: visible;
 }

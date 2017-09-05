@@ -137,9 +137,8 @@
         /**
          * 关闭layerID对应的弹出窗口，并且销毁该窗口
          * @param  {String} layerID layer弹出框的id，不传代表关闭顶层弹窗
-         * @param  {Function} fn    关闭弹窗之后的回调函数
          */
-        close: function (layerID, fn) {
+        close: function (layerID) {
             var stack = _tlayer.layerData.stack;
             var layerData = _tlayer.layerData;
 
@@ -179,8 +178,8 @@
                 delete layerData.layers[layerID];
 
                 //执行回调
-                if (util.isFunction(fn)) {
-                    fn.call(this, layer);
+                if (util.isFunction(layer.settings.onClose)) {
+                    layer.settings.onClose.call(this, layer);
                 }
             });
         },
@@ -370,7 +369,6 @@
                     cStyle.push("width: "+c.width+"px");
                 }
             }
-
             if (c.height) {
                 if (typeof c.height == 'string') {
                     cStyle.push("height: "+c.height);
@@ -1112,7 +1110,7 @@
                 layerUtil.showLayer(layerID, function () {
                     //msg弹出框显示停留settings.delay时间（ms）后消失
                     setTimeout(function () {
-                        methods.close(layerID, settings.onClose);
+                        methods.close(layerID);
                     }, settings.delay);
                 });
             }
@@ -1236,7 +1234,7 @@
                     layerType       : 'conent',
                     closeBtn        : true,
                     content         : {
-                        width       : 600,
+                        width       : 800,
                         padding     : '15px'
                     }
                 }, options || {});

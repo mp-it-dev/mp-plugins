@@ -253,20 +253,24 @@ $.extend($.fn, {
     Table.prototype.initDOM = function () {
         var setting = this.setting;
         var ele = this.ele;
+        var holderHtml = this.initHolder();
+        var theadHtml = this.initThead();
         var html =  
             '<div class="table-container">' + 
-                '<div class="table-drag-line">&nbsp;</div>' +
+                '<div class="table-loading"></div>'+
                 (setting.tableCaption ? '<div class="table-caption"><a class="op_cl"><span></span></a><span>' + setting.tableCaption + '</div>' : '') +
-                '<div class="table-head">'+
-                    '<table class="table ' + setting.tableClass + '">' + 
-                        '<thead>' + this.initHolder() + this.initThead() + '</thead>'+
-                    '</table>' +
-                '</div>'+
-                '<div class="table-body">' +
-                    '<div class="table-loading">努力加载中...</div>'+
-                    '<table class="table table-hover ' + setting.tableClass + '">' + 
-                        '<thead>' + this.initHolder() + '</thead>' +
-                    '</table>' +
+                '<div class="table-content">' +
+                    '<div class="table-drag-line">&nbsp;</div>' +
+                    '<div class="table-head">'+
+                        '<table class="table ' + setting.tableClass + '">' + 
+                            '<thead>' + holderHtml + theadHtml + '</thead>'+
+                        '</table>' +
+                    '</div>'+
+                    '<div class="table-body">' +
+                        '<table class="table table-hover ' + setting.tableClass + '">' + 
+                            '<thead>' + holderHtml + '</thead>' +
+                        '</table>' +
+                    '</div>' +
                 '</div>' +
                 (setting.paging.enable ? '<div class="table-pager"></div>' : '') +
             '</div>';
@@ -416,7 +420,6 @@ $.extend($.fn, {
     Table.prototype.createTbody = function (showEmptyMsg) {
         var ele = this.ele;
         showEmptyMsg = showEmptyMsg !== undefined ? showEmptyMsg : true;
-        
         ele.find('.table-body .table tbody').remove();
 
         if (this.dataList.length == 0) {
@@ -447,34 +450,30 @@ $.extend($.fn, {
         setTimeout(function () {
             var thead = ele.find('.table-head');
             var tbody = ele.find('.table-body');
-            var theadHeight = thead.outerHeight(true);
-            var tbodyHeight = tbody.outerHeight(true);
-            var tpageHeight = ele.find('.table-pager').outerHeight(true);
             var sWidth = util.scrollBarWidth();
 
             // 设置最大高度
             if (setting.maxHeight) {
-                tbody.css('max-height', setting.maxHeight - theadHeight - tpageHeight);
+                tbody.css('max-height', setting.maxHeight);
             }
-
             // 设置高度
             if (setting.height) {
-                tbody.css('height', setting.height - theadHeight - tpageHeight);
+                tbody.css('height', setting.height);
             }
 
             var tbodyTable = tbody.find('.table');
             var theadLastTh = thead.find('.holder th:visible:last');
 
+            // 为了解决内层table造成的横向滚动条问题，原因暂时未查明
+            thead.css('padding-right', 1);
+            tbody.css('padding-right', 1);
             // 还原最后一列列宽
             if (thead.data('minusWidth')) {
                 var w = Math.max(parseInt(theadLastTh[0].style.width) || theadLastTh.width(), 40);
 
                 theadLastTh.width(w + sWidth);
-                thead.css('padding-right', 1);
-                tbody.css('padding-right', 1);
                 thead.removeData('minusWidth');
             }
-
             // 出现竖直滚动条则设置padding-right
             if (tbodyTable.outerHeight() > tbody.outerHeight()) {
                 var w = Math.max(parseInt(theadLastTh[0].style.width) || theadLastTh.width(), 40);
@@ -485,11 +484,6 @@ $.extend($.fn, {
                 thead.data('minusWidth', true);
             } else {
                 tbody.css('max-height', 'none');
-            }
-
-            // 解决IE8下高度会在最大高度基础上加上滚动条高度的bug
-            if (util.browser.msie && util.browser.version < 9 && tbody.getCss('max-height') && tbodyTable.outerWidth() > tbody.outerWidth()) {
-                tbody.css('max-height', tbody.getCss('max-height') - sWidth);
             }
 
             // 计算表格宽度
@@ -509,18 +503,8 @@ $.extend($.fn, {
                 tbodyThs.eq(i).width(w);
                 theadThs.eq(i).width(w);
             }
-
             // 设置总宽度防止拖动时变形
             ele.find('.table').css('width', totalW);
-
-            if (util.browser.msie) {
-                ele.find('.table-th-resize').each(function () {
-                    $(this).height($(this).parent().outerHeight());
-                });
-            }
-
-            // 设置拖动线高度
-            ele.find('.table-drag-line').height(ele.height() - tpageHeight);
 
             // 如果绑定过事件的话不需要再次绑定
             if (!self.isBindedEvent) {
@@ -652,8 +636,9 @@ $.extend($.fn, {
             }
 
             th.append('<div class="table-th-text">' + col.name + (menu && menu.sort ? '<span class="table-sort-icon"></span>' : '') + '</div>');
-            th.append('<div class="table-th-resize"></div>');
-
+            if (setting.resizable) {
+                th.append('<div class="table-th-resize"></div>');
+            }
             if (hasMenu(menu)) {
                 th.append('<div class="table-th-menu"><span class="glyphicon glyphicon-menu-hamburger"></span></div>');
             }
@@ -732,30 +717,28 @@ $.extend($.fn, {
             // 遍历列
             for (j = 0; j < colLen; j++) {
                 var col = colOptions[j];                
-                var text = undefined;
-                var val = undefined;
+                var text;
+                var val;
 
                 if (col.hide) {
                     continue;
                 }
-
                 if (col.field && data) {
                     val = data[col.field];
+                    text = val;
                 }
-
-                // 换行
-                if (typeof val === 'string') {
-                    // html编码
-                    if (setting.autoEncode) {
-                        val = util.htmlEncode(val);
-                    }
-                    val = val.replace(/\n/g, '<br>');
-                }
-
                 if (typeof col.handler === 'function') {
                     text = col.handler(val, data, col);
-                } else {
-                    text = val;
+                    val = text;
+                } else if (typeof text === 'string') {
+                    // html编码
+                    if (setting.autoEncode) {
+                        text = util.htmlEncode(text);
+                    }
+                    // 换行
+                    if (!setting.textTruncation) {
+                        text = text.replace(/\n/g, '<br>');
+                    }
                 }
 
                 var colParam = setting.colParam || {};
@@ -792,11 +775,11 @@ $.extend($.fn, {
                     if (tempText.charAt(0) === '<' && tempText.charAt(tempText.length - 1) === '>' && tempText.length >= 3) {
                         div.append(tempText);
                     } else {
-                        div.html(text).attr('title', text);
+                        div.html(text).attr('title', val);
                     }
                 } else {
                     text = text === undefined || text === null ? '' : text;
-                    div.html(text).attr('title', text);
+                    div.html(text).attr('title', val);
                 }
             }
         }
@@ -1089,20 +1072,6 @@ $.extend($.fn, {
     }
 
     /**
-     * [resize 窗口变化时重新计算表格宽度等信息]
-     * @return {[type]} [description]
-     */
-    Table.prototype.resize = function () {
-        var ele = this.ele;
-
-        ele.find('.table').css('width', '100%');
-        ele.find('.holder th').each(function () {
-            var width = $(this).data('width') || 'auto';
-            $(this).css('width', width);
-        });
-    }
-
-    /**
      * [bindEvents 绑定事件]
      * @return {[type]} [description]
      */
@@ -1118,16 +1087,7 @@ $.extend($.fn, {
 
         // 固定表头滚动
         ele.find('.table-body').on('scroll', function (e) {
-            var w = $(this).width();
-            var h = $(this).height();
-            var top = this.scrollTop;
-            var left = this.scrollLeft;
-
             ele.find('.table-head table').css('left', -this.scrollLeft);
-            ele.find('.table-loading').css({
-                top: h / 2 + top,
-                left: w / 2 + left
-            });
         });
 
         // 列宽度拖动阻止冒泡到排序等操作
@@ -1396,12 +1356,6 @@ $.extend($.fn, {
 
             e.preventDefault();
         });
-
-        $(window).on('resize', function () {
-            for (var i = 0, l = tables.length; i < l; i++) {
-                tables[i].resize();
-            }
-        });
     }());
     
     $.fn.table = function (method) {
@@ -1494,8 +1448,9 @@ $.extend($.fn, {
         if (setting.pageSizeArray && setting.pageSizeArray[0]) {
             setting.pageSize = setting.pageSizeArray[0];
         }
-
-        this.requestData(setting.pageIndex);
+        if (setting.autoLoad) {
+            this.requestData(setting.pageIndex);
+        }        
     }
 
     // 选项
@@ -1522,6 +1477,7 @@ $.extend($.fn, {
         skipPage        : true,                     // 是否启用跳页
         localPage       : false,                    // 是否本地分页
         localData       : false,                    // 保存本地数据
+        autoLoad        : true,                     // 自动加载
 
         beforeSend      : false,                    // 请求之前的回调
         complete        : false,                    // 请求完成的回调
@@ -2186,30 +2142,27 @@ $.extend($.fn, {
      * @param {[type]} value [description]
      */
     UiSelect.prototype.setValue = function (value) {
+        if (!value) return;
+
         var setting = this.setting;
         var dataList = setting.dataList;
+        var oldDataList = [];
 
         this.oldSelectedData = this.selectedData.slice(0);
         this.selectedData = [];
 
-        if (setting.multi && !$.isArray(value)) {
-            throw new Error('Need an array of value when multi option is true!');
-        }
-
-        if (!setting.multi && $.isArray(value)) {
-            throw new Error('Value can not be an array when multi option is false!');
-        }
-
-        if (!$.isArray(value)) {
-            value = [value];
+        if (setting.multi) {
+            oldDataList = value.split(setting.separator);
+        } else {
+            oldDataList = [value];
         }
 
         // 查找选中项
         for (var i = 0, l = dataList.length; i < l; i++) {
             var key = setting.valueField ? dataList[i][setting.valueField] : dataList[i];
 
-            for (var j = 0, jLen = value.length; j < jLen; j++) {
-                if ('' + key === '' + value[j]) {
+            for (var j = 0, jLen = oldDataList.length; j < jLen; j++) {
+                if ('' + key === '' + oldDataList[j]) {
                     this.selectedData.push(dataList[i]);
                 }
             }
@@ -2258,7 +2211,7 @@ $.extend($.fn, {
      * @param {[type]} value [description]
      */
     UiSelect.prototype.getSelectedData = function () {
-        return this.selectedData;
+        return this.setting.multi ? this.selectedData : this.selectedData[0];
     }
 
     /**

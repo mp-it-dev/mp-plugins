@@ -72,23 +72,17 @@
         indexOf: function (arr, value, key) {
             var index = -1;
 
-            if (!util.isArray(arr)) {
-                throw new TypeError(arr + ' is not a Array');
-            }
-
-            if (arr.length > 0) {
-                util.forEach(arr, function (item, idx) {
-                    if (typeof item === 'object' && typeof key !== 'undefined') {
-                        if (item[key] === value[key]) {
-                            index = idx;
-                        }
-                    } else {
-                        if (item === value) {
-                            index = idx;
-                        }
+            util.forEach(arr, function (item, idx) {
+                if (typeof item === 'object' && typeof key !== 'undefined') {
+                    if (item[key] === value[key]) {
+                        index = idx;
                     }
-                });
-            }
+                } else {
+                    if (item === value) {
+                        index = idx;
+                    }
+                }
+            });
 
             return index;
         },
@@ -197,8 +191,7 @@
         // 获取查询字符串
         queryString: function (key, url) {
             var o = {};
-
-            url = url ? url : window.location.href;
+            url = decodeURIComponent(url ? url : window.location.search);
 
             if (url && url.indexOf('?') > -1) {
                 var arr = url.split('?')[1].split('&');
