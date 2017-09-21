@@ -2000,8 +2000,8 @@ $.extend($.fn, {
         });
 
         // 如果数据为空则抛出异常
-        if (!setting.dataList || !setting.dataList.length) {
-            throw new Error('$.uiSelect require more than one data!');
+        if (!setting.dataList) {
+            setting.dataList = [];
         }
 
         if (!setting.multi) { // 如果是单选则默认选中第一个
@@ -3527,6 +3527,7 @@ $.extend($.fn, {
         dataList: [],                   // 数据列表，支持本地数据列表
         localSearchField: null,         // 本地搜索字段
         template: '<td>#{}</td>',       // 列表模板
+        resultAlign: 'left',            // 下拉框对齐位置，默认左对齐
         width: false,                   // 列表宽度
         maxHeight: 300,                 // 列表最大高度
         maxNum: null,                   // 最大显示条数
@@ -3544,7 +3545,7 @@ $.extend($.fn, {
         };
 
         var outer = $('<div class="ui-autoComplete"></div>').css(styleObj);
-        var inner = $('<div class="ui-autoComplete-result"><table></table></div>');
+        var inner = $('<div class="ui-autoComplete-result"><table><thead></thead><tbody></tbody></table></div>');
         this.ele.addClass('ui-autoComplete-input').wrap(outer);
         this.ele = this.ele.parent();
         this.ele.append(inner);
@@ -3554,8 +3555,10 @@ $.extend($.fn, {
             maxHeight: setting.maxHeight
         }
         
-        inner.css(styleObj);
-
+        if (setting.headerTemplate) {
+            inner.find('table thead').html('<tr>' + setting.headerTemplate + '</tr>');
+        }
+        inner.addClass(setting.resultAlign).css(styleObj);
         if (typeof setting.onInit == 'function') {
             setting.onInit.call(this.ele, this);
         }
@@ -3570,7 +3573,7 @@ $.extend($.fn, {
         var ele = this.ele;
         var setting = this.setting;
         
-        var table = ele.find('.ui-autoComplete-result table').empty();
+        var table = ele.find('.ui-autoComplete-result table tbody').empty();
         var resultContainer = ele.find('.ui-autoComplete-result');
         var len = setting.maxNum ? Math.min(setting.maxNum, setting.dataList.length) : setting.dataList.length;
 

@@ -910,14 +910,26 @@
     border: 1px solid #ddd;
     overflow: auto;
 }
+.ui-autoComplete-result.left {
+    left: 0;
+}
+.ui-autoComplete-result.right {
+    right: 0;
+}
 .ui-autoComplete-result table {
     width: 100%;
 }
+.ui-autoComplete-result table th,
 .ui-autoComplete-result table td {
     padding: 4px 10px;
+}
+.ui-autoComplete-result table td {
     word-break: break-all;
 }
-.ui-autoComplete-result table tr + tr {
+.ui-autoComplete-result table thead tr {
+    border-bottom: 1px dashed #ddd;
+}
+.ui-autoComplete-result table tbody tr + tr {
     border-top: 1px dashed #ddd;
 }
 .ui-autoComplete-result table tr:hover {
