@@ -62,7 +62,7 @@
 				theme: 'blue',
 				header: '单部门',				
 				content: {
-					width: 530,
+					width: 750,
 					height: 480,
 					padding: 0,
 					src: this.baseUrl + 'singleDep.html?t=' + new Date().getTime()
@@ -94,7 +94,7 @@
 				theme: 'blue',
 				header: '单职位',				
 				content: {
-					width: 530,
+					width: 750,
 					height: 480,
 					padding: 0,
 					src: this.baseUrl + 'singleJob.html?t=' + new Date().getTime()
@@ -110,7 +110,7 @@
 				theme: 'blue',
 				header: '多职位',
 				content: {
-					width: 530,
+					width: 750,
 					height: 480,
 					padding: 0,
 					src: this.baseUrl + 'multiJob.html?t=' + new Date().getTime()
@@ -126,7 +126,7 @@
 				theme: 'blue',
 				header: '单部门职位',
 				content: {
-					width: 530,
+					width: 750,
 					height: 480,
 					padding: 0,
 					src: this.baseUrl + 'singleDepJob.html?t=' + new Date().getTime()

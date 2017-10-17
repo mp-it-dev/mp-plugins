@@ -1,16 +1,17 @@
 require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], function ($, util, selector) {
 	selector.baseUrl = './assets/plugins/selector/';
-	// selector.apiUrl = 'http://192.168.4.86:100/Selector/';
+	selector.apiUrl = 'http://192.168.102.12:100/Selector/';
 
 	$('#searchProduct').autoComplete({
 		async: {
-            url: 'http://192.168.4.86:100/Selector/Product/GetCpList',
+            url: 'http://192.168.102.12:100/Selector/Product/GetCpList',
             dataType: 'jsonp',
             dataField: null,
             searchField: 'name',
             delay: 0
         },
         width: 300,
+        headerTemplate: '<th>ID</th><th>名称</th><th>版本</th>',
         template: '<td width="100">#{ID}</td><td>#{Name}</td><td width="50">#{OriginData.SaleVersion}</td>',
         maxNum: 10,
         callback: function (data) {

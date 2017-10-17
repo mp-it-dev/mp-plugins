@@ -30,6 +30,10 @@ require(['jquery', 'util', 'ztree'], function($, util) {
 
 			            treeNode.icon = './img/file.png';
 			            treeObj.updateNode(treeNode);
+                        // 第一次焦点自动聚焦
+                        if (treeNode.id === defaultNode.id) {
+                            $('#search-keyword').focus();
+                        }
 			    	}
 			    });
             },
@@ -80,11 +84,60 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     ///////////////
     //事件绑定
     //////////////
-    
-    
+    $('#search-keyword').on('keydown', function(e) {
+        if (e.which == 13) {
+            searchDep();
+        }
+    });
+
+    $('#search-btn').on('click', function(e) {
+        searchDep();
+    });    
+
+    $(document).on('click', '#depList tr', function() {
+        if (typeof callback == 'function') {
+            var data = $(this).data('data');
+            callback(data);
+        }
+    });
 
     //////////////
     ///函数声明
     //////////////
-    
+    function searchDep() {
+        var keyword = $('#search-keyword').val();
+
+        if (!keyword) return;
+        $('#loading').show();
+        $.ajax({
+            url: apiUrl + 'Organization/SearchDepResult',
+            data: {
+                keyword: keyword
+            },
+            dataType: 'jsonp',
+            success: function(data) {
+                $('#loading').hide();
+                var result = $('#depList tbody').empty();
+
+                if (data && data.length > 0) {
+                    var tr;
+                    var parentData;
+
+                    for (var i = 0; i < data.length; i++) {
+                        parentData = data[i].NodeList[data[i].NodeList.length - 2];
+                        tr = $(
+                            '<tr>' +
+                                '<td>' + data[i].DepID + '</td>' +
+                                '<td>' + data[i].DepName + '</td>' +
+                                '<td>' + (parentData ? parentData.DepID : '') + '</td>' +
+                                '<td>' + (parentData ? parentData.DepName : '') + '</td>' +
+                            '</tr>'
+                        ).data('data', data[i]);
+
+                        result.append(tr);
+                    }
+                }               
+            }
+        });
+    }
 });

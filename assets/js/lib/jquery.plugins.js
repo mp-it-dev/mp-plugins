@@ -1999,7 +1999,7 @@ $.extend($.fn, {
             return s1;
         });
 
-        // 如果数据为空则抛出异常
+        // 无数据源
         if (!setting.dataList) {
             setting.dataList = [];
         }
@@ -2051,6 +2051,8 @@ $.extend($.fn, {
      * @param {[type]} isTriggerChangeEvent [是否触发change事件]
      */
     UiSelect.prototype.setSelect = function (isTriggerChangeEvent) {
+        if (!this.selectedData.length) return;
+        
         var setting = this.setting;
         var selectedData = this.selectedData;
         var ele = this.ele;
@@ -3526,6 +3528,7 @@ $.extend($.fn, {
         },
         dataList: [],                   // 数据列表，支持本地数据列表
         localSearchField: null,         // 本地搜索字段
+        headerTemplate: null,           // 候选列表表头
         template: '<td>#{}</td>',       // 列表模板
         resultAlign: 'left',            // 下拉框对齐位置，默认左对齐
         width: false,                   // 列表宽度
@@ -3652,11 +3655,11 @@ $.extend($.fn, {
                         if (async.dataType) {
                             ajaxOpt.dataType = async.dataType;
                         }
-
-                        ajaxOpt.data[async.searchField] = val;
-
                         if (async.data) {
                             $.extend(true, ajaxOpt.data, typeof async.data == 'function' ? async.data() : async.data);
+                        }
+                        if (async.searchField) {
+                            ajaxOpt.data[async.searchField] = val;   
                         }
 
                         $.ajax(ajaxOpt);
@@ -3693,7 +3696,7 @@ $.extend($.fn, {
         });
     
         // 选中候选
-        ele.on('click', '.ui-autoComplete-result tr', function (e) {
+        ele.on('click', '.ui-autoComplete-result tbody tr', function (e) {
             if (typeof setting.callback == 'function') {
                 setting.callback.call(ele.find('.ui-autoComplete-input')[0], $(this).data('data'));
             }

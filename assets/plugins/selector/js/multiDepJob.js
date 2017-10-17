@@ -48,6 +48,10 @@ require(['jquery', 'util', 'ztree'], function($, util) {
 
 			            treeNode.icon = './img/file.png';
 			            treeObj.updateNode(treeNode);
+                        // 第一次焦点自动聚焦
+                        if (treeNode.id === defaultNode.id) {
+                            $('#search-keyword').focus();
+                        }
 			    	}
 			    });
             },
@@ -61,16 +65,35 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                 }
 
                 if (treeNode.checked) {
-                    if (util.indexOf(selectedData, data, 'JobID') == -1) {
+                    if (indexOf(data) == -1) {
                         selectedData.push(data);
                     } 
                 } else {
-                    util.removeOf(selectedData, data, 'JobID');
+                    removeOf(data);
                 }
                 showSelectedData();
             }
         }
     };
+
+    function indexOf(data) {
+        var index = -1;
+
+        for (var i in selectedData) {
+            if (selectedData[i].JobID === data.JobID && selectedData[i].DepID === data.DepID) {
+                index = i;
+            }
+        }
+
+        return index;
+    }
+
+    function removeOf(data) {
+        var index = indexOf(data);
+        if (index > -1) {
+            selectedData.splice(index, 1);
+        }
+    }
 
     ///////////////
     //页面初始化
@@ -88,6 +111,32 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     ///////////////
     //事件绑定
     //////////////
+    // 点击行勾选/取消勾选复选框
+    $(document).on('click', '#depJobList tr', function() {
+        var checked = !$(this).find('input[type="checkbox"]').prop('checked');
+        $(this).find('input[type="checkbox"]').prop('checked', checked).trigger('change');
+    });
+
+    // 加入选择或取消选择
+    $(document).on('change', '#depJobList input[type="checkbox"]', function() {
+        var data = $(this).parents('tr').data('data');
+
+        if ($(this).prop('checked')) {
+            if (indexOf(data) == -1) {
+                selectedData.push(data);
+            }
+        } else {
+            removeOf(data);
+        }
+
+        showSelectedData();
+
+        var totalNum = $('#depJobList input[type="checkbox"]').length;
+        var selectedNum = $('#depJobList input[type="checkbox"]:checked').length;
+
+        $('.js-select-all[data-target="#depJobList"]').prop('checked', totalNum == selectedNum);
+    });
+
     // 全选
     $(document).on('change', '.js-select-all', function(e) {      
         var checked = $(this).prop('checked');
@@ -118,7 +167,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         });
 
         for (var i = 0; i < delData.length; i++) {
-            util.removeOf(selectedData, delData[i], 'JobID');
+            removeOf(delData[i]);
         }
         
         showSelectedData();
@@ -131,25 +180,73 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         }
     });
 
+    // 搜索
+    $('#search-keyword').on('keydown', function(e) {
+        if (e.which == 13) {
+            searchDepJob();
+        }
+    });
+
+    // 搜索
+    $('#search-btn').on('click', function(e) {
+        searchDepJob();
+    });
     //////////////
     ///函数声明
     //////////////
     function showSelectedData() {
-        var result = $('#selectedList').empty();
+        var result = $('#selectedList tbody').empty();
         var tr;
 
         for (var i = 0; i < selectedData.length; i++) {
             tr = $(
                 '<tr>' +
-                    '<td width="40"><input type="checkbox"></td>' +
-                    '<td width="80">' + selectedData[i].DepID + '</td>' +
-                    '<td><div class="text-hidden" title="' + selectedData[i].DepName + '">' + (selectedData[i].DepName || '') + '</div></td>' +
-                    '<td width="80">' + selectedData[i].JobID + '</td>' +
+                    '<td><input type="checkbox"></td>' +
+                    '<td>' + selectedData[i].JobID + '</td>' +
                     '<td><div class="text-hidden" title="' + selectedData[i].JobName + '">' + (selectedData[i].JobName || '') + '</div></td>' +
+                    '<td>' + selectedData[i].DepID + '</td>' +
+                    '<td><div class="text-hidden" title="' + selectedData[i].DepName + '">' + (selectedData[i].DepName || '') + '</div></td>' +
                 '</tr>'
             ).data('index', i);                        
 
             result.append(tr);
         }
+    }
+
+    // 搜索部门职位
+    function searchDepJob() {
+        var keyword = $('#search-keyword').val();
+
+        if (!keyword) return;
+        $('#loading').show();
+        $.ajax({
+            url: apiUrl + 'Organization/SearchDepJobResult',
+            data: {
+                keyword: keyword
+            },
+            dataType: 'jsonp',
+            success: function(data) {
+                $('#loading').hide();
+                var result = $('#depJobList tbody').empty();
+
+                if (data && data.length > 0) {
+                    var tr;
+
+                    for (var i = 0; i < data.length; i++) {
+                        tr = $(
+                            '<tr>' +
+                                '<td><input type="checkbox"></td>' +
+                                '<td>' + data[i].JobID + '</td>' +
+                                '<td><div class="text-hidden" title="' + data[i].JobName + '">' + data[i].JobName + '</div></td>' +
+                                '<td>' + data[i].DepID + '</td>' +
+                                '<td><div class="text-hidden" title="' + data[i].DepName + '">' + data[i].DepName + '</div></td>' +
+                            '</tr>'
+                        ).data('data', data[i]);
+
+                        result.append(tr);
+                    }
+                }               
+            }
+        });
     }
 });

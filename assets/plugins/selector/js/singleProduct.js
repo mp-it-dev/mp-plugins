@@ -4,6 +4,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     var type = option.type || 'Cp';
     var zhujiOnly = option.zhujiOnly === undefined ? true : option.zhujiOnly;
     var callback = option.callback;
+    var filter = option.filter;
 
     var setting = {
         data: {
@@ -36,6 +37,9 @@ require(['jquery', 'util', 'ztree'], function($, util) {
 			    	url: url,
 			    	dataType: 'jsonp',
 			    	success: function(dataList) {
+                        if (filter) {
+                            dataList = filter(dataList);
+                        }
                         if (dataList && dataList.length) {                            
                             for (var i = 0, l = dataList.length; i < l; i++) {
                                 var data = dataList[i];
@@ -84,6 +88,9 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         url: apiUrl + 'Product/GetCpxList',
         dataType: 'jsonp',
         success: function (dataList) {
+            if (filter) {
+                dataList = filter(dataList);
+            }
             if (dataList && dataList.length) {
                 for (var i = 0, l = dataList.length; i < l; i++) {
                     var data = dataList[i];

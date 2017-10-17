@@ -36,6 +36,10 @@ require(['jquery', 'util', 'ztree'], function($, util) {
 
 			            treeNode.icon = './img/file.png';
 			            treeObj.updateNode(treeNode);
+                        // 第一次焦点自动聚焦
+                        if (treeNode.id === defaultNode.id) {
+                            $('#search-keyword').focus();
+                        }
 			    	}
 			    });
             },
@@ -162,7 +166,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         	dataType: 'jsonp',
         	success: function(data) {
         		$('#loading').hide();
-                var result = $('#peopleList').empty();
+                var result = $('#peopleList tbody').empty();
 
         		if (data && data.length > 0) {
         			var tr;
@@ -170,8 +174,8 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         			for (var i = 0; i < data.length; i++) {
                         tr = $(
                             '<tr>' +
-                                '<td width="80">' + data[i].Badge + '</td>' +
-                                '<td width="80">' + data[i].Name + '</td>' +
+                                '<td>' + data[i].Badge + '</td>' +
+                                '<td>' + data[i].Name + '</td>' +
                                 '<td><div class="text-hidden" title="' + data[i].DepName + '">' + data[i].DepName + '</div></td>' +
                                 '<td><div class="text-hidden" title="' + data[i].JobName + '">' + data[i].JobName + '</div></td>' +
                             '</tr>'
@@ -187,7 +191,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     function getGroupPeople() {
         var groupID = $('#jobList li.selected').data('id');
         var ygID = $('#jobList li.selected').data('ygid');
-        var result = $('#peopleList').empty();
+        var result = $('#peopleList tbody').empty();
 
         $('#loading').show();
         $('.js-select-all[data-target="#peopleList"]').prop('checked', false);
@@ -208,8 +212,8 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                     for (var i = 0; i < data.length; i++) {
                         tr = $(
                             '<tr>' +
-                                '<td width="80">' + data[i].Badge + '</td>' +
-                                '<td width="80">' + data[i].Name + '</td>' +
+                                '<td>' + data[i].Badge + '</td>' +
+                                '<td>' + data[i].Name + '</td>' +
                                 '<td><div class="text-hidden" title="' + data[i].DepName + '">' + (data[i].DepName || '') + '</div></td>' +
                                 '<td><div class="text-hidden" title="' + data[i].JobName + '">' + (data[i].JobName || '') + '</div></td>' +
                             '</tr>'

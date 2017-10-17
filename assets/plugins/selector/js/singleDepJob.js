@@ -36,6 +36,10 @@ require(['jquery', 'util', 'ztree'], function($, util) {
 
 			            treeNode.icon = './img/file.png';
 			            treeObj.updateNode(treeNode);
+                        // 第一次焦点自动聚焦
+                        if (treeNode.id === defaultNode.id) {
+                            $('#search-keyword').focus();
+                        }
 			    	}
 			    });
             },
@@ -72,11 +76,61 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     ///////////////
     //事件绑定
     //////////////
-    
-    
+    // 搜索
+    $('#search-keyword').on('keydown', function(e) {
+        if (e.which == 13) {
+            searchDepJob();
+        }
+    });
+
+    // 搜索
+    $('#search-btn').on('click', function(e) {
+        searchDepJob();
+    });    
+
+    // 选中搜索结果
+    $(document).on('click', '#depJobList tr', function() {
+        if (typeof callback == 'function') {
+            var data = $(this).data('data');
+            callback(data);
+        }
+    });
 
     //////////////
     ///函数声明
     //////////////
-    
+    function searchDepJob() {
+        var keyword = $('#search-keyword').val();
+
+        if (!keyword) return;
+        $('#loading').show();
+        $.ajax({
+            url: apiUrl + 'Organization/SearchDepJobResult',
+            data: {
+                keyword: keyword
+            },
+            dataType: 'jsonp',
+            success: function(data) {
+                $('#loading').hide();
+                var result = $('#depJobList tbody').empty();
+
+                if (data && data.length > 0) {
+                    var tr;
+
+                    for (var i = 0; i < data.length; i++) {
+                        tr = $(
+                            '<tr>' +
+                                '<td>' + data[i].JobID + '</td>' +
+                                '<td><div class="text-hidden" title="' + data[i].JobName + '">' + data[i].JobName + '</div></td>' +
+                                '<td>' + data[i].DepID + '</td>' +
+                                '<td><div class="text-hidden" title="' + data[i].DepName + '">' + data[i].DepName + '</div></td>' +
+                            '</tr>'
+                        ).data('data', data[i]);
+
+                        result.append(tr);
+                    }
+                }               
+            }
+        });
+    }
 });

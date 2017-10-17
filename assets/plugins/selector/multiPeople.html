@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="./css/bootstrap-theme.min.css">
 	<link rel="stylesheet" href="./css/zTreeStyle.css">
     <link rel="stylesheet" href="./css/common.css?v=20170309">
-	<link rel="stylesheet" href="./css/site.css?v=20170331">
+	<link rel="stylesheet" href="./css/site.css?v=20171017">
 </head>
 <body>
     <div class="container-selector selector-people">
@@ -46,8 +46,17 @@
     				</thead>
     			</table>
     		</div>
-    		<div class="part-content" style="height: 140px;">
-    			<table class="table table-hover table-condensed table-content" id="peopleList"></table>
+    		<div class="part-content" style="height: 146px;">
+    			<table class="table table-hover table-condensed table-content" id="peopleList">
+                    <colgroup>
+                        <col width="40">
+                        <col width="80">
+                        <col width="80">
+                        <col>
+                        <col>
+                    </colgroup>
+                    <tbody></tbody>    
+                </table>
     		</div>
             <h5 class="part-title">
                 已选员工
@@ -65,8 +74,17 @@
                     </thead>
                 </table>
             </div>
-            <div class="part-content" style="height: 140px;">
-                <table class="table table-hover table-condensed table-content" id="selectedList"></table>
+            <div class="part-content" style="height: 146px;">
+                <table class="table table-hover table-condensed table-content" id="selectedList">
+                    <colgroup>
+                        <col width="40">
+                        <col width="80">
+                        <col width="80">
+                        <col>
+                        <col>
+                    </colgroup>
+                    <tbody></tbody>
+                </table>
             </div>
             <h5 class="part-opt text-right">
                 <button class="btn btn-sm btn-danger" id="deleteSelected">删除</button>
@@ -76,6 +94,6 @@
     </div>
     <script src="./js/require.min.js"></script>
     <script src="./js/main.js?v=20170309"></script>
-    <script src="./js/multiPeople.js?v=20170329"></script>
+    <script src="./js/multiPeople.js?v=20171017"></script>
 </body>
 </html>
