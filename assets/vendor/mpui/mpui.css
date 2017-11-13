@@ -1,0 +1,155 @@
+@charset 'utf-8';
+/**
+ * angular 工具库样式文件
+ * @authors helin 
+ * @date    2017-10-30
+ * @version 0.1.0
+ */
+
+@font-face {
+    font-family: 'FontAwesome';
+    src: url('./fonts/fontawesome-webfont.eot?v=4.6.3');
+    src: url('./fonts/fontawesome-webfont.eot?#iefix&v=4.6.3') format('embedded-opentype'), url('./fonts/fontawesome-webfont.woff2?v=4.6.3') format('woff2'), url('../fonts/fontawesome-webfont.woff?v=4.6.3') format('woff'), url('./fonts/fontawesome-webfont.ttf?v=4.6.3') format('truetype'), url('./fonts/fontawesome-webfont.svg?v=4.6.3#fontawesomeregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.mpui-body-scrollbar-measure {
+    overflow: scroll !important;
+}
+.mpui-scrollbar-measure {
+    position: absolute !important;
+    top: -9999px !important;
+    width: 50px !important;
+    height: 50px !important;
+    overflow: scroll !important;
+}
+
+/* 表格start*/
+[mpui-tb] {
+    overflow: hidden;
+}
+.mpui-tb {
+    position: relative;
+}
+.mpui-tb-inner {
+    min-height: 0%;
+    overflow: auto;
+}
+.mpui-tb-header {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 1;
+    width: 100%;
+}
+.mpui-tb-header-outer {
+    overflow: hidden;
+}
+.mpui-tb-header-inner {    
+    position: relative;
+}
+.mpui-th-resize {
+    position: relative;
+    background-clip: padding-box; /* 解决th设置了position后border不显示的BUG */
+}
+.mpui-th-resize-line {
+    position: absolute;
+    right: -0.5px;
+    top: 0;
+    z-index: 1;
+    width: 5px;
+    height: 100%;
+    padding-left: 4px;
+    cursor: col-resize;
+}
+.mpui-th-resize-line::before {
+    content: '';
+    display: block;
+    width: 1px;
+    height: 100%;
+    background-color: #ddd;
+}
+.mpui-resizing {
+    cursor: col-resize;
+}
+/* 表格end */
+
+/* 表格排序start */
+.mpui-tb-order {
+    position: relative;
+    background-clip: padding-box; /* 解决th设置了position后border不显示的BUG */
+    cursor: pointer;
+}
+.mpui-tb-order::after {
+    font-family: FontAwesome;
+    content: "\f0dc";
+    line-height: 1;
+    position: absolute;
+    top: 50%;
+    margin-top: -0.5em;
+    margin-left: 2px;
+}
+.mpui-tb-order.asc,
+.mpui-tb-order.desc {
+    color: #428bca;
+}
+.mpui-tb-order.asc::after {
+    content: "\f0de";
+    margin-top: -0.25em;
+}
+.mpui-tb-order.desc::after {
+    content: "\f0dd";
+    margin-top: -0.75em;
+}
+/* 表格排序end */
+
+/* 分页start */
+.mpui-pager {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 12px;
+}
+.mpui-pager.justify {
+    text-align: left;
+}
+.mpui-pager-control,
+.mpui-pager-info {
+    display: inline-block;
+}
+.mpui-pager.justify .mpui-pager-control {
+    float: right;
+}
+.mpui-pager-control {
+    font-size: 0;
+}
+.mpui-pager-control .pagination {
+    margin: 0;
+}
+.mpui-pager-control .pagination > li > a, 
+.mpui-pager-control .pagination > li > span {
+    font-size: 12px;
+    line-height: 1.5;
+    padding: 5px 10px;    
+    cursor: pointer;
+}
+.mpui-pager-info {    
+    line-height: 30px;
+}
+.mpui-pager-info .text {
+    color: #428bca;
+    padding: 0 5px;
+}
+.mpui-pager-info input,
+.mpui-pager-info select {
+    height: 22px;
+    margin: 0 5px;
+    padding: 1px;
+    border: 1px solid #ccc;
+    outline: 0;
+}
+.mpui-pager-info input {
+    width: 30px;
+    text-align: center;
+}
+/* 分页end */

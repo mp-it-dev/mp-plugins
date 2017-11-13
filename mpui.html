@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+	<link rel="stylesheet" href="./assets/css/bootstrap.min.css">
+	<link rel="stylesheet" href="./assets/css/common.css">
+	<link rel="stylesheet" href="./assets/css/tlayer.css">
+	<link rel="stylesheet" href="./assets/vendor/mpui/mpui.css">
+	<link rel="stylesheet" href="./assets/css/site.css">
+</head>
+<body ng-controller="pageCtrl" ng-click="isShowColumnSetting = false;">
+    <div class="container-fluid">
+    	<h2 class="page-header">表格测试</h2>
+    	<div class="form-group form-inline row">
+    		<div class="col-md-6">
+    			<div class="dropdown" ng-class="{'open': isShowColumnSetting}" style="display: inline-block;">
+					<button type="button" class="btn btn-default" ng-click="toggleShowColumnSetting($event)">
+					    <span>列显示</span>
+					    <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu" ng-click="$event.stopPropagation()">
+						<li ng-repeat="column in columnList" style="padding: 3px 20px;">
+							<label style="cursor: pointer;">
+								<input type="checkbox" ng-model="column.isShow">
+								<span ng-bind="column.name"></span>
+							</label>
+						</li>
+					</ul>
+				</div>
+    		</div>    		
+    	</div>
+    	<div mpui-tb max-height="500" resize="true" default-order-by="{{sname}}" default-order-sort="{{sorder}}" on-sort="sort(orderBy, orderSort)">
+    		<table class="table table-outline table-grayheader">
+    			<colgroup>
+    				<col ng-repeat="column in columnList" width="{{column.width}}" ng-show="column.isShow">
+    			</colgroup>
+				<thead>
+					<tr>
+						<th ng-repeat="column in columnList" mpui-tb-order="{{column.field}}" ng-show="column.isShow">
+							<span ng-bind="column.name"></span>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="user in userList">
+						<td ng-repeat="column in columnList" ng-show="column.isShow">
+							<span ng-bind="column.handler ? column.handler(user[column.field], user, column) : user[column.field]"></span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+    	</div>
+    	<mpui-pager total="total" page-index="pageIndex" on-paging="onPaging(pageIndex, pageSize)"></mpui-pager>
+    </div>
+	<script src="./assets/vendor/lib/require.js"></script>
+	<script src="./assets/js/angular-config.js"></script>
+	<script src="./assets/js/app/mpui.js"></script>
+</body>
+</html>

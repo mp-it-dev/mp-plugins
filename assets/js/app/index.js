@@ -1,5 +1,5 @@
 require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], function ($, util, selector) {
-	selector.baseUrl = './assets/plugins/selector/';
+	selector.baseUrl = './assets/vendor/selector/';
 	selector.apiUrl = 'http://webapi.maipu.com/Selector/';
 
 	$('#searchProduct').autoComplete({
