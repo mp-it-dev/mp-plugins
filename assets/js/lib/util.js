@@ -27,14 +27,40 @@
             return Object.prototype.toString.call(it) === '[object Object]';
         },
 
-        // 是否为数字
-        isNumber: function (it, isString) {
-            return isString ? !isNaN(Number(it)) && !isNaN(parseFloat(it)) : Object.prototype.toString.call(it) === '[object Number]' && !isNaN(it);
+        /**
+         * [isNumber 数字判断]
+         * @param  {[type]}  it         [description]
+         * @param  {Boolean} isNullable [是否可以为null]
+         * @param  {Boolean} isNegative [是否可以为负数]
+         */
+        isNumber: function (it, isNullable, isNegative) {
+            return (isNullable && it === null || Object.prototype.toString.call(it) === '[object Number]' && !isNaN(it)) && (isNegative || it >= 0);
+        },
+
+        /**
+         * [isStringNumber 字符串数字判断]
+         * @param  {[type]}  it         [description]
+         * @param  {Boolean} isNullable [是否可以为null]
+         * @param  {Boolean} isNegative [是否可以为负数]
+         */
+        isStringNumber: function (it, isNullable, isNegative) {
+            if (it === undefined) {
+                return false;
+            }
+            return isNullable && (it === null || it === '') || !isNaN(Number(it)) && !isNaN(parseFloat(it)) && (isNegative || +it >= 0);
         },
 
         // 是否为整数
-        isInteger: function (it, isString) {
-            return isString ? it !== '' && it.indexOf('.') === -1 && Math.floor(it) === Number(it) : Math.floor(it) === it;
+        isInteger: function (it, isNullable, isNegative) {
+            return (isNullable && it === null || Math.floor(it) === it) && (isNegative || it >= 0);
+        },
+
+        // 是否为字符串整数
+        isStringInteger: function (it, isNullable, isNegative) {
+            if (it === undefined) {
+                return false;
+            }
+            return isNullable && (it === null || it === '') || String(it).indexOf('.') === -1 && Math.floor(it) === Number(it) && (isNegative || +it >= 0);
         },
 
         // 遍历数组或对象
@@ -412,6 +438,13 @@
             }
             
             return destination;
+        },
+
+        // 以目标对象的键，从源对象拷贝值
+        copyObjValue: function (dest, src) {
+            for (var i in dest) {
+                dest[i] = src[i];
+            }
         },
 
         // 格式化数字，将数字格式化成precision位数，separator分隔的数字

@@ -184,7 +184,11 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         var parentData;
 
         for (var i = 0; i < selectedData.length; i++) {
-            parentData = selectedData[i].NodeList[selectedData[i].NodeList.length - 2];
+            if (selectedData[i].NodeList) {
+                parentData = selectedData[i].NodeList[selectedData[i].NodeList.length - 2];
+            } else {
+                parentData = null;
+            }            
             tr = $(
                 '<tr>' +
                     '<td><input type="checkbox"></td>' +

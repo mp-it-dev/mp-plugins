@@ -2051,8 +2051,6 @@ $.extend($.fn, {
      * @param {[type]} isTriggerChangeEvent [是否触发change事件]
      */
     UiSelect.prototype.setSelect = function (isTriggerChangeEvent) {
-        if (!this.selectedData.length) return;
-        
         var setting = this.setting;
         var selectedData = this.selectedData;
         var ele = this.ele;
@@ -2082,13 +2080,15 @@ $.extend($.fn, {
                 table.find('.ui-select-checkAll').addClass('active');
             }
         } else {
-            var data = selectedData[0];
-            var key = setting.valueField ? data[setting.valueField] : data;
-            var item = setting.textField ? data[setting.textField] : data;
+            if (selectedData.length === 1) {
+                var data = selectedData[0];
+                var key = setting.valueField ? data[setting.valueField] : data;
+                var item = setting.textField ? data[setting.textField] : data;
 
-            table.find('[data-key="' + key + '"]').addClass('active');
-            selectedValue.push(key);
-            selectedText.push(item);
+                table.find('[data-key="' + key + '"]').addClass('active');
+                selectedValue.push(key);
+                selectedText.push(item);
+            }            
         }
 
         valueInput.val(selectedValue.join(setting.separator));
@@ -2144,8 +2144,6 @@ $.extend($.fn, {
      * @param {[type]} value [description]
      */
     UiSelect.prototype.setValue = function (value) {
-        if (!value) return;
-
         var setting = this.setting;
         var dataList = setting.dataList;
         var oldDataList = [];
@@ -2154,7 +2152,7 @@ $.extend($.fn, {
         this.selectedData = [];
 
         if (setting.multi) {
-            oldDataList = value.split(setting.separator);
+            oldDataList = value ? value.split(setting.separator) : [];
         } else {
             oldDataList = [value];
         }
@@ -2168,12 +2166,7 @@ $.extend($.fn, {
                     this.selectedData.push(dataList[i]);
                 }
             }
-        }
-
-        // 未找到
-        if (!this.selectedData.length) {
-            return;
-        }
+        }   
 
         // 判断新设置的值是否和旧值相同
         var isSame = false;

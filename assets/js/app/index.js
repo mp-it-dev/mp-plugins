@@ -1,6 +1,6 @@
 require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], function ($, util, selector) {
 	selector.baseUrl = './assets/plugins/selector/';
-	selector.apiUrl = 'http://192.168.102.12:100/Selector/';
+	selector.apiUrl = 'http://webapi.maipu.com/Selector/';
 
 	$('#searchProduct').autoComplete({
 		async: {
@@ -20,7 +20,7 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 	});
 	
 	var table = $("#table").table({
-		tableClass: 'table-bordered',
+		// tableClass: 'table-bordered',
 		height: 400,
 		url: 'http://192.168.102.12:100/Test/User/GetList?pageIndex=1&pageSize=0',
 		dataType: 'jsonp',
@@ -30,6 +30,7 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 		paging: {
 			enable: true,
 			localPage: true,
+			pageIndex: 13,
 			pageSize: 20,
 			pageSizeArray: [20, 40, 60]
 		},

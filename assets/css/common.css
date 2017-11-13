@@ -67,6 +67,7 @@ a:hover {
 }
 
 .text-ellipsis {
+    display: block;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -322,25 +323,28 @@ textarea.form-control {
 }
 /*panel样式重写 end*/
 /* 按钮扩展start */
-.btn-dark {
-    background-color: #424F63;
-    border-color: #374152;
-    color: #fff;
-}
 .btn-dark:hover,
 .btn-dark.active {
     background-color: #374152;
     border-color: #2e3644;
     color: #fff;
 }
-.btn-gray {
+.btn-dark,
+.btn-dark[disabled] {
+    background-color: #424F63;
+    border-color: #374152;
+    color: #fff;
+}
+.btn-gray:hover,
+.btn-gray.active {
+    border-color: #aaa;
+    background-color: #ccc;
+}
+.btn-gray,
+.btn-gray[disabled] {
     border-color: #ccc;
     background-color: #e4e7ea;
     color: #333;
-}
-.btn-gray:hover {
-    border-color: #aaa;
-    background-color: #ccc;
 }
 /* 按钮扩展end */
 /*表单行item start*/
