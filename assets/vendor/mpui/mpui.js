@@ -108,26 +108,25 @@ angular.module('mpui', ['mpui.tpls'])
 
 			// 表头拖动
 			function addResize () {
-				var tables = $ele.find('.mpui-tb-header-inner > table, .mpui-tb-body > table');
-				var isResizing = false;
-
-				// 鼠标滑过表头添加可拖动表示
+				// 鼠标滑过表头添加可拖动标识
 				$ele.on('mouseover', '.mpui-tb-header-inner > table > thead > tr > th', function (evt) {
-					if (!isResizing && !$(this).find('.mpui-th-resize-line').length) {
+					if (!$(this).find('.mpui-th-resize-line').length) {
 						$(this).addClass('mpui-th-resize');
 						$(this).append('<div class="mpui-th-resize-line"></div>');
 					}					
 				});
 
-				// 鼠标移开表头删除可拖动表示
+				// 鼠标移开表头删除可拖动标识
 				$ele.on('mouseleave', '.mpui-tb-header-inner > table > thead > tr > th', function (evt) {
-					if (isResizing) return;
 					$(this).removeClass('mpui-th-resize');
 					$(this).find('.mpui-th-resize-line').remove();
 				});
 
 				// 拖动
 				$ele.on('mousedown', '.mpui-th-resize-line', function (evt) {
+					evt.stopPropagation();
+					evt.preventDefault();
+
 					var $th = $(this).closest('th');
 					var index = $th.index();
 		        	var oldClientX = evt.clientX;
@@ -136,11 +135,10 @@ angular.module('mpui', ['mpui.tpls'])
 		        	var headerThs = $ele.find('.mpui-tb-header-inner > table > thead > tr > th');
 		        	var bodyCols = $ele.find('.mpui-tb-body > table > colgroup > col');
 		        	var bodyThs = $ele.find('.mpui-tb-body > table > thead > tr > th');
-
-		        	$document.find('body').addClass('mpui-resizing');
+		        	var resizeMask = $('<div class="mpui-resize-mask"></div>').appendTo('body');
 		        	isResizing = true;
 
-			        $document.on('mousemove.mpui-th-resize', function (evt) {
+			        resizeMask.on('mousemove.mpui-th-resize', function (evt) {
 			        	var newWidth = Math.max(evt.clientX - oldClientX + oldWidth, 20);
 			        	if (headerCols.length) {
 			        		headerCols.eq(index).attr('width', newWidth);
@@ -150,17 +148,14 @@ angular.module('mpui', ['mpui.tpls'])
 			        		bodyThs.eq(index).attr('width', newWidth);
 			        	}
 			        	evt.preventDefault();
+			        	evt.stopPropagation();
 			        });
 			        
-			        $document.on('mouseup.mpui-th-resize', function (evt) {
-			        	$document.off('mousemove.mpui-th-resize');
-			        	$document.off('mouseup.mpui-th-resize');
-			        	$document.find('body').removeClass('mpui-resizing');
-			        	if (evt.target !== $th[0]) {
-			        		$th.removeClass('mpui-th-resize');
-							$th.find('.mpui-th-resize-line').remove();
-			        	}
-			        	isResizing = false;
+			        resizeMask.on('mouseup.mpui-th-resize', function (evt) {
+						resizeMask.remove();
+			        	$th.find('.mpui-th-resize-line').remove();
+			        	evt.preventDefault();
+			        	evt.stopPropagation();
 			        });
 		        });
 			}
@@ -319,6 +314,47 @@ angular.module('mpui', ['mpui.tpls'])
 			};
 		}
 	};
+}])
+
+/**
+ * 下拉菜单指令，收起/展开切换
+ */
+.directive('mpuiDropdown', ['$document', function ($document) {
+    return {
+        restrict: 'EA',
+        link: function ($scope, $ele, $attrs) {
+            $ele.on('click', '> .btn', function (evt) {
+                evt.stopPropagation();
+                evt.preventDefault();
+                $ele.toggleClass('open');
+            });
+
+            $ele.on('click', '> .dropdown-menu', function (evt) {
+                evt.stopPropagation();
+            });
+
+            $document.find('body').on('click', function (evt) {
+                $ele.removeClass('open');
+            });
+        }
+    };
+}])
+
+/**
+ * 是否显示元素，依赖bootstrap的hidden类
+ */
+.directive('mpuiShow', [function () {
+    return {
+        link: function ($scope, $ele, $attrs) {
+            $scope.$watch($attrs.mpuiShow, function (value) {
+                if (value) {
+                    $ele.removeClass('hidden');
+                } else {
+                    $ele.addClass('hidden');
+                }
+            });
+        }
+    }
 }])
 
 /**

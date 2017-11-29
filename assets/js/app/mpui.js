@@ -28,7 +28,6 @@ require(['angular', 'mpui'], function (angular) {
 				}
 			];
 			$scope.userList = [];
-			$scope.isShowColumnSetting = false;
 			$scope.sname = 'Name';
 			$scope.sorder = 'asc';
 			$scope.total = 0;
@@ -51,15 +50,6 @@ require(['angular', 'mpui'], function (angular) {
 					$scope.userList = res.data;
 					$scope.total = res.total;
 				});
-			};
-
-			$scope.toggleShowColumnSetting = function (evt) {
-				$scope.isShowColumnSetting = !$scope.isShowColumnSetting;
-				evt.stopPropagation();
-			};
-
-			$scope.hideShowColumnSetting = function () {
-				$scope.isShowColumnSetting = false;
 			};
 
 			$scope.sort = function (orderBy, orderSort) {

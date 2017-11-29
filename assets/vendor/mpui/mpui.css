@@ -70,7 +70,13 @@
     height: 100%;
     background-color: #ddd;
 }
-.mpui-resizing {
+.mpui-resize-mask {
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
     cursor: col-resize;
 }
 /* 表格end */

@@ -177,7 +177,7 @@
 
             arr[0] = Number(arr[0]);
 
-            if (util.isNumber(arr[0], true)) {
+            if (util.isStringNumber(arr[0])) {
                 switch (arr[1].trim().toUpperCase()) {
                     case 'GB':
                         fileSize = arr[0] * 1024 * 1024 * 1024;
@@ -193,7 +193,7 @@
                 }
 
                 if (file.size > fileSize) {
-                    alert('超过文件大小限制！' + file.name);
+                    alert('文件大小超过限制(' + setting.fileSizeLimit + ')！' + file.name);
                     return;
                 }
             }

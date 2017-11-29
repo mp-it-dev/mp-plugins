@@ -3523,6 +3523,7 @@ $.extend($.fn, {
         localSearchField: null,         // 本地搜索字段
         headerTemplate: null,           // 候选列表表头
         template: '<td>#{}</td>',       // 列表模板
+        dataFilter: false,              // 数据过滤
         resultAlign: 'left',            // 下拉框对齐位置，默认左对齐
         width: false,                   // 列表宽度
         maxHeight: 300,                 // 列表最大高度
@@ -3575,7 +3576,7 @@ $.extend($.fn, {
 
         if (len > 0) {
             for (var i = 0; i < len; i++) {
-                var tr = $('<tr>' + util.parseTpl(setting.template, setting.dataList[i]) + '</tr>');
+                var tr = $('<tr>' + util.parseTpl(setting.template, typeof setting.dataFilter === 'function' ? setting.dataFilter(setting.dataList[i]) : setting.dataList[i]) + '</tr>');
 
                 tr.data('data', setting.dataList[i]).appendTo(table);
             }

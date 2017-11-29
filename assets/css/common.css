@@ -293,6 +293,9 @@ textarea.form-control {
     top: 3px;
     text-align: right;
 }
+.panel-option .btn + .btn {
+    margin-left: 10px;
+}
 .panel-dark {
     border: 1px solid #535a6c;
 }

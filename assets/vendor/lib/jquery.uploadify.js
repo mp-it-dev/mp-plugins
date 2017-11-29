@@ -727,7 +727,7 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 						}*/
 						break;
 					case SWFUpload.QUEUE_ERROR.FILE_EXCEEDS_SIZE_LIMIT:
-						alert("文件大小超过限制!");
+						alert("文件大小超过限制(" + settings.fileSizeLimit + ")！" + file.name);
 						//this.queueData.errorMsg += '\nThe file "' + file.name + '" exceeds the size limit (' + settings.fileSizeLimit + ').';
 						break;
 					case SWFUpload.QUEUE_ERROR.ZERO_BYTE_FILE:
