@@ -1,4 +1,4 @@
-require(['angular', 'mpui'], function (angular) {
+require(['angular', 'util', 'mpui'], function (angular, util) {
 	angular.module('app', ['mpui'])
 	.controller('pageCtrl', [
 		'$scope',
@@ -6,17 +6,22 @@ require(['angular', 'mpui'], function (angular) {
 		function ($scope, $http) {
 			$scope.columnList = [
 				{
-					name: '姓名',
-					field: 'Name',
-					width: 300,
-					isShow: true
-				}, {
 					name: '工号',
 					field: 'Badge',
 					width: 300,
 					isShow: true
 				}, {
-					name: '部门',
+					name: '姓名',
+					field: 'Name',
+					width: 300,
+					isShow: true
+				}, {
+					name: '姓名拼音',
+					field: 'SpellName',
+					width: 300,
+					isShow: true
+				}, {
+					name: '一级\n部门名称',
 					field: 'OneDepName',
 					width: 300,
 					isShow: true

@@ -52,7 +52,7 @@
 						</li>
 					</ul>
 				</div>
-    		</div>    		
+    		</div> 		
     	</div>
     	<div mpui-tb max-height="500" resize="true" default-order-by="{{sname}}" default-order-sort="{{sorder}}" on-sort="sort(orderBy, orderSort)">
     		<table class="table table-outline table-grayheader">
@@ -62,7 +62,7 @@
 				<thead>
 					<tr>
 						<th ng-repeat="column in columnList" mpui-tb-order="{{column.field}}" ng-show="column.isShow">
-							<span ng-bind="column.name"></span>
+							<span mpui-bind="column.name"></span>
 						</th>
 					</tr>
 				</thead>
@@ -75,7 +75,7 @@
 				</tbody>
 			</table>
     	</div>
-    	<mpui-pager total="total" page-index="pageIndex" on-paging="onPaging(pageIndex, pageSize)"></mpui-pager>
+    	<mpui-pager total="total" page-index="pageIndex" page-size="pageSize" on-paging="onPaging(pageIndex, pageSize)"></mpui-pager>
     </div>
 	<script src="./assets/vendor/lib/require.js"></script>
 	<script src="./assets/js/angular-config.js"></script>

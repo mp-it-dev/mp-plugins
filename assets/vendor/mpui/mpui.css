@@ -83,18 +83,13 @@
 
 /* 表格排序start */
 .mpui-tb-order {
-    position: relative;
-    background-clip: padding-box; /* 解决th设置了position后border不显示的BUG */
     cursor: pointer;
 }
 .mpui-tb-order::after {
     font-family: FontAwesome;
     content: "\f0dc";
-    line-height: 1;
-    position: absolute;
-    top: 50%;
-    margin-top: -0.5em;
-    margin-left: 2px;
+    position: relative;
+    left: 2px;
 }
 .mpui-tb-order.asc,
 .mpui-tb-order.desc {
@@ -102,11 +97,11 @@
 }
 .mpui-tb-order.asc::after {
     content: "\f0de";
-    margin-top: -0.25em;
+    top: 0.25em;
 }
 .mpui-tb-order.desc::after {
     content: "\f0dd";
-    margin-top: -0.75em;
+    top: -0.25em;
 }
 /* 表格排序end */
 

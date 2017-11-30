@@ -626,7 +626,7 @@
 
             var duration = settings.duration;
 
-            $layer[animation](duration, function () {
+            $layer[animation](0, function () {
                 //出栈
                 util.removeOf.call(layerData.stack, layerID);
 

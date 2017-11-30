@@ -36,6 +36,18 @@ function isStringInteger(it, isNullable, isNegative) {
     return isNullable && (it === null || it === '') || String(it).indexOf('.') === -1 && Math.floor(it) === Number(it) && (isNegative || +it >= 0);
 }
 
+// html 字符串编码
+function htmlEncode(str) {
+    if (typeof str !== 'string') {
+        return str;
+    }
+
+    return str.replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\"/g, '&quot;');
+}
+
 angular.module('mpui', ['mpui.tpls'])
 
 /**
@@ -135,7 +147,7 @@ angular.module('mpui', ['mpui.tpls'])
 		        	var headerThs = $ele.find('.mpui-tb-header-inner > table > thead > tr > th');
 		        	var bodyCols = $ele.find('.mpui-tb-body > table > colgroup > col');
 		        	var bodyThs = $ele.find('.mpui-tb-body > table > thead > tr > th');
-		        	var resizeMask = $('<div class="mpui-resize-mask"></div>').appendTo('body');
+		        	var resizeMask = $('<i class="mpui-resize-mask"></i>').appendTo('body');
 		        	isResizing = true;
 
 			        resizeMask.on('mousemove.mpui-th-resize', function (evt) {
@@ -246,7 +258,7 @@ angular.module('mpui', ['mpui.tpls'])
 		scope: {
 			total: '=',
 			pageIndex: '=?',
-			pageSizeArray: '=?',
+			pageSize: '=?',
 			pageLength: '=?',
 			pageInfo: '@?',
 			onPaging: '&'
@@ -255,8 +267,8 @@ angular.module('mpui', ['mpui.tpls'])
 			$scope.pageIndex = $scope.pageIndex || 1;
 			$scope.startIndex = $scope.pageIndex;
 			$scope.endIndex = 0;
-			$scope.pageSizeArray = $scope.pageSizeArray || [10, 20, 40, 80];
-			$scope.pageSize = $scope.pageSizeArray[0];
+			$scope.pageSize = $scope.pageSize || 20;
+			$scope.pageSizeArray = [$scope.pageSize, $scope.pageSize * 2, $scope.pageSize * 4, $scope.pageSize * 8];
 			$scope.pageInfo = $scope.pageInfo === 'false' ? false : true;
 			$scope.pageLength = $scope.pageLength || 5;
 
@@ -355,6 +367,22 @@ angular.module('mpui', ['mpui.tpls'])
             });
         }
     }
+}])
+
+/**
+ * 显示字符串，兼容ngBind和ngBindHtml
+ */
+.directive('mpuiBind', ['$sce', function ($sce) {
+	return {
+		restrict: 'A',
+	    link: function ($scope, $ele, $attrs) {
+	        $scope.$watch($attrs.mpuiBind, function (value) {
+	        	value = htmlEncode(value);
+		        value = typeof value === 'string' ? value.replace(/\n/g, '<br>') : value;
+	        	$ele.html(value);
+	        });
+	    }
+	}
 }])
 
 /**
