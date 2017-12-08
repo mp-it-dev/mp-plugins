@@ -3542,7 +3542,7 @@ $.extend($.fn, {
         };
 
         var outer = $('<div class="ui-autoComplete"></div>').css(styleObj);
-        var inner = $('<div class="ui-autoComplete-result"><table><thead></thead><tbody></tbody></table></div>');
+        var inner = $('<div class="ui-autoComplete-result"><table><thead></thead><tbody></tbody></table><div class="no-result">无结果</div></div>');
         this.ele.addClass('ui-autoComplete-input').wrap(outer);
         this.ele = this.ele.parent();
         this.ele.append(inner);
@@ -3580,16 +3580,16 @@ $.extend($.fn, {
 
                 tr.data('data', setting.dataList[i]).appendTo(table);
             }
-
-            resultContainer.show().scrollTop(0);
-
-            if (setting.autoHide) {
-                setTimeout(function () {
-                    resultContainer.hide();
-                }, 3000);
-            }
+            resultContainer.find('.no-result').hide();
         } else {
-        	resultContainer.hide();
+        	resultContainer.find('.no-result').show();
+        }
+
+        resultContainer.show().scrollTop(0);
+        if (setting.autoHide) {
+            setTimeout(function () {
+                resultContainer.hide();
+            }, 3000);
         }
     }
 
@@ -3629,6 +3629,8 @@ $.extend($.fn, {
                 self.requestTimes++;
 
                 if (val.length < setting.async.minKeywordLength) {
+                    setting.dataList = [];
+                    self.showList();
                     return true;
                 }
 
