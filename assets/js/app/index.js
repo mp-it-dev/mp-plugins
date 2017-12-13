@@ -8,7 +8,8 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
             dataType: 'jsonp',
             dataField: null,
             searchField: 'name',
-            delay: 0
+            delay: 0,
+            minKeywordLength: 1
         },
         width: 300,
         headerTemplate: '<th>ID</th><th>名称</th><th>版本</th>',

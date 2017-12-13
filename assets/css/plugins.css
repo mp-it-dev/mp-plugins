@@ -937,6 +937,10 @@
     color: #0088cc;
     cursor: default;
 }
+.ui-autoComplete-result .no-result {
+    padding: 4px 10px;
+    text-align: center;
+}
 /*input自动补全 end*/
 
 /*正则验证 start*/
