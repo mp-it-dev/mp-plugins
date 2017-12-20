@@ -370,18 +370,16 @@ angular.module('mpui', ['mpui.tpls'])
 }])
 
 /**
- * 显示字符串，兼容ngBind和ngBindHtml
+ * 不换行显示字符串，超出截断
  */
-.directive('mpuiBind', ['$sce', function ($sce) {
+.directive('mpuiEllipsis', ['$sce', function ($sce) {
 	return {
 		restrict: 'A',
-	    link: function ($scope, $ele, $attrs) {
-	        $scope.$watch($attrs.mpuiBind, function (value) {
-	        	value = htmlEncode(value);
-		        value = typeof value === 'string' ? value.replace(/\n/g, '<br>') : value;
-	        	$ele.html(value);
-	        });
-	    }
+        replace: true,
+        scope: {
+            textTruncation: '='
+        },
+        template: '<div class="text-ellipsis" title="{{textTruncation}}">{{textTruncation}}</div>'
 	}
 }])
 
@@ -444,9 +442,9 @@ angular.module('mpui.tpls', [])
     	'</div>'
 	);
 	$templateCache.put('mpui-pager.html', 
-		'<div class="mpui-pager" ng-class="{\'justify\': pageInfo}">' +
+		'<div class="mpui-pager" mpui-show="totalPage" ng-class="{\'justify\': pageInfo}">' +
     		'<div class="mpui-pager-control">' +
-    			'<ul class="pagination" ng-if="totalPage">' +
+    			'<ul class="pagination">' +
     				'<li><a title="第一页" ng-click="goPage(1, $event)">«</a></li>' +
     				'<li ng-repeat="page in pageList" ng-class="{\'active\': page === pageIndex}"><a ng-click="goPage(page, $event)" ng-bind="page"></a></li>' +
     				'<li class="disabled" ng-if="endIndex < totalPage"><a>...</a></li>' +

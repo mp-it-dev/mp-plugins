@@ -72,6 +72,10 @@ a:hover {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+.text-prewrap {
+    white-space: pre-wrap;
+    word-break: break-all;
+}
 
 .checkbox-inline, .radio-inline {
     padding-left: 15px;
