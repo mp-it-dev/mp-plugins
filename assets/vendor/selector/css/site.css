@@ -64,8 +64,10 @@ body {
 	width: 180px;
 }
 .container-selector .part.result {
+	width: 510px;
+}
+.selector-people .part.result {
 	width: 460px;
-	/* border-left: 1px solid #ddd; */
 }
 .ztree {
 	padding: 0;
@@ -120,6 +122,9 @@ body {
 .table.table-content > tbody > tr:hover {
 	cursor: pointer;
 	color: #368ee0;
+}
+.part-opt {	
+	margin-top: 8px;
 }
 .part-opt .btn + .btn {
 	margin-left: 20px;

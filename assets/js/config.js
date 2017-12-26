@@ -14,5 +14,5 @@ require.config({
             deps: ['jquery']
         }
     },
-    urlArgs: 'v=1'   //开发环境下禁用缓存，生产环境要移除
+    urlArgs: 'v=2'   //开发环境下禁用缓存，生产环境要移除
 });

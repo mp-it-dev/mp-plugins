@@ -19,14 +19,30 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         		treeObj.updateNode(treeNode);
 
             	$.ajax({
-			    	url: apiUrl + 'Organization/GetDepNode?pid=' + treeNode.id,
+			    	url: apiUrl + 'Organization/GetDepResult',
+                    data: {
+                        parentDepID: treeNode.id === 'C01' ? '' : treeNode.id
+                    },
 			    	dataType: 'jsonp',
-			    	success: function(data) {
-						if (data && data.length > 0) {
-			                treeObj.addNodes(treeNode, data);
-			            } else {
-			                treeNode.isParent = false;
-			            }
+			    	success: function(dataList) {
+						if (dataList && dataList.length > 0) {
+                            var nodes = [];
+                            var data;
+                            for (var i in dataList) {
+                                data = dataList[i];
+                                nodes.push({
+                                    id: data.DepID,
+                                    name: data.DepName,
+                                    pid: treeNode.id,
+                                    icon: './img/file.png',
+                                    isParent: true,
+                                    originData: data
+                                });
+                            }
+                            treeObj.addNodes(treeNode, nodes);
+                        } else {
+                            treeNode.isParent = false;
+                        }
 
 			            treeNode.icon = './img/file.png';
 			            treeObj.updateNode(treeNode);
@@ -44,26 +60,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                 }
 
                 if (typeof callback == 'function') {
-                    var nodeList = [{ 
-                        DepID: treeNode.id,
-                        DepName: treeNode.name
-                    }];
-                    var data = { 
-                        DepID: treeNode.id,
-                        DepName: treeNode.name,
-                        NodeList: nodeList
-                    };
-                    var pNode = treeNode.getParentNode();
-
-                    while (pNode != null && pNode.pid != null) {
-                        nodeList.unshift({
-                            DepID: pNode.id,
-                            DepName: pNode.name
-                        });
-                        pNode = pNode.getParentNode();
-                    }
-
-                    callback(data);
+                    callback(treeNode.originData);
                 }
             }
         }
@@ -86,53 +83,57 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     //////////////
     $('#search-keyword').on('keydown', function(e) {
         if (e.which == 13) {
-            searchDep();
+            var keyword = $('#search-keyword').val();
+            getDepResult(undefined, keyword);
         }
     });
 
     $('#search-btn').on('click', function(e) {
-        searchDep();
+        var keyword = $('#search-keyword').val();
+        getDepResult(undefined, keyword);
     });    
 
     $(document).on('click', '#depList tr', function() {
         if (typeof callback == 'function') {
-            var data = $(this).data('data');
-            callback(data);
+            callback($(this).data('data'));
         }
     });
 
     //////////////
     ///函数声明
     //////////////
-    function searchDep() {
-        var keyword = $('#search-keyword').val();
-
-        if (!keyword) return;
+    
+    // 搜索部门
+    function getDepResult(parentDepID, keyword) {
+        if (!parentDepID && !keyword) return;
         $('#loading').show();
         $.ajax({
-            url: apiUrl + 'Organization/SearchDepResult',
+            url: apiUrl + 'Organization/GetDepResult',
             data: {
+                parentDepID: parentDepID === 'C01' ? '' : parentDepID,
                 keyword: keyword
             },
             dataType: 'jsonp',
-            success: function(data) {
+            success: function(dataList) {
                 $('#loading').hide();
                 var result = $('#depList tbody').empty();
 
-                if (data && data.length > 0) {
+                if (dataList && dataList.length > 0) {
                     var tr;
+                    var data;
                     var parentData;
 
-                    for (var i = 0; i < data.length; i++) {
-                        parentData = data[i].NodeList[data[i].NodeList.length - 2];
+                    for (var i = 0; i < dataList.length; i++) {
+                        data = dataList[i];
+                        parentData = data.NodeList[data.NodeList.length - 2];
                         tr = $(
                             '<tr>' +
-                                '<td>' + data[i].DepID + '</td>' +
-                                '<td>' + data[i].DepName + '</td>' +
+                                '<td>' + data.DepID + '</td>' +
+                                '<td>' + data.DepName + '</td>' +
                                 '<td>' + (parentData ? parentData.DepID : '') + '</td>' +
                                 '<td>' + (parentData ? parentData.DepName : '') + '</td>' +
                             '</tr>'
-                        ).data('data', data[i]);
+                        ).data('data', data);
 
                         result.append(tr);
                     }

@@ -250,15 +250,15 @@ angular.module('mpui', ['mpui.tpls'])
 /**
  * 分页指令
  */
-.directive('mpuiPager', [function () {
+.directive('mpuiPager', ['$timeout', function ($timeout) {
 	return {
 		restrict: 'EA',
 		replace: true,
 		templateUrl: 'mpui-pager.html',
 		scope: {
 			total: '=',
-			pageIndex: '=?',
-			pageSize: '=?',
+			pageIndex: '=',
+			pageSize: '=',
 			pageLength: '=?',
 			pageInfo: '@?',
 			onPaging: '&'
@@ -279,7 +279,9 @@ angular.module('mpui', ['mpui.tpls'])
 				}
 				$scope.pageIndex = pageIndex;
 				calcPage();
-				$scope.onPaging({ pageIndex: $scope.pageIndex, pageSize: $scope.pageSize });
+				$timeout(function () {
+					$scope.onPaging({ pageIndex: $scope.pageIndex, pageSize: $scope.pageSize });
+				});
 			};
 
 			$scope.skipPage = function (evt) {

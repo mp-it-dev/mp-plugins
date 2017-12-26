@@ -19,20 +19,30 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         		treeObj.updateNode(treeNode);
 
             	$.ajax({
-			    	url: apiUrl + 'Organization/GetDepJobNode?pid=' + treeNode.id,
+			    	url: apiUrl + 'Organization/GetDepResult',
+                    data: {
+                        parentDepID: treeNode.id === 'C01' ? '' : treeNode.id
+                    },
 			    	dataType: 'jsonp',
-			    	success: function(data) {
-						if (data && data.length > 0) {
-                            for (var i = 0, l = data.length; i < l; i++) {
-                                if (data[i].id.indexOf('J') > -1) {
-                                    data[i].icon = './img/worker.png';
-                                }
+			    	success: function(dataList) {
+						if (dataList && dataList.length > 0) {
+                            var nodes = [];
+                            var data;
+                            for (var i in dataList) {
+                                data = dataList[i];
+                                nodes.push({
+                                    id: data.DepID,
+                                    name: data.DepName,
+                                    pid: treeNode.id,
+                                    icon: './img/file.png',
+                                    isParent: true,
+                                    originData: data
+                                });
                             }
-
-			                treeObj.addNodes(treeNode, data);
-			            } else {
-			                treeNode.isParent = false;
-			            }
+                            treeObj.addNodes(treeNode, nodes);
+                        } else {
+                            treeNode.isParent = false;
+                        }
 
 			            treeNode.icon = './img/file.png';
 			            treeObj.updateNode(treeNode);
@@ -44,19 +54,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
 			    });
             },
             onClick: function(event, treeId, treeNode) {
-		        if (treeNode.id.indexOf('J') > -1) {
-                    if (typeof callback == 'function') {
-                        var pNode = treeNode.getParentNode();
-                        var data = { 
-                            DepID: pNode.id,
-                            DepName: pNode.name,
-                            JobID: treeNode.id,
-                            JobName: treeNode.name
-                        };
-                        
-                        callback(data);
-                    }
-                }
+		        searchDepJob(treeNode.id);
             }
         }
     };
@@ -79,13 +77,15 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     // 搜索
     $('#search-keyword').on('keydown', function(e) {
         if (e.which == 13) {
-            searchDepJob();
+            var keyword = $('#search-keyword').val();
+            searchDepJob(undefined, keyword);
         }
     });
 
     // 搜索
     $('#search-btn').on('click', function(e) {
-        searchDepJob();
+        var keyword = $('#search-keyword').val();
+        searchDepJob(undefined, keyword);
     });    
 
     // 选中搜索结果
@@ -99,33 +99,34 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     //////////////
     ///函数声明
     //////////////
-    function searchDepJob() {
-        var keyword = $('#search-keyword').val();
-
-        if (!keyword) return;
+    function searchDepJob(parentDepID, keyword) {
+        if (!parentDepID && !keyword) return;
         $('#loading').show();
         $.ajax({
-            url: apiUrl + 'Organization/SearchDepJobResult',
+            url: apiUrl + 'Organization/GetDepJobResult',
             data: {
+                parentDepID: parentDepID === 'C01' ? '' : parentDepID,
                 keyword: keyword
             },
             dataType: 'jsonp',
-            success: function(data) {
+            success: function(dataList) {
                 $('#loading').hide();
                 var result = $('#depJobList tbody').empty();
 
-                if (data && data.length > 0) {
+                if (dataList && dataList.length > 0) {
                     var tr;
+                    var data;
 
-                    for (var i = 0; i < data.length; i++) {
+                    for (var i = 0; i < dataList.length; i++) {
+                        data = dataList[i];
                         tr = $(
                             '<tr>' +
-                                '<td>' + data[i].JobID + '</td>' +
-                                '<td><div class="text-hidden" title="' + data[i].JobName + '">' + data[i].JobName + '</div></td>' +
-                                '<td>' + data[i].DepID + '</td>' +
-                                '<td><div class="text-hidden" title="' + data[i].DepName + '">' + data[i].DepName + '</div></td>' +
+                                '<td>' + data.JobID + '</td>' +
+                                '<td><div class="text-hidden" title="' + data.JobName + '">' + data.JobName + '</div></td>' +
+                                '<td>' + data.DepID + '</td>' +
+                                '<td><div class="text-hidden" title="' + data.DepName + '">' + data.DepName + '</div></td>' +
                             '</tr>'
-                        ).data('data', data[i]);
+                        ).data('data', data);
 
                         result.append(tr);
                     }

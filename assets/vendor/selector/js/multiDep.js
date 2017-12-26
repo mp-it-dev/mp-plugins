@@ -29,11 +29,27 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         		treeObj.updateNode(treeNode);
 
             	$.ajax({
-			    	url: apiUrl + 'Organization/GetDepNode?pid=' + treeNode.id,
+			    	url: apiUrl + 'Organization/GetDepResult',
+                    data: {
+                        parentDepID: treeNode.id === 'C01' ? '' : treeNode.id
+                    },
 			    	dataType: 'jsonp',
-			    	success: function(data) {
-						if (data && data.length > 0) {
-			                treeObj.addNodes(treeNode, data);
+			    	success: function(dataList) {
+						if (dataList && dataList.length > 0) {
+                            var nodes = [];
+                            var data;
+                            for (var i in dataList) {
+                                data = dataList[i];
+                                nodes.push({
+                                    id: data.DepID,
+                                    name: data.DepName,
+                                    pid: treeNode.id,
+                                    icon: './img/file.png',
+                                    isParent: true,
+                                    originData: data
+                                });
+                            }
+			                treeObj.addNodes(treeNode, nodes);
 			            } else {
 			                treeNode.isParent = false;
 			            }
@@ -47,25 +63,11 @@ require(['jquery', 'util', 'ztree'], function($, util) {
 			    	}
 			    });
             },
+            onClick: function(event, treeId, treeNode) {
+                getDepResult(treeNode.id);
+            },
             onCheck: function (event, treeId, treeNode) {
-                var nodeList = [{ 
-                    DepID: treeNode.id,
-                    DepName: treeNode.name
-                }];
-                var data = {
-                    DepID: treeNode.id,
-                    DepName: treeNode.name,
-                    NodeList: nodeList
-                };
-                var pNode = treeNode.getParentNode();
-
-                while (pNode != null && pNode.pid != null) {
-                    nodeList.unshift({
-                        DepID: pNode.id,
-                        DepName: pNode.name
-                    });
-                    pNode = pNode.getParentNode();
-                }
+                var data = treeNode.originData;
 
                 if (treeNode.checked) {
                     if (util.indexOf(selectedData, data, 'DepID') == -1) {
@@ -137,7 +139,7 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     });
 
     // 阻止冒泡
-    $(document).on('click', '#selectedList tr input[type="checkbox"]', function(e) {      
+    $(document).on('click', '#depList tr input[type="checkbox"], #selectedList tr input[type="checkbox"]', function(e) {
         e.stopPropagation();
     });
 
@@ -167,33 +169,39 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     // 搜索
     $('#search-keyword').on('keydown', function(e) {
         if (e.which == 13) {
-            searchDep();
+            var keyword = $('#search-keyword').val();
+            getDepResult(undefined, keyword);
         }
     });
 
     $('#search-btn').on('click', function(e) {
-        searchDep();
+        var keyword = $('#search-keyword').val();
+        getDepResult(undefined, keyword);
     });
 
     //////////////
     ///函数声明
     //////////////
+    
+    // 显示已选择的数据
     function showSelectedData() {
         var result = $('#selectedList tbody').empty();
         var tr;
+        var data;
         var parentData;
 
         for (var i = 0; i < selectedData.length; i++) {
-            if (selectedData[i].NodeList) {
-                parentData = selectedData[i].NodeList[selectedData[i].NodeList.length - 2];
+            data = selectedData[i];
+            if (data.NodeList) {
+                parentData = data.NodeList[data.NodeList.length - 2];
             } else {
                 parentData = null;
             }            
             tr = $(
                 '<tr>' +
                     '<td><input type="checkbox"></td>' +
-                    '<td>' + selectedData[i].DepID + '</td>' +
-                    '<td><div class="text-hidden" title="' + selectedData[i].DepName + '">' + selectedData[i].DepName + '</div></td>' +
+                    '<td>' + data.DepID + '</td>' +
+                    '<td><div class="text-hidden" title="' + data.DepName + '">' + data.DepName + '</div></td>' +
                     '<td>' + (parentData ? parentData.DepID : '') + '</td>' +
                     '<td><div class="text-hidden" title="' + (parentData ? parentData.DepName : '') + '">' + (parentData ? parentData.DepName : '') + '</div></td>' +
                 '</tr>'
@@ -204,36 +212,38 @@ require(['jquery', 'util', 'ztree'], function($, util) {
     }
 
     // 搜索部门
-    function searchDep() {
-        var keyword = $('#search-keyword').val();
-
-        if (!keyword) return;
+    function getDepResult(parentDepID, keyword) {
+        if (!parentDepID && !keyword) return;
         $('#loading').show();
         $.ajax({
-            url: apiUrl + 'Organization/SearchDepResult',
+            url: apiUrl + 'Organization/GetDepResult',
             data: {
+                parentDepID: parentDepID === 'C01' ? '' : parentDepID,
                 keyword: keyword
             },
             dataType: 'jsonp',
-            success: function(data) {
+            success: function(dataList) {
                 $('#loading').hide();
+                $('.js-select-all[data-target="#depList"]').prop('checked', false);
                 var result = $('#depList tbody').empty();
 
-                if (data && data.length > 0) {
+                if (dataList && dataList.length > 0) {
                     var tr;
+                    var data;
                     var parentData;
 
-                    for (var i = 0; i < data.length; i++) {
-                        parentData = data[i].NodeList[data[i].NodeList.length - 2];
+                    for (var i = 0; i < dataList.length; i++) {
+                        data = dataList[i];
+                        parentData = data.NodeList[data.NodeList.length - 2];
                         tr = $(
                             '<tr>' +
                                 '<td><input type="checkbox"></td>' +
-                                '<td>' + data[i].DepID + '</td>' +
-                                '<td><div class="text-hidden" title="' + data[i].DepName + '">' + data[i].DepName + '</div></td>' +
+                                '<td>' + data.DepID + '</td>' +
+                                '<td><div class="text-hidden" title="' + data.DepName + '">' + data.DepName + '</div></td>' +
                                 '<td>' + (parentData ? parentData.DepID : '') + '</td>' +
                                 '<td><div class="text-hidden" title="' + (parentData ? parentData.DepName : '') + '">' + (parentData ? parentData.DepName : '') + '</div></td>' +
                             '</tr>'
-                        ).data('data', data[i]);
+                        ).data('data', data);
 
                         result.append(tr);
                     }

@@ -19,11 +19,13 @@
 	// 占用全局变量
 	var selectorGlobal = window.selectorGlobal || (window.selectorGlobal = {});
 	var selector = {
-		apiUrl: 'http://webapi.maipu.com/Selector/',
+		apiUrl: 'http://webapi.maipu.com/Selector-v2/',
 		baseUrl: './',
+		badge: '',
 		//单人
 		singlePeople: function (option) {
 			option.apiUrl = option.apiUrl || this.apiUrl;
+			option.badge = option.badge || this.badge;
 			selectorGlobal.singlePeople = option;
 			$.content({
 				layerID: option.layerID || false,
@@ -40,6 +42,7 @@
 		//多人
 		multiPeople: function (option) {
 			option.apiUrl = option.apiUrl || this.apiUrl;
+			option.badge = option.badge || this.badge;
 			selectorGlobal.multiPeople = option;			
 			$.content({
 				layerID: option.layerID || false,
@@ -62,7 +65,7 @@
 				theme: 'blue',
 				header: '单部门',				
 				content: {
-					width: 750,
+					width: 800,
 					height: 480,
 					padding: 0,
 					src: this.baseUrl + 'singleDep.html?t=' + new Date().getTime()
@@ -78,7 +81,7 @@
 				theme: 'blue',
 				header: '多部门',
 				content: {
-					width: 750,
+					width: 800,
 					height: 480,
 					padding: 0,
 					src: this.baseUrl + 'multiDep.html?t=' + new Date().getTime()
@@ -94,7 +97,7 @@
 				theme: 'blue',
 				header: '单职位',				
 				content: {
-					width: 750,
+					width: 800,
 					height: 480,
 					padding: 0,
 					src: this.baseUrl + 'singleJob.html?t=' + new Date().getTime()
@@ -110,7 +113,7 @@
 				theme: 'blue',
 				header: '多职位',
 				content: {
-					width: 750,
+					width: 800,
 					height: 480,
 					padding: 0,
 					src: this.baseUrl + 'multiJob.html?t=' + new Date().getTime()
@@ -126,7 +129,7 @@
 				theme: 'blue',
 				header: '单部门职位',
 				content: {
-					width: 750,
+					width: 800,
 					height: 480,
 					padding: 0,
 					src: this.baseUrl + 'singleDepJob.html?t=' + new Date().getTime()
@@ -142,7 +145,7 @@
 				theme: 'blue',
 				header: '多部门职位',
 				content: {
-					width: 750,
+					width: 800,
 					height: 480,
 					padding: 0,
 					src: this.baseUrl + 'multiDepJob.html?t=' + new Date().getTime()
@@ -174,7 +177,7 @@
 				theme: 'blue',
 				header: '产品选择',
 				content: {
-					width: 750,
+					width: 800,
 					height: 480,
 					padding: 0,
 					src: this.baseUrl + 'multiProduct.html?t=' + new Date().getTime()

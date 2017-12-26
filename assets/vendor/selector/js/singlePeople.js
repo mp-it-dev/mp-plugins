@@ -25,23 +25,39 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         		treeObj.updateNode(treeNode);
 
             	$.ajax({
-			    	url: apiUrl + 'Organization/GetDepNode?pid=' + treeNode.id,
-			    	dataType: 'jsonp',
-			    	success: function(data) {
-						if (data && data.length > 0) {
-			                treeObj.addNodes(treeNode, data);
-			            } else {
-			                treeNode.isParent = false;
-			            }
+                    url: apiUrl + 'Organization/GetDepResult',
+                    data: {
+                        parentDepID: treeNode.id === 'C01' ? '' : treeNode.id
+                    },
+                    dataType: 'jsonp',
+                    success: function(dataList) {
+                        if (dataList && dataList.length > 0) {
+                            var nodes = [];
+                            var data;
+                            for (var i in dataList) {
+                                data = dataList[i];
+                                nodes.push({
+                                    id: data.DepID,
+                                    name: data.DepName,
+                                    pid: treeNode.id,
+                                    icon: './img/file.png',
+                                    isParent: true,
+                                    originData: data
+                                });
+                            }
+                            treeObj.addNodes(treeNode, nodes);
+                        } else {
+                            treeNode.isParent = false;
+                        }
 
-			            treeNode.icon = './img/file.png';
-			            treeObj.updateNode(treeNode);
+                        treeNode.icon = './img/file.png';
+                        treeObj.updateNode(treeNode);
                         // 第一次焦点自动聚焦
                         if (treeNode.id === defaultNode.id) {
                             $('#search-keyword').focus();
                         }
-			    	}
-			    });
+                    }
+                });
             },
             onClick: function(event, treeId, treeNode) {
 		        $('#jobList').empty();
@@ -54,16 +70,18 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                             depID: treeNode.id
                         },
                         dataType: 'jsonp',
-                        success: function(data) {
+                        success: function (dataList) {
+                            var data;
                             var html = '<li class="selected" data-type="job">' +
                                             '<img src="./img/group.png" />' +
                                             '<span>所有职位</span>' +
                                         '</li>';
 
-                            for (var i = 0; i < data.length; i++) {
-                                html += '<li data-type="job" data-jobid="' + data[i].JobID + '">'+
+                            for (var i = 0; i < dataList.length; i++) {
+                                data = dataList[i];
+                                html += '<li data-type="job" data-jobid="' + data.JobID + '">'+
                                             '<img src="./img/worker.png" />' +
-                                            '<span>' + data[i].JobName + '</span>'+
+                                            '<span>' + data.JobName + '</span>'+
                                         '</li>';
                             }
 
@@ -77,18 +95,20 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                             badge: badge
                         },
                         dataType: 'jsonp',
-                        success: function(data) {
+                        success: function (dataList) {
+                            var data;
                             var html = '';
 
-                            for (var i = 0; i < data.length; i++) {
-                                html += '<li data-type="group" data-id="' + data[i].ID + '" data-ygid="' + data[i].YgID + '">'+
+                            for (var i = 0; i < dataList.length; i++) {
+                                data = dataList[i];
+                                html += '<li data-type="group" data-id="' + data.ID + '" data-ygid="' + data.YgID + '">'+
                                             '<img src="./img/worker.png" />' +
-                                            '<span>' + data[i].GroupName + '</span>'+
+                                            '<span>' + data.GroupName + '</span>'+
                                         '</li>';
                             }
 
                             $('#jobList').html(html);
-                            $('#peopleList').empty();
+                            $('#peopleList tbody').empty();
                             $('#jobList li:eq(0)').trigger('click');
                         }
                     });
@@ -164,22 +184,24 @@ require(['jquery', 'util', 'ztree'], function($, util) {
         		keyword: keyword
         	},
         	dataType: 'jsonp',
-        	success: function(data) {
+        	success: function (dataList) {
         		$('#loading').hide();
                 var result = $('#peopleList tbody').empty();
 
-        		if (data && data.length > 0) {
+        		if (dataList && dataList.length > 0) {
         			var tr;
+                    var data;
 
-        			for (var i = 0; i < data.length; i++) {
+        			for (var i = 0; i < dataList.length; i++) {
+                        data = dataList[i];
                         tr = $(
                             '<tr>' +
-                                '<td>' + data[i].Badge + '</td>' +
-                                '<td>' + data[i].Name + '</td>' +
-                                '<td><div class="text-hidden" title="' + data[i].DepName + '">' + data[i].DepName + '</div></td>' +
-                                '<td><div class="text-hidden" title="' + data[i].JobName + '">' + data[i].JobName + '</div></td>' +
+                                '<td>' + data.Badge + '</td>' +
+                                '<td>' + data.Name + '</td>' +
+                                '<td><div class="text-hidden" title="' + data.DepName + '">' + data.DepName + '</div></td>' +
+                                '<td><div class="text-hidden" title="' + data.JobName + '">' + data.JobName + '</div></td>' +
                             '</tr>'
-                        ).data('data', data[i]);        			    
+                        ).data('data', data);        			    
 
                         result.append(tr);
         			}
@@ -203,21 +225,23 @@ require(['jquery', 'util', 'ztree'], function($, util) {
                 ygID: ygID
             },
             dataType: 'jsonp',
-            success: function(data) {
+            success: function (dataList) {
                 $('#loading').hide();
 
-                if (data && data.length > 0) {
+                if (dataList && dataList.length > 0) {
                     var tr;
+                    var data;
 
-                    for (var i = 0; i < data.length; i++) {
+                    for (var i = 0; i < dataList.length; i++) {
+                        data = dataList[i];
                         tr = $(
                             '<tr>' +
-                                '<td>' + data[i].Badge + '</td>' +
-                                '<td>' + data[i].Name + '</td>' +
-                                '<td><div class="text-hidden" title="' + data[i].DepName + '">' + (data[i].DepName || '') + '</div></td>' +
-                                '<td><div class="text-hidden" title="' + data[i].JobName + '">' + (data[i].JobName || '') + '</div></td>' +
+                                '<td>' + data.Badge + '</td>' +
+                                '<td>' + data.Name + '</td>' +
+                                '<td><div class="text-hidden" title="' + data.DepName + '">' + (data.DepName || '') + '</div></td>' +
+                                '<td><div class="text-hidden" title="' + data.JobName + '">' + (data.JobName || '') + '</div></td>' +
                             '</tr>'
-                        ).data('data', data[i]);                        
+                        ).data('data', data);                        
 
                         result.append(tr);
                     }
