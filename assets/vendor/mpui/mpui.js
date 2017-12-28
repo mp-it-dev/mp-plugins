@@ -257,8 +257,8 @@ angular.module('mpui', ['mpui.tpls'])
 		templateUrl: 'mpui-pager.html',
 		scope: {
 			total: '=',
-			pageIndex: '=',
-			pageSize: '=',
+			pageIndex: '=?',
+			pageSize: '=?',
 			pageLength: '=?',
 			pageInfo: '@?',
 			onPaging: '&'
