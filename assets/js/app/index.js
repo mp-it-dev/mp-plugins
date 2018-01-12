@@ -1,6 +1,6 @@
 require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], function ($, util, selector) {
 	selector.baseUrl = './assets/vendor/selector/';
-	selector.apiUrl = 'http://192.168.102.12:100/Selector/';
+	// selector.apiUrl = 'http://192.168.102.12:100/Selector/';
 
 	$('#searchProduct').autoComplete({
 		async: {

@@ -108,7 +108,7 @@
             var fileTypeExts = setting.fileTypeExts.split(',');
 
             fileTypeExts = fileTypeExts.map(function (item) {
-                return fileTypeMap[item.trim()];
+                return fileTypeMap[item.trim().toLowerCase()];
             });
 
             inputFile.prop('accept', fileTypeExts);
@@ -130,7 +130,7 @@
         formData            : {},           // 自定义参数
         fileObjName         : 'FileData',   // 文件发送到服务器端时的名称
         defaultTemplate     : true,         // 是否采用默认模板
-        fileTypeExts        : '',           // 文件类型限制
+        fileTypeExts        : '',           // 文件类型限制，','分隔
         fileSizeLimit       : '2048 MB',    // 文件大小限制
         onSelect            : false,        // 选择文件回调，每一个文件回调一次
         onQueueComplete     : false,        // 队列完成回调
@@ -159,9 +159,15 @@
         this.queueData.files[file.id] = file;
 
         // 检查文件类型
-        if (setting.fileTypeExts && setting.fileTypeExts.indexOf(file.type) == -1) {
-            alert('不允许上传的文件类型！' + file.name);
-            return;
+        if (setting.fileTypeExts) {
+            var fileTypeExts = {};
+            setting.fileTypeExts.split(',').forEach(function (item) {
+                fileTypeExts[item.trim().toLowerCase()] = true;
+            });
+            if (!fileTypeExts[file.type.toLowerCase()]) {
+                alert('不允许上传的文件类型！' + file.name);
+                return;
+            }
         }
 
         // 检查空文件
