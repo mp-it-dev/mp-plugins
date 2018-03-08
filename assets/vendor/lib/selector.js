@@ -36,12 +36,13 @@
 
 	function hide(option) {
 		var index = -1;
-		callbackQueue.forEach((item, idx) => {
+		for (var i in callbackQueue) {
+			var item = callbackQueue[i];
 			if (item.callback === option.callback) {
 				window.removeEventListener('message', item.listener, false);
-				index = idx;
+				index = i;
 			}
-		});
+		}
 		if (index > -1) {
 			callbackQueue.splice(index, 1);
 		}
