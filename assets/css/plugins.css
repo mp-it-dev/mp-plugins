@@ -7,33 +7,32 @@
 .table-container {
     position: relative;
 }
-.table-container .table-head {
-    overflow: hidden;
-    padding-right: 1px;/*解决内层table造成的横向滚动条问题，原因暂时未查明*/
-    padding-left: 1px;/*解决IE8下左边框被隐藏的问题*/
-}
-.table-container .table-body {
-    overflow: auto;
-    padding-right: 1px;/*解决内层table造成的横向滚动条问题，原因暂时未查明*/
-    padding-left: 1px;/*解决IE8下左边框被隐藏的问题*/
-    min-height: 40px;    
+.table-container .table-content {
     position: relative;
 }
-.table-container .table-body.resize-hack {
+.table-container .table-head {
+    padding-left: 1px;/*解决IE8下左边框被隐藏的问题*/
     overflow: hidden;
+}
+.table-container .table-head .table {
+    position: relative;
+}
+.table-container .table-body {
+    position: relative;
+    min-height: 40px;
+    padding-left: 1px;/*解决IE8下左边框被隐藏的问题*/
+    overflow: auto;
 }
 .table-container .table {
     width: 100%;
     max-width: none;
-    border: 0;
     margin: 0;
-    background-color: #fff;
-    table-layout: fixed;
-    position: relative;
+    border: 0;
 }
 .table-container .table-th {
     position: relative;
     cursor: default;
+    background-clip: padding-box;
 }
 .table-container .table > thead > tr > th {
     -webkit-user-select: none;
@@ -100,9 +99,6 @@
     width: 4px;
     height: 100%;
     cursor: e-resize;
-}
-.table-container .table-border .table-th-resize {
-    right: -1px;
 }
 .table-container .table-th-menu {
     position: absolute;
@@ -176,10 +172,10 @@
 .table-sort-active[data-sorder="desc"] .table-sort-icon:before {
     display: none;
 }
-.table-drag {
+.table-container .table-drag {
     cursor: e-resize !important;
 }
-.table-drag-line {
+.table-container .table-drag-line {
     display: none;
     position: absolute;
     left: 0;
@@ -189,22 +185,16 @@
     height: 100%;
     background-color: #777;
 }
-.table-loading {
+.table-container .table-loading {
     position: absolute;
-    left: 50%;
-    top: 50%;
+    left: 0;
+    top: 0;
     z-index: 3;
-    width: 120px;
-    height: 30px;
-    line-height: 30px;
-    margin-left: -60px;
-    margin-top: -15px;
-    padding-left: 35px;
-    font-size: 12px;
-    font-weight: bold;
-    color: #eb8f00;
-    background: #fff url(../img/loading_16.gif) no-repeat 10px center;
-    border: 2px solid #fbd850;
+    width: 100%;
+    height: 100%;
+    background: url(../img/loading_32.gif) no-repeat center;
+    background-color: #ccc;
+    background-color: rgba(204, 204, 204, 0.5);
     display: none;
 }
 .table-columns {
@@ -348,6 +338,10 @@
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
 }
+.ui-select-sm .ui-select {
+    font-size: 12px;
+    line-height: 1.5;
+}
 .ui-select.disabled {
     background-color: #eee;
     background-image: none;
@@ -370,6 +364,16 @@
 
     -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
     box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+}
+.ui-select-sm .ui-select-bar,
+.ui-select-sm .form-control {
+    height: 30px;
+    padding: 5px 20px 5px 10px;
+    font-size: 12px;
+    border-radius: 3px;
+}
+.ui-select-sm .form-control {
+    padding: 5px 10px;
 }
 .ui-select.disabled .ui-select-bar {
     background-color: #eee;
@@ -435,18 +439,18 @@
     table-layout: fixed;
 }
 .ui-select-list table td {
-    padding: 6px 12px;
+    padding: 4px 5px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.ui-select-list table tr:hover {
+.ui-select-sm .ui-select-list table td {
+    padding: 3px 5px;
+}
+.ui-select-list table tr:hover,
+.ui-select-list table tr.active {
 	background-color: #e3e8f7;
     cursor: pointer;
-}
-.ui-select-list table tr.active { 
-    background-color: #0886e9;
-    color: #fff;
 }
 .ui-select-checkbox {
     display: inline-block;
@@ -471,11 +475,16 @@
     margin-left: 20px;
     vertical-align: middle;
 }
+.uploadify-option {
+    margin-bottom: 10px;
+}
 .uploadify-queue-item {
     display: table;
     width: 100%;
-    margin-top: 10px;
     table-layout: fixed;
+}
+.uploadify-queue-item + .uploadify-queue-item {
+    margin-top: 10px;
 }
 .uploadify-queue-item > * {
     display: table-cell;
@@ -499,15 +508,16 @@
     text-overflow: ellipsis;
 }
 .uploadify-queue .file-data {
-    width: 80px;
+    width: 100px;
 }
 .uploadify-queue .file-opt {
     width: 100px;
+    text-align: right;
 }
 .uploadify-queue .file-opt-i {
+    margin-left: 10px;
     color: #0068B7;
     cursor: pointer;
-    margin-right: 10px;
 }
 .uploadify-queue .file-opt-i:hover {
     color: #f00;
@@ -519,43 +529,7 @@
 .uploadify-input-file {
     display: none !important;
 }
-/*滚动条 start*/
-.scroll-target {
-    position: relative;
-    left: 0;
-    top: 0;
-}
-.scrollbar {
-    position: absolute;
-    z-index: 999;
-    opacity: 0.7;
-    filter: alpha(opacity=70);
-}
-.scrollbar:hover {
-    background-color: #eee;
-}
-.scrollbar-x {
-    left: 0;
-    bottom: 0;
-}
-.scrollbar-y {
-    right: 0;
-    top: 0;
-}
-.scrollbar-outer {
-    position: relative;
-}
-.scrollbar-inner {
-    position: absolute;
-    top: 0;
-    left: 0;
-    background-color: #afbebe;
-}
-.scrollbar-inner.ondrag {
-    background-color: #fa0;
-    transition: none;
-}
-/*滚动条 end*/
+/*文件上传end*/
 
 /*表单校验 start*/
 .form-control-error {
@@ -706,8 +680,10 @@
     left: 0;
     top: 0;
     max-width: 300px;
-    padding-left: 100px;
+    padding-left: 15px;
     overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 .gallery-center {
     position: absolute;
@@ -723,7 +699,7 @@
     right: 0;
     top: 0;
     text-align: right;
-    padding-right: 100px;
+    padding-right: 15px;
 }
 .gallery-bar-btn {
     display: inline-block;
@@ -937,20 +913,36 @@
     border: 1px solid #ddd;
     overflow: auto;
 }
+.ui-autoComplete-result.left {
+    left: 0;
+}
+.ui-autoComplete-result.right {
+    right: 0;
+}
 .ui-autoComplete-result table {
     width: 100%;
 }
+.ui-autoComplete-result table th,
 .ui-autoComplete-result table td {
     padding: 4px 10px;
+}
+.ui-autoComplete-result table td {
     word-break: break-all;
 }
-.ui-autoComplete-result table tr + tr {
+.ui-autoComplete-result table thead tr {
+    border-bottom: 1px dashed #ddd;
+}
+.ui-autoComplete-result table tbody tr + tr {
     border-top: 1px dashed #ddd;
 }
-.ui-autoComplete-result table tr:hover {
+.ui-autoComplete-result table tbody tr:hover {
     background-color: #eee;
     color: #0088cc;
     cursor: default;
+}
+.ui-autoComplete-result .no-result {
+    padding: 4px 10px;
+    text-align: center;
 }
 /*input自动补全 end*/
 

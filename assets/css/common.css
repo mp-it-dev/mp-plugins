@@ -67,9 +67,23 @@ a:hover {
 }
 
 .text-ellipsis {
+    display: block;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+.text-prewrap {
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+.text-left {
+    text-align: left !important;
+}
+.text-center {
+    text-align: center !important;
+}
+.text-right {
+    text-align: right !important;
 }
 
 .checkbox-inline, .radio-inline {
@@ -109,8 +123,9 @@ textarea.form-control {
 /*table start*/
 .table {
     width: 100%;
-    background-color: #fff;
     margin-bottom: 0;
+    background-color: #fff;
+    table-layout: fixed;
 }
 .table > tbody > tr > td, 
 .table > tbody > tr > th, 
@@ -122,44 +137,20 @@ textarea.form-control {
     border-bottom: 1px solid #ddd;
     vertical-align: middle;
 }
-.table-fixed {
-    table-layout: fixed;
+.table-colorheader > thead > tr > th {
+    background-color: #eee;
+}
+.table-outline {
+    border: 0 solid #ddd !important;
+    border-width: 0 1px 1px !important;
+}
+.table-outline > thead > tr > th {
+    border-top: 1px solid #ddd !important;
+}
+.table-auto {
+    table-layout: auto;
 }
 /*table end*/
-
-/*滚动条 start*/
-.scrollbar::-webkit-scrollbar { /* 滚动条的滑轨背景颜色 */
-    width: 10px;
-    height: 10px;
-}
-.scrollbar::-webkit-scrollbar-track-piece {     /* 滚动条的滑轨 */
-    background-color: #e9e9e9;
-    -webkit-border-radius: 6px;
-}
-.scrollbar::-webkit-scrollbar-thumb:vertical {  /* 垂直滑块 */
-    height: 9px;
-    background-color: #aaa;
-    -webkit-border-radius: 6px;
-}
-.scrollbar::-webkit-scrollbar-thumb:horizontal {    /* 水平滑块 */
-    width: 9px;
-    background-color: #aaa;
-    -webkit-border-radius: 6px;
-}
-
-/*IE*/
-.scrollbar {
-    /*scrollbar-base-color: #fff;       滚动条的基本颜色*/
-    /*scrollbar-arrow-color: #e9e9e9;     三角箭头的颜色*/
-    /*scrollbar-face-color: #b46868;      立体滚动条的颜色*/
-    /*scrollbar-3dlight-color: #666;      立体滚动条亮边的颜色*/
-    /*scrollbar-highlight-color: #666;    滚动条空白部分的颜色*/
-    /*scrollbar-shadow-color: #999;       立体滚动条阴影的颜色*/
-    /*scrollbar-darkshadow-color: #666;   立体滚动条强阴影的颜色*/
-    /*scrollbar-track-color: #e9e9e9;        立体滚动条背景颜色*/
-}
-
-/*滚动条 end*/
 
 /*icon start*/
 .icon {
@@ -287,9 +278,6 @@ textarea.form-control {
     box-shadow: inset 0 3px 8px rgba(0,0,0,0.125);
     background-image: none;
 }
-.navbar-gray .dropdown-menu > li > a:hover {
-    
-}
 .navbar-gray .dropdown-menu > .active > a, 
 .navbar-gray .dropdown-menu > .active > a:focus, 
 .navbar-gray .dropdown-menu > .active > a:hover {
@@ -303,34 +291,6 @@ textarea.form-control {
 /*导航栏自定义样式 end*/
 
 /*panel样式重写 start*/
-.panel-info {
-    border-color: #2aabd2;
-}
-.panel-info > .panel-heading {
-    color: #fff;
-    background-image: -moz-linear-gradient(top, #5bc0de, #2aabd2);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#5bc0de), to(#2aabd2));
-    background-image: -webkit-linear-gradient(top, #5bc0de, #2aabd2);
-    background-image: -o-linear-gradient(top, #5bc0de, #2aabd2);
-    background-image: linear-gradient(to bottom, #5bc0de, #2aabd2);
-    background-repeat: repeat-x;
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff5bc0de', endColorstr='#ff2aabd2', GradientType=0);
-    border-color: #2aabd2;
-}
-.panel-primary {
-    border-color: #0044cc;
-}
-.panel-primary > .panel-heading {
-    color: #fff;
-    background-image: -moz-linear-gradient(top, #0088cc, #0044cc);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0088cc), to(#0044cc));
-    background-image: -webkit-linear-gradient(top, #0088cc, #0044cc);
-    background-image: -o-linear-gradient(top, #0088cc, #0044cc);
-    background-image: linear-gradient(to bottom, #0088cc, #0044cc);
-    background-repeat: repeat-x;
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0044cc', GradientType=0);
-    border-color: #0044cc;
-}
 .panel-default > .panel-heading {
     border-color: #e8e8e8;
 }
@@ -345,6 +305,10 @@ textarea.form-control {
     right: 15px;
     top: 3px;
     text-align: right;
+    line-height: 30px;
+}
+.panel-option .btn + .btn {
+    margin-left: 10px;
 }
 .panel-dark {
     border: 1px solid #535a6c;
@@ -375,55 +339,37 @@ textarea.form-control {
     display: none;
 }
 /*panel样式重写 end*/
-
-/*按钮重写 start*/
-.btn-primary {
-    color: #ffffff;
-    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-    background-color: #006dcc;
-    background-image: -moz-linear-gradient(top, #0088cc, #0044cc);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0088cc), to(#0044cc));
-    background-image: -webkit-linear-gradient(top, #0088cc, #0044cc);
-    background-image: -o-linear-gradient(top, #0088cc, #0044cc);
-    background-image: linear-gradient(to bottom, #0088cc, #0044cc);
-    background-repeat: repeat-x;
-    border-color: #0044cc #0044cc #002a80;
-    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+/* 按钮扩展start */
+.btn.disabled,
+.btn[disabled],
+fieldset[disabled] .btn {
+    filter: alpha(opacity=45);
+    opacity: 0.45;
 }
-
-.btn-primary:hover, 
-.btn-primary:focus, 
-.btn-primary:active, 
-.btn-primary.active, 
-.btn-primary:active:hover,
-.btn-primary.active:hover,
-.btn-primary:active:focus,
-.btn-primary.active:focus,
-.btn-primary.disabled, 
-.btn-primary.disabled.active, 
-.btn-primary.disabled.focus, 
-.btn-primary.disabled:active, 
-.btn-primary.disabled:focus, 
-.btn-primary.disabled:hover, 
-.btn-primary[disabled],
-.btn-primary[disabled].active, 
-.btn-primary[disabled].focus, 
-.btn-primary[disabled]:active, 
-.btn-primary[disabled]:focus, 
-.btn-primary[disabled]:hover, 
-fieldset[disabled] .btn-primary, 
-fieldset[disabled] .btn-primary.active, 
-fieldset[disabled] .btn-primary.focus, 
-fieldset[disabled] .btn-primary:active, 
-fieldset[disabled] .btn-primary:focus, 
-fieldset[disabled] .btn-primary:hover {
+.btn-dark:hover,
+.btn-dark.active {
+    background-color: #374152;
+    border-color: #2e3644;
     color: #fff;
-    background-color: #04c;
-    border-color: #0044cc #0044cc #002a80;
-    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
 }
-/*按钮样式重写 end*/
-
+.btn-dark,
+.btn-dark[disabled] {
+    background-color: #424F63;
+    border-color: #374152;
+    color: #fff;
+}
+.btn-gray:hover,
+.btn-gray.active {
+    border-color: #aaa;
+    background-color: #ccc;
+}
+.btn-gray,
+.btn-gray[disabled] {
+    border-color: #ccc;
+    background-color: #e4e7ea;
+    color: #333;
+}
+/* 按钮扩展end */
 /*表单行item start*/
 .item {
     position: relative;

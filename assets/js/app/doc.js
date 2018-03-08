@@ -1,10 +1,10 @@
 require.config({
 	paths: {
-		'highlight': '../plugins/highlight/highlight',
-		'tinymce': '../plugins/tinymce/tinymce.min',
-		'highlight/xml': '../plugins/highlight/languages/xml',
-		'highlight/css': '../plugins/highlight/languages/css',
-		'highlight/javascript': '../plugins/highlight/languages/javascript'	
+		'highlight': '../vendor/highlight/highlight',
+		'tinymce': '../vendor/tinymce/tinymce.min',
+		'highlight/xml': '../vendor/highlight/languages/xml',
+		'highlight/css': '../vendor/highlight/languages/css',
+		'highlight/javascript': '../vendor/highlight/languages/javascript'	
 	},
 	shim: {
 		'highlight/xml': ['highlight'],
