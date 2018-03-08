@@ -57,6 +57,7 @@
 				throw new Error('请指定callback');
 			}
 			var instance = $.content({
+				layerID: option.layerID || false,
 				theme: 'blue',
 				header: '单人',
 				content: {
@@ -81,6 +82,7 @@
 				throw new Error('请指定callback');
 			}
 			var instance = $.content({
+				layerID: option.layerID || false,
 				theme: 'blue',
 				header: '多人',
 				content: {
@@ -105,6 +107,7 @@
 				throw new Error('请指定callback');
 			}
 			var instance = $.content({
+				layerID: option.layerID || false,
 				theme: 'blue',
 				header: '单部门',
 				content: {
@@ -129,6 +132,7 @@
 				throw new Error('请指定callback');
 			}
 			var instance = $.content({
+				layerID: option.layerID || false,
 				theme: 'blue',
 				header: '多部门',
 				content: {
@@ -153,6 +157,7 @@
 				throw new Error('请指定callback');
 			}
 			var instance = $.content({
+				layerID: option.layerID || false,
 				theme: 'blue',
 				header: '单职位',
 				content: {
@@ -177,6 +182,7 @@
 				throw new Error('请指定callback');
 			}
 			var instance = $.content({
+				layerID: option.layerID || false,
 				theme: 'blue',
 				header: '多职位',
 				content: {
@@ -201,6 +207,7 @@
 				throw new Error('请指定callback');
 			}
 			var instance = $.content({
+				layerID: option.layerID || false,
 				theme: 'blue',
 				header: '单部门职位',
 				content: {
@@ -225,6 +232,7 @@
 				throw new Error('请指定callback');
 			}
 			var instance = $.content({
+				layerID: option.layerID || false,
 				theme: 'blue',
 				header: '多部门职位',
 				content: {
@@ -249,6 +257,7 @@
 				throw new Error('请指定callback');
 			}
 			var instance = $.content({
+				layerID: option.layerID || false,
 				theme: 'blue',
 				header: '单产品',
 				content: {
@@ -273,6 +282,7 @@
 				throw new Error('请指定callback');
 			}
 			var instance = $.content({
+				layerID: option.layerID || false,
 				theme: 'blue',
 				header: '多产品',
 				content: {
