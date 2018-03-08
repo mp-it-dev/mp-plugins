@@ -57,14 +57,14 @@
     		</div> 		
     	</div>
     	<div mpui-tb max-height="500" resize="true" default-order-by="{{sname}}" default-order-sort="{{sorder}}" on-sort="sort(orderBy, orderSort)">
-    		<table class="table table-outline table-grayheader">
+    		<table class="table table-bordered table-grayheader">
     			<colgroup>
     				<col ng-repeat="column in columnList" width="{{column.width}}" ng-show="column.isShow">
     			</colgroup>
 				<thead>
 					<tr>
 						<th ng-repeat="column in columnList" mpui-tb-order="{{column.field}}" ng-show="column.isShow">
-							<span mpui-bind="column.name"></span>
+							<span ng-bind="column.name"></span>
 						</th>
 					</tr>
 				</thead>

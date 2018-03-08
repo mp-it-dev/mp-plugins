@@ -37,7 +37,7 @@ require(['angular', 'util', 'mpui'], function (angular, util) {
 			$scope.sorder = 'asc';
 			$scope.total = 0;
 			$scope.pageIndex = 1;
-			$scope.pageSize = 0;
+			$scope.pageSize = 20;
 
 			$scope.getUserList = function () {
 				// $.loading('loading...');

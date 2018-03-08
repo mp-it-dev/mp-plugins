@@ -121,7 +121,7 @@ angular.module('mpui', ['mpui.tpls'])
 			// 表头拖动
 			function addResize () {
 				// 鼠标滑过表头添加可拖动标识
-				$ele.on('mouseover', '.mpui-tb-header-inner > table > thead > tr > th', function (evt) {
+				$ele.on('mouseenter', '.mpui-tb-header-inner > table > thead > tr > th', function (evt) {
 					if (!$(this).find('.mpui-th-resize-line').length) {
 						$(this).addClass('mpui-th-resize');
 						$(this).append('<div class="mpui-th-resize-line"></div>');
@@ -278,7 +278,6 @@ angular.module('mpui', ['mpui.tpls'])
 					evt.preventDefault();
 				}
 				$scope.pageIndex = pageIndex;
-				calcPage();
 				$timeout(function () {
 					$scope.onPaging({ pageIndex: $scope.pageIndex, pageSize: $scope.pageSize });
 				});
@@ -309,6 +308,9 @@ angular.module('mpui', ['mpui.tpls'])
 			};
 
 			$scope.$watch('total', function () {
+				calcPage();
+			});
+			$scope.$watch('pageIndex', function () {
 				calcPage();
 			});
 
@@ -374,14 +376,14 @@ angular.module('mpui', ['mpui.tpls'])
 /**
  * 不换行显示字符串，超出截断
  */
-.directive('mpuiEllipsis', ['$sce', function ($sce) {
+.directive('textEllipsis', ['$sce', function ($sce) {
 	return {
 		restrict: 'A',
         replace: true,
         scope: {
-            textTruncation: '='
+            textEllipsis: '='
         },
-        template: '<div class="text-ellipsis" title="{{textTruncation}}">{{textTruncation}}</div>'
+        template: '<div class="text-ellipsis" title="{{textEllipsis}}">{{textEllipsis}}</div>'
 	}
 }])
 

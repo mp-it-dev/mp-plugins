@@ -551,6 +551,9 @@
                 }
             });
 
+            // 绑定iframe onload事件
+            $layer.find('.layer-box-iframe').on("load", settings.onLoad);
+
             layerUtil.centerLayer.call(self, $layer.find(".layer-box-container"), settings);
             layerUtil.drag.call(self, $layer.find(".layer-title"), $layer.find(".layer-box-container"), settings);
         },

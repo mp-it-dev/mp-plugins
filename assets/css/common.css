@@ -76,6 +76,15 @@ a:hover {
     white-space: pre-wrap;
     word-break: break-all;
 }
+.text-left {
+    text-align: left !important;
+}
+.text-center {
+    text-align: center !important;
+}
+.text-right {
+    text-align: right !important;
+}
 
 .checkbox-inline, .radio-inline {
     padding-left: 15px;
@@ -296,6 +305,7 @@ textarea.form-control {
     right: 15px;
     top: 3px;
     text-align: right;
+    line-height: 30px;
 }
 .panel-option .btn + .btn {
     margin-left: 10px;
@@ -330,6 +340,12 @@ textarea.form-control {
 }
 /*panel样式重写 end*/
 /* 按钮扩展start */
+.btn.disabled,
+.btn[disabled],
+fieldset[disabled] .btn {
+    filter: alpha(opacity=45);
+    opacity: 0.45;
+}
 .btn-dark:hover,
 .btn-dark.active {
     background-color: #374152;

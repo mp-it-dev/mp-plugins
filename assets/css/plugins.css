@@ -32,6 +32,7 @@
 .table-container .table-th {
     position: relative;
     cursor: default;
+    background-clip: padding-box;
 }
 .table-container .table > thead > tr > th {
     -webkit-user-select: none;

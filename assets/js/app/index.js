@@ -1,6 +1,5 @@
 require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], function ($, util, selector) {
-	selector.baseUrl = './assets/vendor/selector/';
-	// selector.apiUrl = 'http://192.168.102.12:100/Selector/';
+	selector.rootUrl = 'http://webapi.mptest.com/Selector-v2/';
 
 	$('#searchProduct').autoComplete({
 		async: {
