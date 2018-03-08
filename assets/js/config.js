@@ -7,7 +7,7 @@ require.config({
         'tlayer': '../vendor/lib/jquery.tlayer',
         'plugins': '../vendor/lib/jquery.plugins',
         'util': '../vendor/lib/util',
-        'selector': '../vendor/selector/selector'
+        'selector': '../vendor/lib/selector'
     },
     shim: {
         'bootstrap': {
