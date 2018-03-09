@@ -48,13 +48,19 @@
 			<div class="panel-body">
 				<form class="form-horizontal">
 					<div class="row form-group">
-						<label class="col-md-2 control-label">邮箱：</label>
+						<label class="col-md-2 control-label">
+							<span class="required"></span>
+							邮箱：
+						</label>
 						<div class="col-md-3">
 							<input type="text" class="form-control" data-uitype="validate" data-rules="[{type: 'email', msg: '邮箱格式不正确！'}]" />
 						</div>
 					</div>
 					<div class="row form-group">
-						<label class="col-md-2 control-label">身份证：</label>
+						<label class="col-md-2 control-label">
+							<span class="half-required"></span>
+							身份证：
+						</label>
 						<div class="col-md-3">
 							<input type="text" class="form-control" data-uitype="validate" data-rules="[{type: 'idcard', msg: '身份证格式不正确！'}]" data-placement="top" />
 						</div>

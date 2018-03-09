@@ -1,5 +1,4 @@
-﻿@charset "utf-8";
-/**
+﻿/**
  * 本文件是在bootstrap的基础上扩展和重写的一些样式
  */
 
@@ -13,6 +12,7 @@
 
 body {
     font-family: Helvetica Neue, Arial, Microsoft Yahei;
+    word-break: break-all;
 }
 
 article,
@@ -384,18 +384,6 @@ fieldset[disabled] .btn {
     padding: 7px 10px 7px 0;
     vertical-align: top;
 }
-.item-name.required {
-    position: relative;
-}
-.item-name.required:before {
-    content: "*";
-    position: absolute;
-    left: -8px;
-    top: 13px;
-    font-size: 18px;
-    line-height: 1;
-    color: red;
-}
 .item-control {
     display: table-cell;
     vertical-align: middle;
@@ -426,3 +414,25 @@ fieldset[disabled] .btn {
     border-radius: 3px;
 }
 /*表单行item end*/
+.required,
+.half-required {
+    position: relative;
+}
+.required::before {
+    content: "*";
+    position: absolute;
+    left: -8px;
+    top: 2px;
+    font-size: 18px;
+    line-height: 1;
+    color: red;
+}
+.half-required::before {
+    display: inline;
+    content: "|";
+    position: absolute;
+    left: -4px;
+    top: 0px;
+    line-height: 1;
+    color: red;
+}
