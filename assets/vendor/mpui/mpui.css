@@ -32,10 +32,6 @@
 .mpui-tb {
     position: relative;
 }
-.mpui-tb-inner {
-    min-height: 0%;
-    overflow: auto;
-}
 .mpui-tb-header {
     position: absolute;
     left: 0;
@@ -48,6 +44,10 @@
 }
 .mpui-tb-header-inner {    
     position: relative;
+}
+.mpui-tb-body {
+    min-height: 0%;
+    overflow: auto;
 }
 .mpui-th-resize {
     position: relative;

@@ -1,5 +1,5 @@
 require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], function ($, util, selector) {
-	selector.rootUrl = 'http://webapi.mptest.com/Selector-v2/';
+	selector.rootUrl = 'http://webapi.maipu.com/Selector-v2/';
 
 	$('#searchProduct').autoComplete({
 		async: {
