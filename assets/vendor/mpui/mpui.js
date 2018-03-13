@@ -216,9 +216,6 @@ angular.module('mpui', ['mpui.tpls'])
 			};
 		},
 		link: function ($scope, $ele, $attrs, ctrls) {
-			// 是否显示竖直滚动条
-			$scope.isShowScrollbar = false;
-
 			var $header = $ele.find('.mpui-tb-header');
 			var $body = $ele.find('.mpui-tb-body');
 
@@ -272,19 +269,19 @@ angular.module('mpui', ['mpui.tpls'])
 		        	var oldWidth = $th.outerWidth();
 		        	var headerCols = $ele.find('.mpui-tb-header-inner > table > colgroup > col');
 		        	var headerThs = $ele.find('.mpui-tb-header-inner > table > thead > tr > th');
-		        	var bodyCols = $ele.find('.mpui-tb-body > table > colgroup > col');
-		        	var bodyThs = $ele.find('.mpui-tb-body > table > thead > tr > th');
+		        	var bodyCols = $ele.find('.mpui-tb-body-inner > table > colgroup > col');
+		        	var bodyThs = $ele.find('.mpui-tb-body-inner > table > thead > tr > th');
 		        	var resizeMask = $('<i class="mpui-resize-mask"></i>').appendTo('body');
 		        	isResizing = true;
 
 			        resizeMask.on('mousemove.mpui-th-resize', function (evt) {
 			        	var newWidth = Math.max(evt.clientX - oldClientX + oldWidth, 20);
 			        	if (headerCols.length) {
-			        		headerCols.eq(index).attr('width', newWidth);
-			        		bodyCols.eq(index).attr('width', newWidth);
+			        		headerCols.eq(index).width(newWidth);
+			        		bodyCols.eq(index).width(newWidth);
 			        	} else {
-			        		headerThs.eq(index).attr('width', newWidth);
-			        		bodyThs.eq(index).attr('width', newWidth);
+			        		headerThs.eq(index).width(newWidth);
+			        		bodyThs.eq(index).width(newWidth);
 			        	}
 			        	evt.preventDefault();
 			        	evt.stopPropagation();
@@ -376,7 +373,6 @@ angular.module('mpui', ['mpui.tpls'])
 			pageIndex: '=?',
 			pageSize: '=?',
 			pageLength: '=?',
-			pageInfo: '@?',
 			onPaging: '&'
 		},
 		link: function ($scope, $ele, $attrs) {
@@ -385,7 +381,7 @@ angular.module('mpui', ['mpui.tpls'])
 			$scope.endIndex = 0;
 			$scope.pageSize = $scope.pageSize || 20;
 			$scope.pageSizeArray = [$scope.pageSize, $scope.pageSize * 2, $scope.pageSize * 4, $scope.pageSize * 8];
-			$scope.pageInfo = $scope.pageInfo === 'false' ? false : true;
+			$scope.pageInfo = $attrs.pageInfo === 'false' ? false : true;
 			$scope.pageLength = $scope.pageLength || 5;
 
 			$scope.goPage = function (pageIndex, evt) {
