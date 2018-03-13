@@ -241,7 +241,7 @@ angular.module('mpui', ['mpui.tpls'])
 				evt.stopPropagation();
 			});
 
-			if ($attrs.resize !== 'false') {
+			if ($attrs.resize === 'true') {
 				addResize();
 			}
 
