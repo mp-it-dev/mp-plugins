@@ -30,8 +30,11 @@
 			callback: option.callback,
 			listener: listener
 		});
-		// 将选项传到iframe中
-		win.postMessage(JSON.stringify(option), selector.rootUrl);
+		// 设置一个延迟，看能不能确保IE有时候没有加载出来的问题
+		setTimeout(function () {
+			// 将选项传到iframe中
+			win.postMessage(JSON.stringify(option), selector.rootUrl);
+		}, 100);
 	}
 
 	function hide(option) {

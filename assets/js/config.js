@@ -7,7 +7,8 @@ require.config({
         'tlayer': '../vendor/lib/jquery.tlayer',
         'plugins': '../vendor/lib/jquery.plugins',
         'util': '../vendor/lib/util',
-        'selector': '../vendor/lib/selector'
+        'selector': '../vendor/lib/selector',
+        'maipuWindowsService': '../vendor/lib/maipuWindowsService'
     },
     shim: {
         'bootstrap': {

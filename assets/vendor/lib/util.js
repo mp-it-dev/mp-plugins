@@ -340,7 +340,9 @@
         getFileSize: function (fileSize) {
             fileSize = parseInt(fileSize);
 
-            if (fileSize > 1024 * 1024) {
+            if (fileSize > 1024 * 1024 * 1024) {
+                return (fileSize / 1024 / 1024 / 1024).toFixed(2) + 'GB';
+            } else if (fileSize > 1024 * 1024) {
                 return (fileSize / 1024 / 1024).toFixed(2) + 'MB';
             } else if (fileSize > 1024) {
                 return (fileSize / 1024).toFixed(2) + ' KB';

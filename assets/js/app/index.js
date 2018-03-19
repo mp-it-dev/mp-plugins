@@ -1,4 +1,4 @@
-require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], function ($, util, selector) {
+require(['jquery', 'util', 'selector', 'maipuWindowsService', 'uploadify', 'tlayer', 'plugins'], function ($, util, selector, maipuWindowsService) {
 	selector.rootUrl = 'http://webapi.maipu.com/Selector-v2/';
 
 	$('#searchProduct').autoComplete({
@@ -203,5 +203,17 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 		name: 'test_multi_select',
 		search: true,
 		multi: true
+	});
+
+	$('.maipu-windows-service').on('click', function () {
+		var type = $(this).data('type');
+		var multi = $(this).data('multi') === 'true';
+		maipuWindowsService[type]({
+			multi: multi,
+			callback: function (data) {
+				console.log(data);
+				maipuWindowsService.close();
+			}
+		})
 	});
 });
