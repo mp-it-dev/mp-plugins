@@ -1444,6 +1444,7 @@ $.extend($.fn, {
         this.ele = ele;
         this.setting = setting;
         this.startIndex = 1;
+        this.endIndex = 1;
 
         if (setting.pageSizeArray && setting.pageSizeArray[0]) {
             setting.pageSize = setting.pageSizeArray[0];
@@ -1537,7 +1538,7 @@ $.extend($.fn, {
 
                 // 返回数据
                 if (setting.localPage) {
-                    setting.success(setting.dataList.slice(0, setting.pageIndex * setting.pageSize));
+                    setting.success(setting.dataList.slice((setting.pageIndex - 1) * setting.pageSize, setting.pageIndex * setting.pageSize));
                 } else {
                     setting.success(setting.dataList.slice(0));
                 }
