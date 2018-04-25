@@ -464,7 +464,7 @@
 }
 /*下拉框 end*/
 
-/*上传按钮*/
+/*文件上传 start*/
 .uploadify {
     position: relative;
     display: inline-block;

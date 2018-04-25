@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+	<title>Examples</title>
+    <link rel="stylesheet" type="text/css" href="./assets/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="./assets/css/common.css">
+    <link rel="stylesheet" type="text/css" href="./assets/css/tlayer.css">
+</head>
+<body>
+    <div class="container">
+    	<div class="page-header">文件下载</div>
+    	<div class="row">
+    		<div class="col-md-6">
+    			<input type="text" class="form-control" name="url">
+    		</div>
+    		<div class="col-md-6">
+    			<button type="button" class="btn btn-primary" id="download">下载文件</button>
+    			<button type="button" class="btn btn-warning" id="downloadProgress">查看下载文件进度</button>
+    		</div>
+    	</div>
+    </div>
+
+    <script src="./assets/vendor/lib/jquery-1.11.3.min.js"></script>
+    <script src="./assets/vendor/lib/jquery.tlayer.js"></script>
+    <script src="./assets/vendor/lib/maipuWindowsService.js"></script>
+    <script type="text/javascript">
+    $('#download').on('click', function () {
+        var url = $('[name="url"]').val();
+        if (!url) {
+            alert('请输入下载地址');
+            return;
+        }
+        maipuWindowsService.selectDirectory({
+            callback: function (data) {
+                maipuWindowsService.close();
+                maipuWindowsService.downloadFile({
+                    url: url,
+                    savePath: data.FullName,
+                    callback: function (res) {
+                        if (res.State) {
+                            alert('成功加入下载队列')
+                        } else {                            
+                            alert(res.Msg);
+                        }
+                    }
+                });
+            }
+        });
+    });
+
+    $('#downloadProgress').on('click', function () {
+        maipuWindowsService.downloadProgress();
+    });
+    </script>
+</body>
+</html>

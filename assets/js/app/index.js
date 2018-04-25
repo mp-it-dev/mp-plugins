@@ -30,7 +30,7 @@ require(['jquery', 'util', 'selector', 'maipuWindowsService', 'uploadify', 'tlay
 		paging: {
 			enable: true,
 			localPage: true,
-			pageIndex: 13,
+			pageIndex: 1,
 			pageSize: 20,
 			pageSizeArray: [20, 40, 60]
 		},
@@ -207,7 +207,7 @@ require(['jquery', 'util', 'selector', 'maipuWindowsService', 'uploadify', 'tlay
 
 	$('.maipu-windows-service').on('click', function () {
 		var type = $(this).data('type');
-		var multi = $(this).data('multi') === 'true';
+		var multi = !!$(this).data('multi');
 		maipuWindowsService[type]({
 			multi: multi,
 			callback: function (data) {

@@ -3,19 +3,21 @@
  * 依赖jquery、tlayer
  * @return {[type]}         [description]
  */
-(function (factory) {
-    // AMD
-    if (typeof define === 'function' && define.amd) {
+(function (root, factory) {
+    if (typeof exports === 'object' && typeof module === 'object'){
+		module.exports = factory(require('jquery'), require('tlayer'));
+    } else if (typeof define === 'function' && define.amd) {
         define(['jquery', 'tlayer'], factory);
+    } else if (typeof exports === 'object') {
+		exports['maipuWindowsService'] = factory(require('jquery'), require('tlayer'));
     } else {
-        if (typeof jQuery === 'undefined' || !jQuery.tlayer) {
-            throw new Error('selector depends on jquery, tlayer');
+		if (typeof root['jQuery'] === 'undefined' || !root['jQuery'].tlayer) {
+            throw new Error('maipuWindowsService depends on jquery, tlayer');
         }
-
-        factory(jQuery, window);
-    }
+		root['maipuWindowsService'] = factory(root['jQuery']);
+	}
 }
-(function ($, global) {
+(typeof self !== 'undefined' ? self : this, function ($) {
 	// 回调函数队列
 	var callbackQueue = [];
 
@@ -63,24 +65,17 @@
             if (res.Data && compareVersion(res.Data, version) >= 0) {
 				deferred.resolve();
 			} else {
-				$.alert(
-					'<p style="color: red;">出错了！可能的原因及解决办法如下：</p>' +
-					'<ul style="list-style: disc; margin-left: 20px;">' +
-						'<li>未安装迈普工具箱（<a href="ftp://10.0.0.16/temp/%B5%C7%C2%BC%C8%CF%D6%A4/%C2%F5%C6%D5%D7%C0%C3%E6%B9%A4%BE%DF%CF%E4.exe" target="_blank">点击下载</a>）</li>' +
-						'<li>迈普认证服务未升级到最新版本（打开迈普工具箱升级）</li>' +
-						'<li>迈普认证服务未启动（在windows服务中启动迈普认证服务并设置为自动启动）</li>' +
-					'</ul>');
+				alert('请先升级迈普桌面服务到最新版本！');
 				deferred.reject();
+				$.ajax({
+		            url: maipuWindowsService.rootUrl + 'Common/OpenToolBox',
+		            dataType: 'jsonp',
+		            jsonp: 'jsoncallback'
+		        });
 			}
         });
         $('head script:eq(0)').on('error', function (evt) {
-			$.alert(
-				'<p style="color: red;">出错了！可能的原因及解决办法如下：</p>' +
-				'<ul style="list-style: disc; margin-left: 20px;">' +
-					'<li>未安装迈普工具箱（<a href="ftp://10.0.0.16/temp/%B5%C7%C2%BC%C8%CF%D6%A4/%C2%F5%C6%D5%D7%C0%C3%E6%B9%A4%BE%DF%CF%E4.exe" target="_blank">点击下载</a>）</li>' +
-					'<li>迈普认证服务未升级到最新版本（打开迈普工具箱升级）</li>' +
-					'<li>迈普认证服务未启动（在windows服务中启动迈普认证服务并设置为自动启动）</li>' +
-				'</ul>');
+			alert('迈普桌面服务不可用！');
             $(this).remove();
             deferred.reject();
         });
@@ -94,17 +89,23 @@
 		if (versionArr1.length !== versionArr2.length) {
 			throw new Error('can not compare version');
 		}
-		var count1 = 0;
-		var count2 = 0;
+		var v1, v2;
 		for (var i in versionArr1) {
-			count1 += versionArr1[i] * Math.pow(1000, versionArr1.length - i);
-			count2 += versionArr2[i] * Math.pow(1000, versionArr2.length - i);
+			v1 = +versionArr1[i];
+			v2 = +versionArr2[i];
+			if (v1 > v2) {
+				return 1;
+			}
+			if (v1 < v2) {
+				return -1;
+			}
 		}
-		return count1 > count2 ? 1 : count1 < count2 ? -1 : 0;
+		return 0;
 	}
 
 	var maipuWindowsService = {
 		rootUrl: 'http://localhost:18002/',
+		checkVersion: checkVersion,
 		// 选择目录
 		selectDirectory: function(option) {
 			option = option || {};
@@ -112,7 +113,7 @@
 				throw new Error('请指定callback');
 			}
 			var _this = this;
-			checkVersion('1.0.0')
+			checkVersion('1.0.3.7')
 			.then(function () {
 				$.content({
 					layerID: option.layerID || false,
@@ -139,7 +140,7 @@
 				throw new Error('请指定callback');
 			}
 			var _this = this;
-			checkVersion('1.0.0')
+			checkVersion('1.0.3.7')
 			.then(function () {
 				$.content({
 					layerID: option.layerID || false,
@@ -160,19 +161,48 @@
 			});
 		},
 		// 下载文件
-		downloadFile: function(url, savePath) {
-			if (!urlList || !urlList.length) return;
+		downloadFile: function(option) {
+			option = option || {};
+			if (!option.url || !option.savePath) {
+				throw new Error('文件下载地址和保存路径均不能为为空');
+			}
 			var _this = this;
-			checkVersion('1.0.0')
+			checkVersion('1.0.3.7')
 			.then(function () {
 				$.ajax({
 					url: _this.rootUrl + 'FileTransport/DownloadFile',
 					data: {
-						url: url,
-						savePath: savePath
+						label: option.label || '',
+						url: option.url,
+						savePath: option.savePath
 					},
 					dataType: 'jsonp',
 					jsonp: 'jsoncallback'
+				})
+				.then(option.callback);
+			});
+		},
+		// 下载进度
+		downloadProgress: function (option) {
+			option = option || {};
+			var _this = this;
+			checkVersion('1.0.3.7')
+			.then(function () {
+				$.content({
+					layerID: option.layerID || false,
+					theme: 'blue',
+					header: '下载文件进度',
+					content: {
+						width: 830,
+						height: 590,
+						src: _this.rootUrl + 'FileTransport/DownloadProgress?origin=' + encodeURIComponent(window.location.protocol + '//' + window.location.host),
+					},
+					onLoad: function () {
+						show.call(this, option);
+					},
+					onClose: function () {
+						hide.call(this, option);
+					}
 				});
 			});
 		},

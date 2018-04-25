@@ -356,7 +356,7 @@
                 // 设置错误样式
                 $('#' + file.id).attr('data-status', 'error');
                 $('#' + file.id).find('.file-data').html('error');
-                $('#' + file.id).find('.file-icon').attr('<span class="icon error"></span>');
+                $('#' + file.id).find('.file-icon').html('<span class="icon error"></span>');
             }
         }
     };
@@ -400,7 +400,7 @@
     };
 
     Uploadify.prototype.destroy = function () {
-        this.ele.replaceWith(this.originEle);
+        this.ele.replaceWith(this.original);
     };
 
     Uploadify.prototype.bindEvents = function () {
