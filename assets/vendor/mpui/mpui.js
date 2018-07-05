@@ -417,6 +417,7 @@ angular.module('mpui', ['mpui.tpls'])
 			$scope.changePageSize = function (size) {
 				$scope.pageSize = size;
 				$scope.goPage(1);
+				calcPage();
 			};
 
 			$scope.$watch('total', function () {

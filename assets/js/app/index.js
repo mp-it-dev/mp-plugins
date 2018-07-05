@@ -1,5 +1,5 @@
 require(['jquery', 'util', 'selector', 'maipuWindowsService', 'uploadify', 'tlayer', 'plugins'], function ($, util, selector, maipuWindowsService) {
-	selector.rootUrl = 'http://webapi.maipu.com/Selector-v2/';
+	// selector.rootUrl = 'http://192.168.102.12:100/Selector/';
 
 	$('#searchProduct').autoComplete({
 		async: {
@@ -98,6 +98,7 @@ require(['jquery', 'util', 'selector', 'maipuWindowsService', 'uploadify', 'tlay
         selector[type]({
         	badge: badge,
         	oldData: btn.data('data'),
+        	needLoff: 'Y',
             callback: function(data) {
                 console.log(data);
                 btn.data('data', data);
