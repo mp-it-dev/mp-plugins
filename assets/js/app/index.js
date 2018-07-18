@@ -1,9 +1,9 @@
 require(['jquery', 'util', 'selector', 'maipuWindowsService', 'uploadify', 'tlayer', 'plugins'], function ($, util, selector, maipuWindowsService) {
-	// selector.rootUrl = 'http://192.168.102.12:100/Selector/';
+	// selector.rootUrl = 'http://eip.mpdev.com:4000/Selector-v2/';
 
 	$('#searchProduct').autoComplete({
 		async: {
-            url: 'http://192.168.102.12:100/Selector/Product/GetCpList',
+            url: 'http://eip.mpdev.com:4000/Selector-v2/Product/GetCpList',
             dataType: 'jsonp',
             dataField: null,
             searchField: 'name',
@@ -22,14 +22,13 @@ require(['jquery', 'util', 'selector', 'maipuWindowsService', 'uploadify', 'tlay
 	var table = $("#table").table({
 		// tableClass: 'table-bordered',
 		height: 400,
-		url: 'http://192.168.102.12:100/Test/User/GetList?pageIndex=1&pageSize=0',
+		url: 'http://eip.mpdev.com/Test/User/GetList',
 		dataType: 'jsonp',
 		jsonp: 'callback',
 		rownum: true,
 		checkbox: true,
 		paging: {
 			enable: true,
-			localPage: true,
 			pageIndex: 1,
 			pageSize: 20,
 			pageSizeArray: [20, 40, 60]
