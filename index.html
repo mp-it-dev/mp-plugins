@@ -1,22 +1,24 @@
 <!DOCTYPE html>
 <html lang="zh-cn">
+
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
-	<title>前端控件-首页</title>
-	<link rel="stylesheet" type="text/css" href="./assets/css/bootstrap.min.css">
-	<link rel="stylesheet" type="text/css" href="./assets/css/common.css">
-	<link rel="stylesheet" type="text/css" href="./assets/css/plugins.css">
-	<link rel="stylesheet" type="text/css" href="./assets/css/tlayer.css">
-	<link rel="stylesheet" type="text/css" href="./assets/css/site.css">
-	<!--[if lt IE 9]>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <title>前端控件-首页</title>
+    <link rel="stylesheet" type="text/css" href="./assets/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="./assets/css/common.css">
+    <link rel="stylesheet" type="text/css" href="./assets/css/plugins.css">
+    <link rel="stylesheet" type="text/css" href="./assets/css/tlayer.css">
+    <link rel="stylesheet" type="text/css" href="./assets/css/site.css">
+    <!--[if lt IE 9]>
 		<script src="./assets/vendor/lib/html5shiv.min.js"></script>
 		<script src="./assets/vendor/lib/respond.min.js"></script>
 	<![endif]-->
 </head>
+
 <body>
-	<div class="navbar navbar-gray" role="navigation" id="header">
+    <div class="navbar navbar-gray" role="navigation" id="header">
         <div class="container">
             <div class="navbar-header">
                 <button class="collapsed navbar-toggle" type="button" data-toggle="collapse" data-target="#menu">
@@ -25,8 +27,7 @@
                     <span class="icon-bar"></span>
                 </button>
                 <a class="navbar-brand" href="./">
-                    <i class="glyphicon glyphicon-home"></i>
-                    前端常用控件
+                    <i class="glyphicon glyphicon-home"></i> 前端常用控件
                 </a>
             </div>
             <div class="collapse navbar-collapse" id="menu">
@@ -39,167 +40,148 @@
     </div>
 
     <div class="container" id="main">
-    	<div class="panel panel-default">
-			<div class="panel-heading">
-				<h5 class="panel-title">表单元素</h5>
-			</div>
-			<div class="panel-body">
-				<form class="form-horizontal">
-					<div class="row form-group">
-						<label class="col-md-2 control-label">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h5 class="panel-title">表单元素</h5>
+            </div>
+            <div class="panel-body">
+                <form class="form-horizontal">
+                    <div class="row form-group">
+                        <label class="col-md-2 control-label">
 							<span class="required"></span>
 							邮箱：
 						</label>
-						<div class="col-md-3">
-							<input type="text" class="form-control" data-uitype="validate" data-rules="[{type: 'email', msg: '邮箱格式不正确！'}]" />
-						</div>
-					</div>
-					<div class="row form-group">
-						<label class="col-md-2 control-label">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" data-uitype="validate" data-rules="[{type: 'email', msg: '邮箱格式不正确！'}]" />
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-md-2 control-label">
 							<span class="half-required"></span>
 							身份证：
 						</label>
-						<div class="col-md-3">
-							<input type="text" class="form-control" data-uitype="validate" data-rules="[{type: 'idcard', msg: '身份证格式不正确！'}]" data-placement="top" />
-						</div>
-					</div>
-					<div class="row form-group">
-						<label class="col-md-2 control-label">固定电话：</label>
-						<div class="col-md-3">
-							<input type="text" class="form-control" data-uitype="validate" data-rules="[{type: 'tel', msg: '固定电话格式不正确！'}]" data-placement="bottom" />
-						</div>
-					</div>
-					<div class="row form-group">
-						<label class="col-md-2 control-label">手机：</label>
-						<div class="col-md-3">
-							<input type="text" class="form-control" data-uitype="validate" data-rules="[{type: 'mobile', msg: '手机格式不正确！'}]" data-placement="left" />
-						</div>
-					</div>
-					<div class="row form-group">
-						<label class="col-md-2 control-label">Textarea框：</label>
-						<div class="col-md-6">
-							<textarea class="form-control"></textarea>
-						</div>
-					</div>
-					<div class="row form-group">
-						<label class="col-md-2 control-label">搜索产品：</label>
-						<div class="col-md-3">
-							<input type="text" class="form-control" id="searchProduct" />
-						</div>
-					</div>
-					<div class="row form-group">
-						<label class="col-md-2 control-label">Select框（单选）：</label>
-						<div class="col-md-3">
-							<div id="single-ui-select"></div>
-						</div>
-						<div class="col-md-3">
-							<select class="form-control">
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" data-uitype="validate" data-rules="[{type: 'idcard', msg: '身份证格式不正确！'}]" data-placement="top" />
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-md-2 control-label">固定电话：</label>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" data-uitype="validate" data-rules="[{type: 'tel', msg: '固定电话格式不正确！'}]" data-placement="bottom" />
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-md-2 control-label">手机：</label>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" data-uitype="validate" data-rules="[{type: 'mobile', msg: '手机格式不正确！'}]" data-placement="left" />
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-md-2 control-label">Textarea框：</label>
+                        <div class="col-md-6">
+                            <textarea class="form-control"></textarea>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-md-2 control-label">搜索产品：</label>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" id="searchProduct" />
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-md-2 control-label">Select框（单选）：</label>
+                        <div class="col-md-3">
+                            <div id="single-ui-select"></div>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-control">
 								<option>11</option>
 							</select>
-						</div>
-					</div>
-					<div class="row form-group">
-						<label class="col-md-2 control-label">Select框（多选）：</label>
-						<div class="col-md-3">
-							<div id="multi-ui-select"></div>
-						</div>
-					</div>
-					<div class="row form-group">
-						<label class="col-md-2 control-label">按钮：</label>
-						<div class="col-md-10">
-							<button type="button" class="btn btn-default" id="msg">按钮1</button>
-							<button type="button" class="btn btn-primary" id="alert">按钮2</button>
-							<button type="button" class="btn btn-success" id="tips">按钮3</button>
-							<button type="button" class="btn btn-info" id="loading">按钮4</button>
-							<button type="button" class="btn btn-warning" id="content">按钮5</button>
-							<button type="button" class="btn btn-danger" id="confirm">按钮6</button>
-						</div>
-					</div>
-					<div class="row form-group">
-						<label class="col-md-2 control-label">按钮组：</label>
-						<div class="col-md-10 btn-group">
-							<button type="button" class="btn btn-default">按钮1</button>
-							<button type="button" class="btn btn-default">按钮2</button>
-							<button type="button" class="btn btn-default">按钮3</button>
-						</div>
-					</div>
-					<div class="row form-group">
-						<label class="col-md-2 control-label">人员选择：</label>
-					    <div class="col-md-10">
-					    	<button type="button" class="btn btn-primary selector-organiztion" data-type="singlePeople" data-badge="001515">单人</button>
-	    	                <button type="button" class="btn btn-success selector-organiztion" data-type="multiPeople" data-badge="001515">多人</button>
-	    	                <button type="button" class="btn btn-info selector-organiztion" data-type="singleDep">单部门</button>
-	    	                <button type="button" class="btn btn-warning selector-organiztion" data-type="multiDep">多部门</button>
-	    	                <button type="button" class="btn btn-danger selector-organiztion" data-type="singleDepJob">单部门职位</button>
-	    	                <button type="button" class="btn btn-default selector-organiztion" data-type="multiDepJob">多部门职位</button>
-					    </div>
-					</div>
-					<div class="row form-group">
-						<label class="col-md-2 control-label">选产品结构：</label>
-					    <div class="col-md-10">
-					    	<button type="button" class="btn btn-primary selector-product" data-type="singleProduct" data-level="Cpx">单产品线</button>
-					    	<button type="button" class="btn btn-info selector-product" data-type="multiProduct" data-level="Cpx">多产品线</button>
-					    	<button type="button" class="btn btn-success selector-product" data-type="singleProduct" data-level="Cpxl">单产品系列</button>
-					    	<button type="button" class="btn btn-warning selector-product" data-type="multiProduct" data-level="Cpxl">多产品系列</button>
-					    	<button type="button" class="btn btn-info selector-product" data-type="singleProduct" data-level="Cp">单主机</button>
-					    	<button type="button" class="btn btn-danger selector-product" data-type="multiProduct" data-level="Cp">多主机</button>
-					    	<button type="button" class="btn btn-warning selector-product" data-type="singleProduct" data-level="Cp" data-zhuji-only="false">单产品</button>
-					    	<button type="button" class="btn btn-default selector-product" data-type="multiProduct" data-level="Cp" data-zhuji-only="false">多产品</button>
-					    </div>
-					</div>
-					<div class="row form-group">
-						<label class="col-md-2 control-label">迈普工具箱服务：</label>
-					    <div class="col-md-10">
-					    	<button type="button" class="btn btn-primary maipu-windows-service" data-type="selectDirectory">选择目录</button>
-					    	<button type="button" class="btn btn-info maipu-windows-service" data-type="selectFile" data-multi="false">选择单文件</button>
-					    	<button type="button" class="btn btn-success maipu-windows-service" data-type="selectFile" data-multi="true">选择多文件</button>
-					    	<button type="button" class="btn btn-warning maipu-windows-service" data-type="downloadProgress">查看下载文件进度</button>
-					    </div>
-					</div>
-					<div class="row form-group">
-						<label class="col-md-2 control-label">文件上传：</label>
-						<div class="col-md-6">
-							<button id="upload" class="btn btn-primary">文件上传</button>
-						</div>
-					</div>
-				</form>
-			</div>
-    	</div>
-		<div class="panel panel-primary">
-			<div class="panel-heading">
-				<h5 class="panel-title">表格</h5>
-			</div>
-			<div class="panel-body">
-		    	<div id="table"></div>
-			</div>
-		</div>
-		<div class="panel panel-dark">
-			<div class="panel-heading">
-				<h5 class="panel-title">图片查看器</h5>
-			</div>
-			<div class="panel-body">
-				<ul class="imglist" data-uitype="gallery" data-errorimg="./img/error.png" data-loadingimg="./img/loading_32.gif" data-showlist="true">
-					<li><a href="#"><img src="./assets/img/gallery/1.jpg" alt="第一张"></a></li>
-					<li><a href="#"><img src="./assets/img/gallery/2.jpg" alg="第二张"></a></li>
-					<li><a href="#"><img src="./assets/img/gallery/3.jpg" alg="第三张"></a></li>
-					<li><a href="#"><img src="./assets/img/gallery/4.jpg" alg="第四张"></a></li>
-					<li><a href="#"><img src="./assets/img/gallery/5.jpg" alg="第五张"></a></li>
-					<li><a href="#"><img src="./assets/img/gallery/6.jpg" alt="第六张"></a></li>
-					<li><a href="#"><img src="./assets/img/gallery/7.jpg" alt="第七张"></a></li>
-					<li><a href="#"><img src="./assets/img/gallery/8.jpg" alt="第八张"></a></li>
-					<li><a href="#"><img src="./assets/img/gallery/9.jpg" alt="第九张"></a></li>
-					<li><a href="#"><img src="./assets/img/gallery/10.jpg" alt="第十张"></a></li>
-					<li><a href="#"><img src="./assets/img/gallery/11.jpg" alt="第十一张"></a></li>
-				</ul>
-			</div>
-		</div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-md-2 control-label">Select框（多选）：</label>
+                        <div class="col-md-3">
+                            <div id="multi-ui-select"></div>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-md-2 control-label">按钮：</label>
+                        <div class="col-md-10">
+                            <button type="button" class="btn btn-default" id="msg">按钮1</button>
+                            <button type="button" class="btn btn-primary" id="alert">按钮2</button>
+                            <button type="button" class="btn btn-success" id="tips">按钮3</button>
+                            <button type="button" class="btn btn-info" id="loading">按钮4</button>
+                            <button type="button" class="btn btn-warning" id="content">按钮5</button>
+                            <button type="button" class="btn btn-danger" id="confirm">按钮6</button>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-md-2 control-label">按钮组：</label>
+                        <div class="col-md-10 btn-group">
+                            <button type="button" class="btn btn-default">按钮1</button>
+                            <button type="button" class="btn btn-default">按钮2</button>
+                            <button type="button" class="btn btn-default">按钮3</button>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-md-2 control-label">人员选择：</label>
+                        <div class="col-md-10">
+                            <button type="button" class="btn btn-primary selector-organiztion" data-type="singlePeople" data-badge="001515">单人</button>
+                            <button type="button" class="btn btn-success selector-organiztion" data-type="multiPeople" data-badge="001515">多人</button>
+                            <button type="button" class="btn btn-info selector-organiztion" data-type="singleDep">单部门</button>
+                            <button type="button" class="btn btn-warning selector-organiztion" data-type="multiDep">多部门</button>
+                            <button type="button" class="btn btn-danger selector-organiztion" data-type="singleDepJob">单部门职位</button>
+                            <button type="button" class="btn btn-default selector-organiztion" data-type="multiDepJob">多部门职位</button>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-md-2 control-label">选产品结构：</label>
+                        <div class="col-md-10">
+                            <button type="button" class="btn btn-primary selector-product" data-type="singleProduct" data-level="Cpx">单产品线</button>
+                            <button type="button" class="btn btn-info selector-product" data-type="multiProduct" data-level="Cpx">多产品线</button>
+                            <button type="button" class="btn btn-success selector-product" data-type="singleProduct" data-level="Cpxl">单产品系列</button>
+                            <button type="button" class="btn btn-warning selector-product" data-type="multiProduct" data-level="Cpxl">多产品系列</button>
+                            <button type="button" class="btn btn-info selector-product" data-type="singleProduct" data-level="Cp">单主机</button>
+                            <button type="button" class="btn btn-danger selector-product" data-type="multiProduct" data-level="Cp">多主机</button>
+                            <button type="button" class="btn btn-warning selector-product" data-type="singleProduct" data-level="Cp" data-zhuji-only="false">单产品</button>
+                            <button type="button" class="btn btn-default selector-product" data-type="multiProduct" data-level="Cp" data-zhuji-only="false">多产品</button>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-md-2 control-label">迈普工具箱服务：</label>
+                        <div class="col-md-10">
+                            <button type="button" class="btn btn-primary maipu-windows-service" data-type="selectDirectory">选择目录</button>
+                            <button type="button" class="btn btn-info maipu-windows-service" data-type="selectFile" data-multi="false">选择单文件</button>
+                            <button type="button" class="btn btn-success maipu-windows-service" data-type="selectFile" data-multi="true">选择多文件</button>
+                            <button type="button" class="btn btn-warning maipu-windows-service" data-type="downloadProgress">查看下载文件进度</button>
+                        </div>
+                    </div>
+                    <div class="row form-group">
+                        <label class="col-md-2 control-label">文件上传：</label>
+                        <div class="col-md-6">
+                            <button id="upload" class="btn btn-primary">文件上传</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h5 class="panel-title">表格</h5>
+            </div>
+            <div class="panel-body">
+                <div id="table"></div>
+            </div>
+        </div>
     </div>
-	
-	<div class="page-footer" id="footer">
-		<p class="text-center">底部</p>
-	</div>
-<script src="./assets/vendor/lib/require.min.js"></script>
-<script src="./assets/js/config.js"></script>
-<script src="./assets/js/app/index.js"></script>
+
+    <div class="page-footer" id="footer">
+        <p class="text-center">底部</p>
+    </div>
+    <script src="./assets/vendor/lib/require.min.js"></script>
+    <script src="./assets/js/config.js"></script>
+    <script src="./assets/js/app/index.js"></script>
 </body>
+
 </html>
