@@ -137,8 +137,9 @@
         /**
          * 关闭layerID对应的弹出窗口，并且销毁该窗口
          * @param  {String} layerID layer弹出框的id，不传代表关闭顶层弹窗
+         * @param  {Boolean} isForce 是否强制关闭，不执行beforeClose
          */
-        close: function (layerID) {
+        close: function (layerID, isForce) {
             var stack = _tlayer.layerData.stack;
             var layerData = _tlayer.layerData;
 
@@ -156,7 +157,7 @@
             layerID = layer.layer.attr('id');
 
             var res = true;
-            if (util.isFunction(layer.settings.beforeClose)) {
+            if (!isForce && util.isFunction(layer.settings.beforeClose)) {
                 res = layer.settings.beforeClose.call(layer.layer, layerID);
             }
 

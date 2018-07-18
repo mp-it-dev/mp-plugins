@@ -1,9 +1,9 @@
-require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], function ($, util, selector) {
-	selector.rootUrl = 'http://webapi.mptest.com/Selector-v2/';
+require(['jquery', 'util', 'selector', 'maipuWindowsService', 'uploadify', 'tlayer', 'plugins'], function ($, util, selector, maipuWindowsService) {
+	// selector.rootUrl = 'http://eip.mpdev.com:4000/Selector-v2/';
 
 	$('#searchProduct').autoComplete({
 		async: {
-            url: 'http://192.168.102.12:100/Selector/Product/GetCpList',
+            url: 'http://eip.mpdev.com:4000/Selector-v2/Product/GetCpList',
             dataType: 'jsonp',
             dataField: null,
             searchField: 'name',
@@ -22,15 +22,14 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 	var table = $("#table").table({
 		// tableClass: 'table-bordered',
 		height: 400,
-		url: 'http://192.168.102.12:100/Test/User/GetList?pageIndex=1&pageSize=0',
+		url: 'http://eip.mpdev.com/Test/User/GetList',
 		dataType: 'jsonp',
 		jsonp: 'callback',
 		rownum: true,
 		checkbox: true,
 		paging: {
 			enable: true,
-			localPage: true,
-			pageIndex: 13,
+			pageIndex: 1,
 			pageSize: 20,
 			pageSizeArray: [20, 40, 60]
 		},
@@ -67,7 +66,7 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 		}, {
 			name: '邮箱',
 			field: 'Email',
-			minWidth: 500
+			minWidth: 200
 		}, {
 			name: '顶级部门名称',
 			field: 'ZeroDepName',
@@ -98,6 +97,7 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
         selector[type]({
         	badge: badge,
         	oldData: btn.data('data'),
+        	needLoff: 'Y',
             callback: function(data) {
                 console.log(data);
                 btn.data('data', data);
@@ -203,5 +203,17 @@ require(['jquery', 'util', 'selector', 'uploadify', 'tlayer', 'plugins'], functi
 		name: 'test_multi_select',
 		search: true,
 		multi: true
+	});
+
+	$('.maipu-windows-service').on('click', function () {
+		var type = $(this).data('type');
+		var multi = !!$(this).data('multi');
+		maipuWindowsService[type]({
+			multi: multi,
+			callback: function (data) {
+				console.log(data);
+				maipuWindowsService.close();
+			}
+		})
 	});
 });

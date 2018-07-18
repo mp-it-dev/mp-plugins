@@ -3,19 +3,21 @@
  * 依赖jquery、tlayer
  * @return {[type]}         [description]
  */
-(function (factory) {
-    // AMD
-    if (typeof define === 'function' && define.amd) {
+(function (root, factory) {
+    if (typeof exports === 'object' && typeof module === 'object'){
+		module.exports = factory(require('jquery'), require('tlayer'));
+    } else if (typeof define === 'function' && define.amd) {
         define(['jquery', 'tlayer'], factory);
+    } else if (typeof exports === 'object') {
+		exports['selector'] = factory(require('jquery'), require('tlayer'));
     } else {
-        if (typeof jQuery === 'undefined' || !jQuery.tlayer) {
-            throw new Error('selector depends on jquery, tlayer');
+		if (typeof root['jQuery'] === 'undefined' || !root['jQuery'].tlayer) {
+            throw new Error('selector depends on jQuery, tlayer');
         }
-
-        factory(jQuery, window);
-    }
+		root['selector'] = factory(root['jQuery']);
+	}
 }
-(function ($, global) {
+(typeof self !== 'undefined' ? self : this, function ($) {
 	// 回调函数队列
 	var callbackQueue = [];
 
@@ -30,8 +32,11 @@
 			callback: option.callback,
 			listener: listener
 		});
-		// 将选项传到iframe中
-		win.postMessage(JSON.stringify(option), selector.rootUrl);
+		// 设置一个延迟，看能不能确保IE有时候没有加载出来的问题
+		setTimeout(function () {
+			// 将选项传到iframe中
+			win.postMessage(JSON.stringify(option), selector.rootUrl);
+		}, 100);
 	}
 
 	function hide(option) {

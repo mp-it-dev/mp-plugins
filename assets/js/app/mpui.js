@@ -41,7 +41,7 @@ require(['angular', 'util', 'mpui'], function (angular, util) {
 
 			$scope.getUserList = function () {
 				// $.loading('loading...');
-				$http.jsonp('http://192.168.102.12:100/Test/User/GetList', {
+				$http.jsonp('http://eip.mpdev.com/Test/User/GetList', {
 					params: {
 						sorder: $scope.sorder,
 						sname: $scope.sname,

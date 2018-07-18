@@ -35,8 +35,6 @@
     </div>
 
     <div class="container">
-    	<textarea class="form-control" ng-model="text"></textarea>
-    	<p class="text-prewrap" ng-bind="text"></p>
     	<h2 class="page-header">表格测试</h2>
     	<div class="form-group form-inline row">
     		<div class="col-md-6">
@@ -58,12 +56,9 @@
     	</div>
     	<div mpui-tb max-height="500" resize="true" default-order-by="{{sname}}" default-order-sort="{{sorder}}" on-sort="sort(orderBy, orderSort)">
     		<table class="table table-bordered table-grayheader">
-    			<colgroup>
-    				<col ng-repeat="column in columnList" width="{{column.width}}" ng-show="column.isShow">
-    			</colgroup>
 				<thead>
 					<tr>
-						<th ng-repeat="column in columnList" mpui-tb-order="{{column.field}}" ng-show="column.isShow">
+						<th ng-repeat="column in columnList" width="{{column.width}}" mpui-tb-order="{{column.field}}" ng-show="column.isShow">
 							<span ng-bind="column.name"></span>
 						</th>
 					</tr>

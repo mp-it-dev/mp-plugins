@@ -6,7 +6,6 @@
 	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
 	<title>前端控件-首页</title>
 	<link rel="stylesheet" type="text/css" href="./assets/css/bootstrap.min.css">
-	<!-- <link rel="stylesheet" type="text/css" href="./assets/css/bootstrap-theme.min.css"> -->
 	<link rel="stylesheet" type="text/css" href="./assets/css/common.css">
 	<link rel="stylesheet" type="text/css" href="./assets/css/plugins.css">
 	<link rel="stylesheet" type="text/css" href="./assets/css/tlayer.css">
@@ -34,7 +33,6 @@
                 <ul class="nav navbar-nav">
                     <li class="active"><a href="./">jQuery组件</a></li>
                     <li><a href="./mpui.html">angular组件</a></li>
-                    <li><a href="./doc.html">文档</a></li>
                 </ul>
             </div>
         </div>
@@ -48,13 +46,19 @@
 			<div class="panel-body">
 				<form class="form-horizontal">
 					<div class="row form-group">
-						<label class="col-md-2 control-label">邮箱：</label>
+						<label class="col-md-2 control-label">
+							<span class="required"></span>
+							邮箱：
+						</label>
 						<div class="col-md-3">
 							<input type="text" class="form-control" data-uitype="validate" data-rules="[{type: 'email', msg: '邮箱格式不正确！'}]" />
 						</div>
 					</div>
 					<div class="row form-group">
-						<label class="col-md-2 control-label">身份证：</label>
+						<label class="col-md-2 control-label">
+							<span class="half-required"></span>
+							身份证：
+						</label>
 						<div class="col-md-3">
 							<input type="text" class="form-control" data-uitype="validate" data-rules="[{type: 'idcard', msg: '身份证格式不正确！'}]" data-placement="top" />
 						</div>
@@ -141,6 +145,15 @@
 					    	<button type="button" class="btn btn-danger selector-product" data-type="multiProduct" data-level="Cp">多主机</button>
 					    	<button type="button" class="btn btn-warning selector-product" data-type="singleProduct" data-level="Cp" data-zhuji-only="false">单产品</button>
 					    	<button type="button" class="btn btn-default selector-product" data-type="multiProduct" data-level="Cp" data-zhuji-only="false">多产品</button>
+					    </div>
+					</div>
+					<div class="row form-group">
+						<label class="col-md-2 control-label">迈普工具箱服务：</label>
+					    <div class="col-md-10">
+					    	<button type="button" class="btn btn-primary maipu-windows-service" data-type="selectDirectory">选择目录</button>
+					    	<button type="button" class="btn btn-info maipu-windows-service" data-type="selectFile" data-multi="false">选择单文件</button>
+					    	<button type="button" class="btn btn-success maipu-windows-service" data-type="selectFile" data-multi="true">选择多文件</button>
+					    	<button type="button" class="btn btn-warning maipu-windows-service" data-type="downloadProgress">查看下载文件进度</button>
 					    </div>
 					</div>
 					<div class="row form-group">
